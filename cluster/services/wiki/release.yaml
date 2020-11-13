@@ -1,0 +1,29 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: wikijs
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: wikijs
+      version: 3.10.1
+      sourceRef:
+        kind: GitRepository
+        name: requarks
+  values:
+    replicaCount: 2
+    image:
+      pullPolicy: Always
+    ingress:
+      enabled: true
+      hosts:
+      - host: wiki.zro.io
+        paths: ["/"]
+    postgresql:
+      enabled: false
+      postgresqlHost: postgres.wiki.svc
+      postgresqlDatabase: postgres
+      postgresqlUser: postgres
+      existingSecret: postgres-auth
+      secretKey: password
