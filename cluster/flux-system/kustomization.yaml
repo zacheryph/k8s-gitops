@@ -3,3 +3,17 @@ kind: Kustomization
 resources:
 - ./gotk-components.yaml
 - ./gotk-sync.yaml
+- ./helm-repositories/appscode.yaml
+- ./helm-repositories/bitnami.yaml
+- ./helm-repositories/drone.yaml
+- ./helm-repositories/gitea.yaml
+- ./helm-repositories/harbor.yaml
+- ./helm-repositories/ingress-nginx.yaml
+- ./helm-repositories/jetstack.yaml
+- ./helm-repositories/k8s-at-home.yaml
+- ./helm-repositories/loki.yaml
+- ./helm-repositories/longhorn.yaml
+- ./helm-repositories/minio.yaml
+- ./helm-repositories/oteemo.yaml
+- ./helm-repositories/prometheus-community.yaml
+- ./helm-repositories/stable.yaml
