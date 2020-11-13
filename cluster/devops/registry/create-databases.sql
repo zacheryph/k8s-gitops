@@ -1,0 +1,4 @@
+CREATE DATABASE registry;
+CREATE DATABASE clair;
+CREATE DATABASE notary_server;
+CREATE DATABASE notary_signer;

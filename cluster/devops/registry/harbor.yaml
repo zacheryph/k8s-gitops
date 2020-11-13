@@ -1,0 +1,58 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: harbor
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: harbor
+      version: 1.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: harbor
+        namespace: flux-system
+  values:
+    expose:
+      tls:
+        certSource: none
+      ingress:
+        hosts:
+          core: r.zro.io
+          notary: notary.zro.io
+    externalURL: https://r.zro.io
+    persistence:
+      imageChartStorage:
+        disableredirect: true
+        type: s3
+        s3:
+          bucket: registry
+          # accesskey: valuesFrom:Secret:minio-credentials
+          # secretkey: valuesFrom:Secret:minio-credentials
+          regionendpoint: http://internal.minio.svc
+          secure: false
+    database:
+      type: external
+      external:
+        host: postgres.registry.svc
+        username: postgres
+        # password: valuesFrom:Secret:postgres-auth
+    redis:
+      type: external
+      external:
+        addr: "redis-master.registry.svc:6379"
+    jobservice:
+      jobLogger: database
+  valuesFrom:
+  - kind: Secret
+    name: postgres-auth
+    valuesKey: password
+    targetPath: database.external.password
+  - kind: Secret
+    name: minio-credentials
+    valuesKey: accesskey
+    targetPath: persistence.imageChartStorage.s3.accesskey
+  - kind: Secret
+    name: minio-credentials
+    valuesKey: secretkey
+    targetPath: persistence.imageChartStorage.s3.secretkey
