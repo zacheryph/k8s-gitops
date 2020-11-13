@@ -7,5 +7,5 @@ resources:
 - cloudflare-token.yaml
 - cert-manager.yaml
 - issuer.yaml
-# - ingress-nginx.yaml
-# - wildcard-certificate.yaml
+- ingress-nginx.yaml
+- wildcard-certificate.yaml

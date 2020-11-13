@@ -18,6 +18,6 @@ spec:
       extraArgs:
         default-ssl-certificate: "ingress-system/zro-wildcard-certificate"
       metrics:
-        enabled: true
+        enabled: false
         serviceMonitor:
-          enabled: true
+          enabled: false
