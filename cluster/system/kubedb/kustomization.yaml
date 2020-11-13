@@ -1,14 +1,16 @@
-namespace: kubedb-system
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
 
+namespace: kubedb-system
 resources:
 - namespace.yaml
 - release.yaml
 - catalog.yaml
 
-patches:
-- target:
-    kind: HelmRelease
-  patch: |
-    - op: replace
-      path: /spec/chart/spec/version
-      value: v0.15.1
+# patches:
+# - target:
+#     kind: HelmRelease
+#   patch: |
+#     - op: replace
+#       path: /spec/chart/spec/version
+#       value: v0.15.1
