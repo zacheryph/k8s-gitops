@@ -8,6 +8,7 @@ resources:
 - runner.yaml
 - secrets-provider.yaml
 - postgres-auth.yaml
+- secrets.yaml
 - ../../../shared/postgres
 
 patchesStrategicMerge:
