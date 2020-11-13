@@ -1,0 +1,10 @@
+peers:
+- peer-address: 10.72.13.254
+  peer-asn: 64542
+  my-asn: 64552
+address-pools:
+- name: default
+  protocol: bgp
+  avoid-buggy-ips: true
+  addresses:
+  - 10.72.48.0/20
