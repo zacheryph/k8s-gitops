@@ -47,5 +47,5 @@ spec:
   valuesFrom:
   - kind: Secret
     name: postgres-auth
-    valuesKey: POSTGRES_PASSWORD
+    valuesKey: password
     targetPath: gitea.config.database.PASSWD
