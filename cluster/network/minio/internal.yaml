@@ -16,8 +16,7 @@ spec:
   values:
     fullnameOverride: internal
     mode: standalone
-    accessKey: TJO7WCRFR6UDUGARGOT3NKSX
-    secretKey: MyyFXX26c94J1I4vtDqLwrHdT8bJ3S6r-EyX4RNDSaqvvM-n
+    existingSecret: internal-credentials
     buckets:
     - name: registry
       policy: none
