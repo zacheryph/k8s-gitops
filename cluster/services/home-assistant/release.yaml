@@ -1,0 +1,27 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: home-assistant
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: home-assistant
+      version: 2.6.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+  values:
+    ingress:
+      enabled: true
+      hosts:
+      - home-assistant.zro.io
+    monitoring:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+    configurator:
+      enabled: true
+    vscode:
+      enabled: true
