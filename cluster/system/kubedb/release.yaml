@@ -1,0 +1,40 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: operator
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: kubedb
+      version: v0.15.1
+      sourceRef:
+        kind: HelmRepository
+        name: appscode
+        namespace: flux-system
+  values:
+    enableAnalytics: false
+    # monitoring:
+    #   enabled: true
+    #   agent: prometheus.io/operator
+    license: |
+      -----BEGIN CERTIFICATE-----
+      MIIDSTCCAjGgAwIBAgIIPuVCGHuUdGcwDQYJKoZIhvcNAQELBQAwJTEWMBQGA1UE
+      ChMNQXBwc0NvZGUgSW5jLjELMAkGA1UEAxMCY2EwHhcNMjAxMDI5MTYzMDM4WhcN
+      MjExMDI5MTYzMDM4WjBKMRkwFwYDVQQKExBrdWJlZGItY29tbXVuaXR5MS0wKwYD
+      VQQDEyQ1ODhiNTUxNS1jMzY3LTRmMmYtYWZiNy1lNDM0OTc3MWNhNjkwggEiMA0G
+      CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCmGhtvOpYHwvLhRFbyJsSmHjQn6b8f
+      gD50mClu26oR30AAIa8c+iJCWKKmZE5GJ+GokURyxH75iwbGw7JjZ0VbwPPwzVBF
+      Cx4vSrpYoHeRWlS9xnAdIZef1JLChyB6+rAUZxe9Tam4sqrNKWk973e3vD9WOUGR
+      ADTp4AAR3MlAdVw8TV403ji4xioUAulMOgDy24a3Acknh8EE1i5OsPfgEFfSs45u
+      oTy+QpGF/Ri603DSf2X5MZ52VHDtcetiwHUf4OUO/Hg0KwyVzcJyjzq+OtREQUHc
+      trVzGT5b9x397gUtUhrFxEfgirsrWXGXmILeP9PKpdQes42LrafSnR9dAgMBAAGj
+      WDBWMA4GA1UdDwEB/wQEAwIFoDATBgNVHSUEDDAKBggrBgEFBQcDAjAvBgNVHREE
+      KDAmgiQ1ODhiNTUxNS1jMzY3LTRmMmYtYWZiNy1lNDM0OTc3MWNhNjkwDQYJKoZI
+      hvcNAQELBQADggEBAGQanuFXl8cdlSM1dpzSy1E2nlUCh6MQNGiCdqS8iBmeeuWa
+      ou7szXdIGj0I0JOP1Sld9lyUQQNoeHn8pRA9H705N30WtaLvzKE+rjYCwZveJFR7
+      x1F83EQCEntqhmrO/8cSUk83vXuT2sV3lyZaGMzSKrguC0M1m9AdddFPzdqrHha+
+      nQkV8apxnbylwIjktCTK2qGm+yR4jy718ZS93wjC235Sjax5zweZl9tGrVy7f3F5
+      62J32dFRNW9q6+5rAjZ7VRunhfj9U5clYqaHStw7RsLgAWspTI6jxVGSY7exdpp5
+      lM1JlCuKQh+mc5L8dxx97SY38FjhwMnzrMlz0N8=
+      -----END CERTIFICATE-----

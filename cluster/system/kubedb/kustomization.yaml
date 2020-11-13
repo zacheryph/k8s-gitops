@@ -1,0 +1,14 @@
+namespace: kubedb-system
+
+resources:
+- namespace.yaml
+- release.yaml
+- catalog.yaml
+
+patches:
+- target:
+    kind: HelmRelease
+  patch: |
+    - op: replace
+      path: /spec/chart/version
+      value: v0.15.1
