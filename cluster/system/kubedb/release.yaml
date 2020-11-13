@@ -14,9 +14,9 @@ spec:
         namespace: flux-system
   values:
     enableAnalytics: false
-    # monitoring:
-    #   enabled: true
-    #   agent: prometheus.io/operator
+    monitoring:
+      enabled: true
+      agent: prometheus.io/operator
     license: |
       -----BEGIN CERTIFICATE-----
       MIIDSTCCAjGgAwIBAgIIPuVCGHuUdGcwDQYJKoZIhvcNAQELBQAwJTEWMBQGA1UE

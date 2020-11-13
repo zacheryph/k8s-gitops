@@ -12,10 +12,10 @@ spec:
         kind: HelmRepository
         name: stable
         namespace: flux-system
-  values: {}
-    # serviceMonitor:
-    #   create: true
-    #   interval: 60s
-    #   scrapeTimeout: 30s
-    # dashboards:
-    #   create: true
+  values:
+    serviceMonitor:
+      create: true
+      interval: 60s
+      scrapeTimeout: 30s
+    dashboards:
+      create: true
