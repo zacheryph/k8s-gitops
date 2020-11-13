@@ -6,7 +6,7 @@ resources:
 - namespace.yaml
 - release.yaml
 - postgres-auth.yaml
-- ../../shared/postgres
+- ../../../shared/postgres
 
 patchesStrategicMerge:
 - postgres.yaml
