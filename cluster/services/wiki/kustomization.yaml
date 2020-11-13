@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: wiki
 resources:
 - namespace.yaml
+- git-repo.yaml
 - release.yaml
 - postgres-auth.yaml
 - ../../../shared/postgres

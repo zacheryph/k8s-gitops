@@ -3,7 +3,7 @@ kind: GitRepository
 metadata:
   name: requarks
 spec:
-  interval: 1d
+  interval: 12h
   url: https://github.com/Requarks/wiki
   ref:
     branch: latest
