@@ -1,0 +1,51 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: gitea
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: gitea
+      version: 2.0.2
+      sourceRef:
+        kind: HelmRepository
+        name: gitea
+        namespace: flux-system
+  values:
+    ingress:
+      enabled: true
+      hosts:
+      - git.zro.io
+      annotations:
+        nginx.ingress.kubernetes.io/proxy-body-size: 128m
+    persistence:
+      enabled: true
+      size: 100Gi
+    gitea:
+      database:
+        builtIn:
+          postgresql:
+            enabled: false
+      cache:
+        builtIn:
+          enabled: false
+      config:
+        default:
+          APP_NAME: Zro
+        server:
+          DISABLE_SSH: true
+        database:
+          DB_TYPE: postgres
+          HOST: postgres.gitea.svc:5432
+          NAME: postgres
+          USER: postgres
+        cache:
+          ADAPTER: memcache
+          ENABLED: true
+          HOST: memcached:11211
+  valuesFrom:
+  - kind: Secret
+    name: postgres-auth
+    valuesKey: POSTGRES_PASSWORD
+    targetPath: gitea.config.database.PASSWD

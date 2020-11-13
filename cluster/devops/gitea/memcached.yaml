@@ -1,0 +1,7 @@
+apiVersion: kubedb.com/v1alpha2
+kind: Memcached
+metadata:
+  name: memcached
+spec:
+  version: 1.5.22
+  replicas: 2
