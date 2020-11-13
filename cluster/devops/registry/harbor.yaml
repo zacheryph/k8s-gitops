@@ -40,7 +40,7 @@ spec:
     redis:
       type: external
       external:
-        addr: "redis-master.registry.svc:6379"
+        addr: "redis.registry.svc:6379"
     jobservice:
       jobLogger: database
   valuesFrom:
