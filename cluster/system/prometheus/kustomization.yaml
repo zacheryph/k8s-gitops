@@ -1,0 +1,7 @@
+namespace: prometheus-system
+
+resources:
+- namespace.yaml
+- release.yaml
+- loki-stack.yaml
+- loki-datasource.yaml
