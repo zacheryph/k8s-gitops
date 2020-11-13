@@ -1,0 +1,16 @@
+namespace: blocky
+
+resources:
+- namespace.yaml
+- release.yaml
+
+configMapGenerator:
+- name: dashboard
+  files:
+  - dashboard.json
+  options:
+    labels:
+      grafana_dashboard: "1"
+
+generatorOptions:
+  disableNameSuffixHash: true

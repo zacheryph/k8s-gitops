@@ -1,0 +1,24 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: minio
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: minio
+      version: 8.0.3
+      sourceRef:
+        kind: HelmRepository
+        name: minio
+        namespace: flux-system
+  values:
+    mode: standalone
+    existingSecret: credentials
+    ingress:
+      enabled: true
+      hosts:
+      - s3.zro.io
+    metrics:
+      serviceMonitor:
+        enabled: true

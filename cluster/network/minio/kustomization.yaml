@@ -1,0 +1,7 @@
+namespace: minio
+
+resources:
+- namespace.yaml
+- credentials.yaml
+- release.yaml
+- internal.yaml
