@@ -4,8 +4,6 @@ kind: Postgres
 metadata:
   name: postgres
 spec:
-  authSecret:
-    name: postgres-auth
   storage:
     resources:
       requests:
