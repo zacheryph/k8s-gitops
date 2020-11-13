@@ -1,0 +1,50 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: drone
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: drone
+      version: 0.1.7
+      sourceRef:
+        kind: HelmRepository
+        name: drone
+        namespace: flux-system
+  values:
+    persistentVolume:
+      enabled: false
+    ingress:
+      enabled: true
+      hosts:
+      - host: drone.zro.io
+        paths:
+        - "/"
+    env:
+      DRONE_USER_CREATE: username:context,admin:true
+      DRONE_SERVER_PROXY_HOST: drone.drone.svc
+      DRONE_SERVER_PROXY_PROTO: http
+      DRONE_SERVER_HOST: drone.zro.io
+      DRONE_SERVER_PROTO: https
+      DRONE_DATABASE_DRIVER: postgres
+      DRONE_GIT_ALWAYS_AUTH: true
+      DRONE_GITEA_SERVER: https://git.zro.io
+
+  valuesFrom:
+  - kind: Secret
+    name: postgres-auth
+    valuesKey: datasource
+    targetPath: env.DRONE_DATABASE_DATASOURCE
+  - kind: Secret
+    name: drone
+    valuesKey: rpcSecret
+    targetPath: env.DRONE_RPC_SECRET
+  - kind: Secret
+    name: gitea-credentials
+    valuesKey: clientId
+    targetPath: env.DRONE_GITEA_CLIENT_ID
+  - kind: Secret
+    name: gitea-credentials
+    valuesKey: clientSecret
+    targetPath: env.DRONE_GITEA_CLIENT_SECRET
