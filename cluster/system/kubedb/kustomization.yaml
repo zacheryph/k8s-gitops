@@ -10,5 +10,5 @@ patches:
     kind: HelmRelease
   patch: |
     - op: replace
-      path: /spec/chart/version
+      path: /spec/chart/spec/version
       value: v0.15.1
