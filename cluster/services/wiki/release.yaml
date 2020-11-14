@@ -25,4 +25,4 @@ spec:
       postgresqlDatabase: postgres
       postgresqlUser: postgres
       existingSecret: postgres-auth
-      secretKey: password
+      existingSecretKey: password
