@@ -1,3 +1,6 @@
+---
+# GitOps Toolkit revision latest
+# Components: source-controller,kustomize-controller,helm-controller,notification-controller
 apiVersion: v1
 kind: Namespace
 metadata:
@@ -1639,7 +1642,7 @@ spec:
           valueFrom:
             fieldRef:
               fieldPath: metadata.namespace
-        image: ghcr.io/fluxcd/helm-controller:v0.2.0
+        image: ghcr.io/fluxcd/helm-controller:v0.2.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
@@ -2185,3 +2188,4 @@ spec:
       volumes:
       - emptyDir: {}
         name: temp
+---
