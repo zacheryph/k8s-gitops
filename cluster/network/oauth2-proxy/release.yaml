@@ -26,9 +26,9 @@ spec:
       email-domain: "*"
       cookie-domain: ".zro.io"
       whitelist-domain: ".zro.io"
-      login_url: "https://git.zro.io/login/oauth/authorize"
-      redeem_url: "https://git.zro.io/login/oauth/access_token"
-      validate_url: "https://git.zro.io/api/v1"
+      login-url: "https://git.zro.io/login/oauth/authorize"
+      redeem-url: "https://git.zro.io/login/oauth/access_token"
+      validate-url: "https://git.zro.io/api/v1"
   valuesFrom:
   - kind: Secret
     name: credentials
