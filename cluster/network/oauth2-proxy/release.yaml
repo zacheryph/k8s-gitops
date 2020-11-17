@@ -24,11 +24,9 @@ spec:
         validate_url = "https://git.zro.io/api/v1"
     ingress:
       enabled: true
-      path: /oauth2
+      path: /
       hosts:
-      - dash.zro.io
-      - dashboard.inwin-cluster.zro.io
-      - longhorn.inwin-cluster.zro.io
+      - auth.zro.io
   valuesFrom:
   - kind: Secret
     name: credentials
