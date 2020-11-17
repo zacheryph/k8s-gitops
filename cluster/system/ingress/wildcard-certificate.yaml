@@ -15,6 +15,7 @@ spec:
   - zro.net
   - "*.zro.io"
   - "*.zro.net"
+  - "*.inwin-cluster.zro.io"
   issuerRef:
     kind: Issuer
     name: letsencrypt-cloudflare
