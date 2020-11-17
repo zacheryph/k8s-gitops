@@ -14,19 +14,21 @@ spec:
   values:
     image:
       tag: v6.1.1
-    config:
-      configFile: |-
-        provider = "github"
-        email_domains = [ "*" ]
-        provider_display_name = "Gitea"
-        login_url = "https://git.zro.io/login/oauth/authorize"
-        redeem_url = "https://git.zro.io/login/oauth/access_token"
-        validate_url = "https://git.zro.io/api/v1"
+    replicaCount: 2
     ingress:
       enabled: true
       path: /
       hosts:
       - auth.zro.io
+    extraArgs:
+      provider: "github"
+      provider-display-name: "Gitea"
+      email-domain: "*"
+      cookie-domain: ".zro.io"
+      whitelist-domain: ".zro.io"
+      login_url: "https://git.zro.io/login/oauth/authorize"
+      redeem_url: "https://git.zro.io/login/oauth/access_token"
+      validate_url: "https://git.zro.io/api/v1"
   valuesFrom:
   - kind: Secret
     name: credentials
