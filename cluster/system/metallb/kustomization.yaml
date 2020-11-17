@@ -6,9 +6,9 @@ resources:
 - github.com/metallb/metallb/manifests?ref=v0.9.5
 
 configMapGenerator:
-  - name: config
-    files:
-    - config=config.yaml
+- name: config
+  files:
+  - config=config.yaml
 
 generatorOptions:
   disableNameSuffixHash: true

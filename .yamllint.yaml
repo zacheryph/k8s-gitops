@@ -1,0 +1,18 @@
+---
+extends: default
+
+ignore: |
+  charts/
+  cluster/flux-system/*.yaml
+
+rules:
+  brackets:
+    min-spaces-inside: 0
+    max-spaces-inside: 1
+  comments:
+    min-spaces-from-content: 1
+  document-start: disable
+  indentation:
+    spaces: 2
+    indent-sequences: consistent
+  line-length: disable

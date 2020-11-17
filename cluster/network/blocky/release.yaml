@@ -29,14 +29,13 @@ spec:
 
     # blocky configuration
     config:
-      # beginning of actual config
       upstream:
         # these external DNS resolvers will be used. Blocky picks 2 random resolvers from the list for each query
         # format for resolver: net:host:[port][/path]. net could be tcp, udp, tcp-tls or https (DoH). If port is empty, default port will be used (53 for udp and tcp, 853 for tcp-tls, 443 for https (Doh))
         externalResolvers:
-          - udp:1.1.1.1
-          - tcp-tls:1.0.0.1:853
-          - https://cloudflare-dns.com/dns-query
+        - udp:1.1.1.1
+        - tcp-tls:1.0.0.1:853
+        - https://cloudflare-dns.com/dns-query
 
       # optional: custom IP address for domain name (with all sub-domains)
       # example: query "printer.lan" or "my.printer.lan" will return 192.168.178.3
@@ -59,15 +58,26 @@ spec:
       blocking:
         # definition of blacklist groups. Can be external link (http/https) or local file
         blackLists:
+          # which response will be sent, if query is blocked:
+          #   zeroIp: 0.0.0.0 will be returned (default)
+          #   nxDomain: return NXDOMAIN as return code
+          # blockType: zeroIp
+
+          # optional: automatically list refresh period in minutes. Default: 4h.
+          # Negative value -> deactivate automatically refresh.
+          # 0 value -> use default
+          # refreshPeriod: 1
+
           ads:
-            - https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
-            - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
-            - https://mirror1.malwaredomains.com/files/justdomains
-            - http://sysctl.org/cameleon/hosts
-            - https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist
-            - https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
+          - https://s3.amazonaws.com/lists.disconnect.me/simple_ad.txt
+          - https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts
+          - https://mirror1.malwaredomains.com/files/justdomains
+          - http://sysctl.org/cameleon/hosts
+          - https://zeustracker.abuse.ch/blocklist.php?download=domainblocklist
+          - https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
           special:
-            - https://hosts-file.net/ad_servers.txt
+          - https://hosts-file.net/ad_servers.txt
+
         # definition of whitelist groups. Attention: if the same group has black and whitelists,
         # whitelists will be used to disable particular blacklist entries. If a group has only
         # whitelist entries -> this means only domains from this list are allowed,
@@ -76,25 +86,16 @@ spec:
         # whiteLists:
         #   ads:
         #     - whitelist.txt
+
         # definition: which groups should be applied for which client
         clientGroupsBlock:
           # default will be used, if no special definition for a client name exists
           default:
-            - ads
-            - special
+          - ads
+          - special
           # use client name or ip address
           # laptop.fritz.box:
           #   - ads
-
-        # which response will be sent, if query is blocked:
-        #   zeroIp: 0.0.0.0 will be returned (default)
-        #   nxDomain: return NXDOMAIN as return code
-        # blockType: zeroIp
-
-        # optional: automatically list refresh period in minutes. Default: 4h.
-        # Negative value -> deactivate automatically refresh.
-        # 0 value -> use default
-        # refreshPeriod: 1
 
       # optional: configuration for caching of DNS responses
       # caching:
