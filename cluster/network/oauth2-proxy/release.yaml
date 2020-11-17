@@ -19,6 +19,11 @@ spec:
       email_domain = "*"
     ingress:
       enabled: true
+      path: /oauth2
+      hosts:
+      - dash.zro.io
+      - dashboard.inwin-cluster.zro.io
+      - longhorn.inwin-cluster.zro.io
   valuesFrom:
   - kind: Secret
     name: credentials
