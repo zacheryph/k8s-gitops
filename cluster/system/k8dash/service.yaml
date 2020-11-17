@@ -1,0 +1,10 @@
+kind: Service
+apiVersion: v1
+metadata:
+  name: k8dash
+spec:
+  ports:
+    - port: 80
+      targetPort: 4654
+  selector:
+    k8s-app: k8dash

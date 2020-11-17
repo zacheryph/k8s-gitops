@@ -1,0 +1,17 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: k8dash
+  annotations:
+    nginx.ingress.kubernetes.io/auth-signin: https://auth.zro.io/oauth2/sign_in
+    nginx.ingress.kubernetes.io/auth-url: https://auth.zro.io/oauth2/auth
+spec:
+  rules:
+  - host: k8dash.inwin-cluster.zro.io
+    http:
+      paths:
+      - backend:
+          serviceName: k8dash
+          servicePort: 80
+        path: /
+        pathType: Prefix
