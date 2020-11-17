@@ -8,6 +8,7 @@ resources:
 - ./helm-repositories/drone.yaml
 - ./helm-repositories/gitea.yaml
 - ./helm-repositories/harbor.yaml
+- ./helm-repositories/halkeye.yaml
 - ./helm-repositories/ingress-nginx.yaml
 - ./helm-repositories/jetstack.yaml
 - ./helm-repositories/k8s-at-home.yaml
