@@ -17,6 +17,10 @@ spec:
     configFile: |-
       provider = "github"
       email_domain = "*"
+      provider_display_name = "Gitea"
+      login_url = "https://git.zro.io/login/oauth/authorize"
+      redeem_url = "https://git.zro.io/login/oauth/access_token"
+      validate_url = "https://git.zro.io/api/v1"
     ingress:
       enabled: true
       path: /oauth2
