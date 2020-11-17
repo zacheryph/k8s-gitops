@@ -17,7 +17,7 @@ spec:
     config:
       configFile: |-
         provider = "github"
-        email_domain = "*"
+        email_domains = [ "*" ]
         provider_display_name = "Gitea"
         login_url = "https://git.zro.io/login/oauth/authorize"
         redeem_url = "https://git.zro.io/login/oauth/access_token"
