@@ -1,0 +1,8 @@
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: HelmRepository
+metadata:
+  name: halkeye
+  namespace: flux-system
+spec:
+  interval: 10m0s
+  url: https://halkeye.github.io/helm-charts/
