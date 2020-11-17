@@ -6,11 +6,10 @@ spec:
   interval: 1h
   chart:
     spec:
-      chart: oauth2-proxy
-      version: 3.2.5
+      chart: charts/oauth2-proxy
       sourceRef:
-        kind: HelmRepository
-        name: stable
+        kind: GitRepository
+        name: flux-system
         namespace: flux-system
   values:
     image:
