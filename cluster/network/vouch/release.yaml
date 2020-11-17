@@ -25,22 +25,20 @@ spec:
           domain: zro.io
         oauth:
           provider: github
-          client_id: xxxxxxxxxxxxxxxxxxxx
-          client_secret: xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
           auth_url: https://git.zro.io/login/oauth/authorize
           token_url: https://git.zro.io/login/oauth/access_token
           user_info_url: https://git.zro.io/api/v1/user?token=
           callback_url: https://vouch.zro.io/auth
   valuesFrom:
   - kind: Secret
-    name: vouch
+    name: credentials
     valuesKey: jwtSecret
     targetPath: config.jwt.secret
   - kind: Secret
-    name: vouch
+    name: credentials
     valuesKey: clientId
     targetPath: config.oauth.client_id
   - kind: Secret
-    name: vouch
+    name: credentials
     valuesKey: clientSecret
     targetPath: config.oauth.client_secret
