@@ -4,5 +4,6 @@ kind: Kustomization
 namespace: k8dash
 resources:
 - namespace.yaml
-- release.yaml
+- deploy.yaml
+- service.yaml
 - ingress.yaml
