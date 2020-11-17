@@ -23,12 +23,12 @@ spec:
         allowAllUsers: true
         cookie:
           domain: zro.io
-        oauth:
-          provider: github
-          auth_url: https://git.zro.io/login/oauth/authorize
-          token_url: https://git.zro.io/login/oauth/access_token
-          user_info_url: https://git.zro.io/api/v1/user?token=
-          callback_url: https://vouch.zro.io/auth
+      oauth:
+        provider: github
+        auth_url: https://git.zro.io/login/oauth/authorize
+        token_url: https://git.zro.io/login/oauth/access_token
+        user_info_url: https://git.zro.io/api/v1/user?token=
+        callback_url: https://vouch.zro.io/auth
   valuesFrom:
   - kind: Secret
     name: credentials
