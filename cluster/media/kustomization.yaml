@@ -5,6 +5,7 @@ namespace: media
 resources:
 - namespace.yaml
 - jackett.yaml
+- qbittorrent.yaml
 - plex.yaml
 - radarr.yaml
 - sonarr.yaml
