@@ -19,6 +19,10 @@ spec:
       pullPolicy: Always
     env:
       TZ: "America/New_York"
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
     service:
       additionalServices:
       - enabled: true
