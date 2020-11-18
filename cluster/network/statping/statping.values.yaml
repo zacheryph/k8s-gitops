@@ -1,0 +1,5 @@
+statping:
+  admin:
+    user: ${USER_NAME}
+    password: ${USER_PASSWORD}
+    email: ${USER_EMAIL}

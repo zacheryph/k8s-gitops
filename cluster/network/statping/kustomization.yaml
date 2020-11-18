@@ -1,0 +1,5 @@
+namespace: statping
+
+resources:
+- namespace.yaml
+- release.yaml
