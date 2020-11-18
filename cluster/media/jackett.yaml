@@ -18,6 +18,10 @@ spec:
       tag: v0.16.2184
     env:
       TZ: "America/Chicago"
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
     ingress:
       enabled: true
       annotations:
