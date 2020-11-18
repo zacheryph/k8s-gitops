@@ -1,0 +1,41 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: jackett
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: jackett
+      version: 5.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+  values:
+    image:
+      repository: k8sathome/jackett
+      tag: v0.16.2184
+    env:
+      TZ: "America/Chicago"
+    ingress:
+      enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/auth-signin: https://auth.zro.io/oauth2/start
+        nginx.ingress.kubernetes.io/auth-url: https://auth.zro.io/oauth2/auth
+      hosts:
+      - host: jackett.zro.io
+        paths:
+        - path: /
+          pathType: Prefix
+    persistence:
+      config:
+        enabled: true
+        accessMode: ReadWriteOnce
+        size: 10Gi
+    resources:
+      requests:
+        memory: 250Mi
+        cpu: 250m
+      limits:
+        memory: 500Mi

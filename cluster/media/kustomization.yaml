@@ -4,4 +4,7 @@ kind: Kustomization
 namespace: media
 resources:
 - namespace.yaml
+- jackett.yaml
 - plex.yaml
+- radarr.yaml
+- sonarr.yaml
