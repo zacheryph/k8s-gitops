@@ -4,7 +4,6 @@ kind: Kustomization
 namespace: ingress-system
 resources:
 - namespace.yaml
-- cloudflare-token.yaml
 - cert-manager.yaml
 - issuer.yaml
 - ingress-nginx.yaml

@@ -7,9 +7,6 @@ resources:
 - release.yaml
 - runner.yaml
 - secrets-provider.yaml
-- postgres-auth.yaml
-- secrets.yaml
-- gitea-credentials.yaml
 - ../../../shared/postgres
 
 patchesStrategicMerge:

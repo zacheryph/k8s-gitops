@@ -6,4 +6,3 @@ resources:
 - namespace.yaml
 - release.yaml
 - mosquitto-mqtt.yaml
-- secret.yaml

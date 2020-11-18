@@ -1,0 +1,4 @@
+config:
+  cookieSecret: ${OAUTH_COOKIE_SECRET}
+  clientID: ${OAUTH_CLIENT_ID}
+  clientSecret: ${OAUTH_CLIENT_SECRET}

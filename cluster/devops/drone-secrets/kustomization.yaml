@@ -4,5 +4,3 @@ kind: Kustomization
 namespace: drone-secrets
 resources:
 - namespace.yaml
-- registry.yaml
-- sonarqube.yaml

@@ -49,10 +49,5 @@ spec:
     valuesKey: password
     targetPath: database.external.password
   - kind: Secret
-    name: minio-credentials
-    valuesKey: accesskey
-    targetPath: persistence.imageChartStorage.s3.accesskey
-  - kind: Secret
-    name: minio-credentials
-    valuesKey: secretkey
-    targetPath: persistence.imageChartStorage.s3.secretkey
+    name: minio-credential-values
+    targetPath: persistence.imageChartStorage.s3

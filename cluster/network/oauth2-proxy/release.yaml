@@ -31,14 +31,4 @@ spec:
       validate-url: "https://git.zro.io/api/v1"
   valuesFrom:
   - kind: Secret
-    name: credentials
-    valuesKey: jwtSecret
-    targetPath: config.cookieSecret
-  - kind: Secret
-    name: credentials
-    valuesKey: clientId
-    targetPath: config.clientID
-  - kind: Secret
-    name: credentials
-    valuesKey: clientSecret
-    targetPath: config.clientSecret
+    name: oauth2-proxy-values
