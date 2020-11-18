@@ -1,0 +1,30 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: plex
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: plex
+      version: 2.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+  values:
+    timezone: CST
+    allowedNetworks:
+    - 127.0.0.1
+    - 10.42.0.0/16
+    - 10.72.143.0/24
+    persistence:
+      data:
+        claimName: media-pool
+    ingress:
+      enabled: true
+      hosts:
+      - plex.zro.io
+  valuesFrom:
+  - kind: Secret
+    name: plex-values
