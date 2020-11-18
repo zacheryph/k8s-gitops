@@ -47,7 +47,7 @@ spec:
         claimName: media-pool
     resources:
       requests:
-        memory: 250Mi
+        memory: 500Mi
         cpu: 250m
       limits:
-        memory: 1500Mi
+        memory: 4Gi
