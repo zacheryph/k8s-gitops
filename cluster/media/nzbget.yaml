@@ -1,12 +1,12 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: qbittorrent
+  name: nzbget
 spec:
   interval: 1h
   chart:
     spec:
-      chart: qbittorrent
+      chart: nzbget
       version: 6.4.0
       sourceRef:
         kind: HelmRepository
@@ -14,8 +14,8 @@ spec:
         namespace: flux-system
   values:
     image:
-      repository: k8sathome/qbittorrent
-      tag: v4.3.0.1
+      repository: k8sathome/nzbget
+      tag: v21.0
       pullPolicy: Always
     env:
       TZ: "America/Chicago"
@@ -23,24 +23,13 @@ spec:
       runAsUser: 568
       runAsGroup: 568
       fsGroup: 568
-    service:
-      additionalServices:
-      - enabled: true
-        nameSuffix: bittorrent
-        type: LoadBalancer
-        port:
-          port: 50413
-          name: bittorrent
-          protocol: TCP
-          targetPort: 6881
-        externalTrafficPolicy: Local
     ingress:
       enabled: true
       annotations:
         nginx.ingress.kubernetes.io/auth-signin: https://auth.zro.io/oauth2/start
         nginx.ingress.kubernetes.io/auth-url: https://auth.zro.io/oauth2/auth
       hosts:
-      - host: torrent.zro.io
+      - host: nzbget.zro.io
         paths:
         - path: /
           pathType: Prefix
