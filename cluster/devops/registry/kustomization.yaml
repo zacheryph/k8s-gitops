@@ -4,7 +4,6 @@ kind: Kustomization
 namespace: registry
 resources:
 - namespace.yaml
-- minio-credentials.yaml
 - harbor.yaml
 - service.yaml
 - ../../../shared/postgres
