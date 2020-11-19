@@ -25,6 +25,14 @@ spec:
       enabled: true
       hosts:
       - plex.zro.io
+    serviceTCP:
+      type: LoadBalancer
+      annotations:
+        metallb.universe.tf/allow-shared-ip: plex-svc
+    serviceUDP:
+      type: LoadBalancer
+      annotations:
+        metallb.universe.tf/allow-shared-ip: plex-svc
   valuesFrom:
   - kind: Secret
     name: plex-values
