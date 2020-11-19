@@ -50,6 +50,3 @@ spec:
         enabled: false
       kubedb:
         enabled: false
-  valuesFrom:
-  - kind: Secret
-    name: statping-values
