@@ -13,6 +13,8 @@ spec:
         name: k8s-at-home
         namespace: flux-system
   values:
+    image:
+      tag: 1.20.5.3600-47c0d9038
     timezone: "America/Chicago"
     allowedNetworks:
     - 127.0.0.1
