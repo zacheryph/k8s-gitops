@@ -18,6 +18,8 @@ spec:
     csi:
       kubeletRootDir: /var/lib/kubelet
     defaultSettings:
+      backupTarget: s3://longhorn-backups@us-west-000
+      backupTargetCredentialSecret: backup-credentials
       storageMinimalAvailablePercentage: 10
     ingress:
       enabled: true
