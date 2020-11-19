@@ -26,6 +26,8 @@ spec:
     env:
     - name: DB_CONN
       value: postgres
+    - name: DB_HOST
+      value: postgres
     - name: DB_DATABASE
       value: postgres
     - name: DB_USER
