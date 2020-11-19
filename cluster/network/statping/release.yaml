@@ -24,7 +24,8 @@ spec:
       enabled: true
       size: 4Gi
     postgres:
-      postgresql:
+      # 1.0.1 chart has this misspelled in dependencies
+      posgresql:
         enabled: false
       kubedb:
         enabled: true
