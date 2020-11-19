@@ -15,6 +15,13 @@ spec:
   values:
     statping:
       name: "Zro Ping"
+      admin:
+        existingSecret:
+          enabled: true
+          name: credentials
+          userKey: user
+          passwordKey: password
+          emailKey: email
     ingress:
       enabled: true
       hosts:
