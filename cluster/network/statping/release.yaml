@@ -23,12 +23,24 @@ spec:
     persistence:
       enabled: true
       size: 4Gi
+    env:
+    - name: DB_CONN
+      value: postgres
+    - name: DB_DATABASE
+      value: postgres
+    - name: DB_USER
+      value: postgres
+    - name: DB_PASS
+      valueFrom:
+        secretKeyRef:
+          name: postgres-auth
+          key: password
     postgres:
       # 1.0.1 chart has this misspelled in dependencies
       posgresql:
         enabled: false
       kubedb:
-        enabled: true
+        enabled: false
   valuesFrom:
   - kind: Secret
     name: statping-values
