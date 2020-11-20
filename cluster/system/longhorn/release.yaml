@@ -18,6 +18,7 @@ spec:
     csi:
       kubeletRootDir: /var/lib/kubelet
     defaultSettings:
+      backupstorePollInterval: 1800
       backupTarget: s3://inwin-backups@us-west-000/longhorn
       backupTargetCredentialSecret: backup-credentials
       storageMinimalAvailablePercentage: 10
