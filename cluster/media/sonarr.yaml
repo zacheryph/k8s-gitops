@@ -32,6 +32,14 @@ spec:
         paths:
         - path: /
           pathType: Prefix
+      additionalIngresses:
+      - enabled: true
+        nameSuffix: "api"
+        hosts:
+        - host: sonarr.zro.io
+          paths:
+          - path: /api
+            pathType: Prefix
     persistence:
       config:
         enabled: true
