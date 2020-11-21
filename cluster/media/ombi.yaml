@@ -1,0 +1,47 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: ombi
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: ombi
+      version: 5.4.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+  values:
+    image:
+      repository: k8sathome/ombi
+      tag: v4.0.720
+    strategy:
+      type: Recreate
+    env:
+      TZ: "America/Chicago"
+    podSecurityContext:
+      runAsUser: 568
+      runAsGroup: 568
+      fsGroup: 568
+    ingress:
+      enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/auth-signin: https://auth.zro.io/oauth2/start
+        nginx.ingress.kubernetes.io/auth-url: https://auth.zro.io/oauth2/auth
+      hosts:
+      - host: ombi.zro.io
+        paths:
+        - path: /
+          pathType: Prefix
+    persistence:
+      config:
+        enabled: true
+        accessMode: ReadWriteOnce
+        size: 10Gi
+    resources:
+      requests:
+        memory: 250Mi
+        cpu: 250m
+      limits:
+        memory: 1500Mi

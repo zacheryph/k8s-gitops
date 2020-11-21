@@ -6,6 +6,7 @@ resources:
 - namespace.yaml
 - jackett.yaml
 - nzbget.yaml
+- ombi.yaml
 - qbittorrent.yaml
 - plex.yaml
 - radarr.yaml
