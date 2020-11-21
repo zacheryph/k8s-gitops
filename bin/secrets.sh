@@ -97,14 +97,48 @@ function wipe_secrets() {
   rm -rf cluster/secrets
 }
 
+function check_secret_exists() {
+  file=${1}
+  resourceSuffix=${2}
+
+  base=$(basename "${file}")
+  parent=$(dirname "${file}")
+  ns=$(extract_ns "${parent}")
+  sealedName="${base%%.*}${resourceSuffix}"
+  sealedFile="cluster/secrets/${ns}/${sealedName}.yaml"
+
+  [ "${file}" -ot "${sealedFile}" ] && return
+  echo "secret missing or outdated for: ${file}"
+  EXIT_CODE=1
+}
+
+function check_secrets() {
+  export EXIT_CODE=0
+  file=${1}
+  ext=${file#*\.}
+
+  if [ "${ext}" == "values.yaml" ]; then
+    check_secret_exists "${file}" "-values" --from-file=values.yaml=/dev/stdin
+  fi
+
+  if [ "${ext}" == "crypt.env" ]; then
+    check_secret_exists "${file}" "" --from-env-file=/dev/stdin
+  fi
+
+  exit ${EXIT_CODE}
+}
+
 function usage() {
   echo "== secrets management"
-  echo "usage: secrets.sh <refresh|write|wipe>"
+  echo "usage: secrets.sh <check|refresh|write|wipe>"
   exit
 }
 
 [[ -z "$1" ]] && usage
 case "$1" in
+  check)
+    check_secrets "${@:2}"
+    ;;
   refresh)
     refresh_secrets
     write_kustomization
