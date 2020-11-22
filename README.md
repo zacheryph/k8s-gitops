@@ -12,6 +12,49 @@
 
 ## Overview
 
+## Secret Management
+
+Secrets are managed by `bin/secrets.sh`. Below is a short description of
+the commands and the two types of files that are automatically generated.
+All secrets are able to use environment variables from `.secrets.env` which
+is secured by git-crypt.
+
+Refreshing of secrets have the caveat of only knowing if the source file is
+newer than the sealed secret. This does not account for changed to
+`.secrets.env` that affect the secret. If changes are made to existing values
+you will need to touch the secret[s] affected or remove their sealed secret
+counterparts.
+
+Secrets are generated into `cluster/secrets`, and the `kustomization.yaml`
+automatically generated containing them all. Each secret exists in their
+respective namespace which is extracted from the `kustomization.yaml` within
+the same directory the secret exists in.
+
+As an added bonus there is a pre-commit hook to ensure all sealed secrets
+exist and are up to date so that you do not forget to generate any new
+ones.
+
+### Secret Commands
+
+* `./bin/secrets.sh check` -  ensures all `SealedSecret` resources exist
+* `./bin/secrets.sh refresh` -  create & update any secrets necessary
+* `./bin/secrets.sh write` -  recreate all secrets
+* `./bin/secrets.sh wipe` -  destroy all `SealedSecret` resources
+
+### Secret Types
+
+#### `secret-name.crypt.env`
+
+> env format file that creates a secret with a key for each
+> _environment variable_. The secret name is the name of the
+> file less the crypt.env suffix.
+
+#### `secret-name.values.yaml`
+
+> this is for `HelmRelease` style values. They will generate a secret
+> with a `values.yaml` key containing the contents of this file. The
+> secret generated will be names `secret-name-values`.
+
 ## Hardware
 
 Cluster is 3 built 1u servers with the following hardware.
