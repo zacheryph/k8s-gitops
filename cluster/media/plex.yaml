@@ -35,6 +35,13 @@ spec:
       type: LoadBalancer
       annotations:
         metallb.universe.tf/allow-shared-ip: plex-svc
+    resources:
+      requests:
+        cpu: 2000m
+        memory: 4000Mi
+      limits:
+        gpu.intel.com/i915: 1
+        memory: 12000Mi
   valuesFrom:
   - kind: Secret
     name: plex-values
