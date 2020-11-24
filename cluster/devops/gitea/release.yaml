@@ -13,6 +13,8 @@ spec:
         name: gitea
         namespace: flux-system
   values:
+    image:
+      tag: 1.12.6
     ingress:
       enabled: true
       hosts:

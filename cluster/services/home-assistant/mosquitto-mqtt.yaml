@@ -13,6 +13,8 @@ spec:
         name: k8s-at-home
         namespace: flux-system
   values:
+    image:
+      tag: 1.6.12
     resources:
       limits:
         cpu: 100m

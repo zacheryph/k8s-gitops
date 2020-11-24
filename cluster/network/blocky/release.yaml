@@ -13,6 +13,8 @@ spec:
         name: k8s-at-home
         namespace: flux-system
   values:
+    image:
+      tag: v0.11
     timeZone: America/Chicago
     serviceTCP:
       enabled: true

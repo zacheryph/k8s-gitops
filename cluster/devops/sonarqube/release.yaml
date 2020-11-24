@@ -13,6 +13,8 @@ spec:
         name: oteemo
         namespace: flux-system
   values:
+    image:
+      tag: 8.5.1-community
     ingress:
       enabled: true
       hosts:

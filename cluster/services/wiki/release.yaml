@@ -11,9 +11,9 @@ spec:
         kind: GitRepository
         name: requarks
   values:
-    replicaCount: 2
     image:
-      pullPolicy: Always
+      tag: 2.5.170
+    replicaCount: 2
     ingress:
       enabled: true
       hosts:
