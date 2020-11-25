@@ -22,8 +22,6 @@ spec:
         path: /
     initContainersSecurityContext:
       privileged: false
-    persistence:
-      enabled: true
     postgresql:
       enabled: false
       postgresqlServer: postgres.sonarqube.svc
