@@ -17,7 +17,7 @@ spec:
       repository: bitwardenrs/server
       tag: 1.17.0
     bitwardenrs:
-      domain: warden.zro.io
+      domain: https://warden.zro.io
     persistence:
       existingClaim: bitwarden-database
     ingress:
