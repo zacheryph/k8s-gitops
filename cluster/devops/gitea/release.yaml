@@ -7,13 +7,14 @@ spec:
   chart:
     spec:
       chart: gitea
-      version: 2.0.6
+      version: 2.0.7
       sourceRef:
         kind: HelmRepository
         name: gitea
         namespace: flux-system
   values:
     image:
+      repository: gitea/gitea
       tag: 1.12.6
     ingress:
       enabled: true
