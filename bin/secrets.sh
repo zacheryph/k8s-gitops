@@ -1,25 +1,11 @@
 #!/usr/bin/env bash
-REPO_ROOT=$(git rev-parse --show-toplevel)
-export REPO_ROOT
-
-need() {
-    which "$1" &>/dev/null || die "Binary '$1' is missing but required"
-}
+source ${BASH_SOURCE[0]%/*}/common.sh
 
 need "envsubst"
 need "kubectl"
 need "kubeseal"
 need "yq"
-
-if [ "$(uname)" == "Darwin" ]; then
-  set -a
-  # shellcheck disable=SC1091
-  . "${REPO_ROOT}/.secrets.env"
-  set +a
-else
-  # shellcheck disable=SC1091
-  . "${REPO_ROOT}/.secrets.env"
-fi
+load_env
 
 function extract_ns() {
   yq r "${1}/kustomization.yaml" "namespace"
