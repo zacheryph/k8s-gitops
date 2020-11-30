@@ -17,4 +17,3 @@ resources:
 - ./helm-repositories/minio.yaml
 - ./helm-repositories/oteemo.yaml
 - ./helm-repositories/prometheus-community.yaml
-- ./helm-repositories/stable.yaml
