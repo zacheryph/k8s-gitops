@@ -6,13 +6,15 @@ spec:
   interval: 1h
   chart:
     spec:
-      chart: charts/oauth2-proxy
+      chart: oauth2-proxy
+      version: 4.0.1
       sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: HelmRepository
+        name: k8s-at-home
         namespace: flux-system
   values:
     image:
+      repository: quay.io/pusher/oauth2_proxy
       tag: v6.1.1
     replicaCount: 2
     ingress:
