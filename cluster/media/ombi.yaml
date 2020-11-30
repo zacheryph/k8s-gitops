@@ -26,9 +26,6 @@ spec:
       fsGroup: 568
     ingress:
       enabled: true
-      annotations:
-        nginx.ingress.kubernetes.io/auth-signin: https://auth.zro.io/oauth2/start
-        nginx.ingress.kubernetes.io/auth-url: https://auth.zro.io/oauth2/auth
       hosts:
       - host: ombi.zro.io
         paths:
