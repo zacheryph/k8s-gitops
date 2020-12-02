@@ -29,9 +29,6 @@ spec:
       hosts:
       - host: ping.zro.io
         paths: [ / ]
-    persistence:
-      enabled: true
-      size: 4Gi
     env:
     - name: DB_CONN
       value: postgres
