@@ -29,7 +29,7 @@ function gensecret() {
 }
 
 function seal() {
-  kubeseal --controller-name=sealed-secrets --format=yaml \
+  kubeseal --format=yaml \
     | yq d - "spec.template" \
     | yq d - "metadata.creationTimestamp"
 }
