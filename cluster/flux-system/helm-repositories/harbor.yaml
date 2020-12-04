@@ -4,5 +4,5 @@ metadata:
   name: harbor
   namespace: flux-system
 spec:
-  interval: 10m0s
+  interval: 30m0s
   url: https://helm.goharbor.io

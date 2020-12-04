@@ -4,5 +4,5 @@ metadata:
   name: gitea
   namespace: flux-system
 spec:
-  interval: 10m0s
+  interval: 30m0s
   url: https://dl.gitea.io/charts/
