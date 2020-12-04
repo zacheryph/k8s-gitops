@@ -27,8 +27,6 @@ spec:
         type: s3
         s3:
           bucket: registry
-          # accesskey: valuesFrom:Secret:minio-credentials
-          # secretkey: valuesFrom:Secret:minio-credentials
           regionendpoint: http://internal.minio.svc
           secure: false
     database:
@@ -45,9 +43,8 @@ spec:
       jobLogger: database
   valuesFrom:
   - kind: Secret
+    name: harbor-values
+  - kind: Secret
     name: postgres-auth
     valuesKey: password
     targetPath: database.external.password
-  - kind: Secret
-    name: minio-credential-values
-    targetPath: persistence.imageChartStorage.s3
