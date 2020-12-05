@@ -14,7 +14,8 @@ spec:
         namespace: flux-system
   values:
     image:
-      tag: 0.118.3
+      repository: homeassistant/home-assistant
+      tag: 0.118.4
     ingress:
       enabled: true
       hosts:

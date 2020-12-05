@@ -12,6 +12,7 @@ spec:
         name: requarks
   values:
     image:
+      repository: requarks/wiki
       tag: 2.5.170
     replicaCount: 2
     ingress:

@@ -13,6 +13,9 @@ spec:
         name: drone
         namespace: flux-system
   values:
+    image:
+      repository: drone/drone
+      tag: 1.9.2
     persistentVolume:
       enabled: false
     ingress:
