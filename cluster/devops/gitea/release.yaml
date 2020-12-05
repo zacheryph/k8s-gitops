@@ -15,7 +15,7 @@ spec:
   values:
     image:
       repository: gitea/gitea
-      tag: 1.13.0
+      version: 1.13.0
     ingress:
       enabled: true
       hosts:
