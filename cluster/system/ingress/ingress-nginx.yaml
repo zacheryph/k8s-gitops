@@ -6,6 +6,7 @@ spec:
   interval: 1h
   chart:
     spec:
+      # registryUrl=https://kubernetes.github.io/ingress-nginx
       chart: ingress-nginx
       version: 3.10.1
       sourceRef:

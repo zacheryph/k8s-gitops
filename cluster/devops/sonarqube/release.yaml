@@ -6,6 +6,7 @@ spec:
   interval: 1h
   chart:
     spec:
+      # registryUrl=https://oteemo.github.io/charts
       chart: sonarqube
       version: 9.1.2
       sourceRef:

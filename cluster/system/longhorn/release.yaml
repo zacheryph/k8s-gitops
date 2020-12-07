@@ -6,6 +6,7 @@ spec:
   interval: 1h
   chart:
     spec:
+      # registryUrl=https://charts.longhorn.io
       chart: longhorn
       version: 1.0.2
       sourceRef:

@@ -6,6 +6,7 @@ spec:
   interval: 1h
   chart:
     spec:
+      # registryUrl=https://charts.jetstack.io
       chart: cert-manager
       version: 1.0.4
       sourceRef:

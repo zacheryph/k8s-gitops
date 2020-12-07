@@ -6,6 +6,7 @@ spec:
   interval: 1h
   chart:
     spec:
+      # registryUrl=https://charts.appscode.com/stable/
       chart: kubedb
       version: v0.15.1
       sourceRef:

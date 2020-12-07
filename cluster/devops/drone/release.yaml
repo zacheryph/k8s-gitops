@@ -6,6 +6,7 @@ spec:
   interval: 1h
   chart:
     spec:
+      # registryUrl=https://charts.drone.io
       chart: drone
       version: 0.1.7
       sourceRef:

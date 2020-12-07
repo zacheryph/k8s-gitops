@@ -6,6 +6,7 @@ spec:
   interval: 1h
   chart:
     spec:
+      # registryUrl=https://helm.goharbor.io
       chart: harbor
       version: 1.5.1
       sourceRef:
