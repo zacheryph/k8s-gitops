@@ -26,6 +26,8 @@ spec:
           userKey: user
           passwordKey: password
           emailKey: email
+    persistence:
+      enabled: false
     ingress:
       enabled: true
       hosts:
