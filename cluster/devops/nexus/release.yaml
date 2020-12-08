@@ -1,0 +1,31 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: nexus-repository-manager
+spec:
+  interval: 1h
+  chart:
+    spec:
+      # registryUrl=https://sonatype.github.io/helm3-charts/
+      chart: nexus-repository-manager
+      version: 28.1.3
+      sourceRef:
+        kind: HelmRepository
+        name: sonatype
+        namespace: flux-system
+  values:
+    image:
+      repository: sonatype/nexus3
+      tag: 3.28.1
+    nexus:
+      docker:
+        enabled: true
+        registries:
+        - host: r.zro.io
+          port: 5000
+    ingress:
+      enabled: true
+      hostRepo: nexus.zro.io
+    persistence:
+      enabled: true
+      storageSize: 100Gi
