@@ -15,6 +15,7 @@ spec:
         namespace: flux-system
   values:
     image:
+      repository: plexinc/pms-docker
       tag: 1.20.5.3600-47c0d9038
     timezone: "America/Chicago"
     allowedNetworks:

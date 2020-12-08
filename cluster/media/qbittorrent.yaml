@@ -17,7 +17,6 @@ spec:
     image:
       repository: k8sathome/qbittorrent
       tag: v4.3.0.1
-      pullPolicy: Always
     env:
       TZ: "America/Chicago"
     podSecurityContext:

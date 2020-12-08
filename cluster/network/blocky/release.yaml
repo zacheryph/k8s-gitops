@@ -15,6 +15,7 @@ spec:
         namespace: flux-system
   values:
     image:
+      repository: spx01/blocky
       tag: v0.11
     timeZone: America/Chicago
     serviceTCP:
