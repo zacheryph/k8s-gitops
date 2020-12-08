@@ -29,3 +29,13 @@ spec:
       enabled: true
     vscode:
       enabled: true
+      image:
+        repository: codercom/code-server
+        tag: 3.7.2
+      ingress:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/auth-signin: https://auth.zro.io/oauth2/start
+          nginx.ingress.kubernetes.io/auth-url: https://auth.zro.io/oauth2/auth
+        hosts:
+        - home-vscode.zro.io
