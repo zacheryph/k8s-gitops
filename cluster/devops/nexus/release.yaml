@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: sonatype/nexus3
-      tag: 3.28.1
+      tag: 3.29.0
     nexus:
       docker:
         enabled: true
