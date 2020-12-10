@@ -4,11 +4,11 @@ kind: Kustomization
 namespace: media
 resources:
 - namespace.yaml
-- jackett.yaml
+# - jackett.yaml
 - nzbget.yaml
 - nzbhydra2.yaml
 - ombi.yaml
-- qbittorrent.yaml
+# - qbittorrent.yaml
 - plex.yaml
 - radarr.yaml
 - sonarr.yaml
