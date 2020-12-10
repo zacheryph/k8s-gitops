@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: k8sathome/ombi
-      tag: v4.0.739
+      tag: v4.0.748
     strategy:
       type: Recreate
     env:
