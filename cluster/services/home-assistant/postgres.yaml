@@ -1,0 +1,8 @@
+# extends shared/postgres.yaml
+apiVersion: kubedb.com/v1alpha2
+kind: Postgres
+metadata:
+  name: postgres
+spec:
+  authSecret:
+    name: postgres-auth

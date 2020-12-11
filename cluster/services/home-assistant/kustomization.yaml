@@ -7,3 +7,6 @@ resources:
 - release.yaml
 - vernemq.yaml
 - ../../../shared/postgres
+
+patchesStrategicMerge:
+- postgres.yaml
