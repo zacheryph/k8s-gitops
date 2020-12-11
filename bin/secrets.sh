@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 source ${BASH_SOURCE[0]%/*}/common.sh
 
-need "envsubst"
+# need "envsubst"
+need "gomplate"
 need "kubectl"
 need "kubeseal"
 need "yq"
@@ -11,30 +12,36 @@ function extract_ns() {
   yq r "${1}/kustomization.yaml" "namespace"
 }
 
-function envsub() {
-  envsubst -no-unset -i "${1}"
+# secret_template ns name
+function secret_template() {
+  rawJson='{ "apiVersion": "v1", "kind": "Secret" }'
+  namespace=${1}
+  name=${2}
+
+  echo ${rawJson} | yq r --prettyPrint - \
+    | yq w - metadata.namespace ${namespace} \
+    | yq w - metadata.name ${name}
 }
 
-# gensecret ns name args...
-function gensecret() {
-  ns=$1
-  name=$2
-
-  kubectl create secret generic \
-    --dry-run=client \
-    --output=json \
-    --namespace="${ns}" \
-    "${name}" \
-    "${@:3}"
+# expand_values file
+function expand_template_file() {
+  gomplate \
+    -c .=${REPO_ROOT}/.secrets.env \
+    -d files=${REPO_ROOT}/.secrets/ \
+    -f "${1}"
 }
 
-function seal() {
-  kubeseal --format=yaml \
-    | yq d - "spec.template" \
-    | yq d - "metadata.creationTimestamp"
+# process_secrets .secrets.yaml
+function process_secrets() {
+  expand_template_file ${1} | yq p - data
 }
 
-# ... file resource-suffix gensecret-argument
+# process_values .values.yaml
+function process_values() {
+  echo "values.yaml: $(expand_template_file ${1} | base64)" | yq p - data
+}
+
+# file data-file
 function write_sealed_secret() {
   file=${1}
   resourceSuffix=${2}
@@ -49,24 +56,32 @@ function write_sealed_secret() {
 
   echo "generating: ${sealedFile}"
   mkdir -p "cluster/secrets/${ns}"
-  envsub "${file}" \
-    | gensecret "${ns}" "${sealedName}" "${@:3}" \
+
+  yq m \
+    <(secret_template ${ns} ${sealedName}) \
+    ${3} \
     | seal \
     > "${sealedFile}"
+}
+
+function seal() {
+  kubeseal --format=yaml \
+    | yq d - "spec.template" \
+    | yq d - "metadata.creationTimestamp"
 }
 
 function refresh_secrets() {
   # *.values.yaml
   while IFS= read -r -d '' file
   do
-    write_sealed_secret "${file}" "-values" --from-file=values.yaml=/dev/stdin
+    write_sealed_secret "${file}" "-values" <(process_values ${file})
   done <  <(find cluster -type f -name '*.values.yaml' -print0)
 
-  # *.crypt.env
+  # *.secrets.yaml
   while IFS= read -r -d '' file
   do
-    write_sealed_secret "${file}" "" --from-env-file=/dev/stdin
-  done <  <(find cluster -type f -name '*.crypt.env' -print0)
+    write_sealed_secret "${file}" "" <(process_secrets ${file})
+  done <  <(find cluster -type f -name '*.secrets.yaml' -print0)
 }
 
 function write_kustomization() {
@@ -104,11 +119,11 @@ function check_secrets() {
   ext=${file#*\.}
 
   if [ "${ext}" == "values.yaml" ]; then
-    check_secret_exists "${file}" "-values" --from-file=values.yaml=/dev/stdin
+    check_secret_exists "${file}" "-values"
   fi
 
-  if [ "${ext}" == "crypt.env" ]; then
-    check_secret_exists "${file}" "" --from-env-file=/dev/stdin
+  if [ "${ext}" == "secrets.yaml" ]; then
+    check_secret_exists "${file}" ""
   fi
 
   exit ${EXIT_CODE}
