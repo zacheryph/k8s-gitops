@@ -1,0 +1,4 @@
+git:
+  user:
+    name: {{ .USER_FULL_NAME }}
+    email: {{ .USER_EMAIL }}

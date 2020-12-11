@@ -17,6 +17,10 @@ spec:
     image:
       repository: homeassistant/home-assistant
       tag: 0.118.5
+    extraEnv:
+      TZ: America/Chicago
+    extraSecretForEnvFrom:
+    - home-assistant-env
     ingress:
       enabled: true
       hosts:
@@ -25,8 +29,10 @@ spec:
       enabled: true
       serviceMonitor:
         enabled: true
-    configurator:
+    git:
       enabled: true
+      repo: https://github.com/zacheryph/hass-config
+      secret: github-credentials
     vscode:
       enabled: true
       image:
