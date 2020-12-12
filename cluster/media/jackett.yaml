@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: k8sathome/jackett
-      tag: v0.17.20
+      tag: v0.17.29
     env:
       TZ: "America/Chicago"
     podSecurityContext:
