@@ -1,10 +1,12 @@
 #!/usr/bin/env bash
-# this is for viewing a HelmRelease template
-# its very basic and will not load valuesFrom
+source ${BASH_SOURCE[0]%/*}/common.sh
+
+need "yq"
 
 function _usage() {
   echo "== usage: template.sh path/to/helm-release.yaml"
   echo "note:"
+  echo "  - this will not pull valuesFrom values"
   echo "  - requires all helm repositories be installed locally"
   echo "  - requires release be from a helm repository and not git"
   echo
@@ -15,7 +17,7 @@ function _usage() {
 releaseFile=${1}
 [ -f "${releaseFile}" ] || _usage
 
-# extract repository and chart name
+# extract release, repository and chart names
 name=$(yq r ${releaseFile} "metadata.name")
 repo=$(yq r ${releaseFile} "spec.chart.spec.sourceRef.name")
 chart=$(yq r ${releaseFile} "spec.chart.spec.chart")
