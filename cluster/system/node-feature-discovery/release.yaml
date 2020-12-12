@@ -33,19 +33,19 @@ spec:
       sources:
         usb:
           deviceClassWhitelist:
-              - "02"
-              - "0e"
-              - "ef"
-              - "fe"
-              - "ff"
-            deviceLabelFields:
-              - "class"
-              - "vendor"
-              - "device"
+          - "02"
+          - "0e"
+          - "ef"
+          - "fe"
+          - "ff"
+          deviceLabelFields:
+          - "class"
+          - "vendor"
+          - "device"
         custom:
-          - name: "zwave"
-            matchOn:
-              - usbId:
-                  class: ["02"]
-                  vendor: ["0658"]
-                  device: ["0200"]
+        - name: "zwave"
+          matchOn:
+          - usbId:
+              class: ["02"]
+              vendor: ["0658"]
+              device: ["0200"]
