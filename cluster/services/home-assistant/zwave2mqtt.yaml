@@ -24,6 +24,16 @@ spec:
       config:
         enabled: true
         size: 1Gi
+    ingress:
+      enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/auth-signin: https://auth.zro.io/oauth2/start
+        nginx.ingress.kubernetes.io/auth-url: https://auth.zro.io/oauth2/auth
+      hosts:
+      - host: zwave2mqtt.zro.io
+        paths:
+        - path: /
+          pathType: Prefix
     additionalVolumeMounts:
     - name: usb
       mountPath: /dev/serial/by-id/usb-0658_0200-if00
