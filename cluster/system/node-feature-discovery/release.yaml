@@ -42,10 +42,10 @@ spec:
               - "class"
               - "vendor"
               - "device"
-          custom:
-            - name: "zwave"
-              matchOn:
-                - usbId:
-                    class: ["02"]
-                    vendor: ["0658"]
-                    device: ["0200"]
+        custom:
+          - name: "zwave"
+            matchOn:
+              - usbId:
+                  class: ["02"]
+                  vendor: ["0658"]
+                  device: ["0200"]
