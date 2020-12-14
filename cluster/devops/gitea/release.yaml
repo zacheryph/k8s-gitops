@@ -37,6 +37,7 @@ spec:
       config:
         default:
           APP_NAME: Zro
+          BRANCH: main
         server:
           DISABLE_SSH: true
         database:
