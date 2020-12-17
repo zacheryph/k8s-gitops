@@ -56,8 +56,8 @@ spec:
         - name: config
           mountPath: /config
         - name: deploykey
-          mountPath: /root/.ssh/id_ed25519
-          subPath: id_ed25519
+          mountPath: /root/.ssh/id_rsa
+          subPath: id_rsa
   valuesFrom:
   - kind: Secret
     name: home-assistant-values

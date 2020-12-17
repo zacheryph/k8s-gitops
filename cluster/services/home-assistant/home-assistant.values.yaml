@@ -1,3 +1,3 @@
 git:
   deployKey: |
-    {{- include "files" "id_ed25519" | printf "\n%v" | indent 4 }}
+    {{- include "files" "id_rsa" | printf "\n%v" | indent 4 }}
