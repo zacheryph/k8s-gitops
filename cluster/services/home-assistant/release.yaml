@@ -33,19 +33,29 @@ spec:
       enabled: true
       serviceMonitor:
         enabled: true
-    git:
-      enabled: true
-      repo: https://github.com/zacheryph/hass-config
-      secret: github-credentials
-    vscode:
-      enabled: true
-      image:
-        repository: codercom/code-server
-        tag: 3.7.4
-      ingress:
+    persistence:
+      config:
         enabled: true
-        annotations:
-          nginx.ingress.kubernetes.io/auth-signin: https://auth.zro.io/oauth2/start
-          nginx.ingress.kubernetes.io/auth-url: https://auth.zro.io/oauth2/auth
-        hosts:
-        - home-vscode.zro.io
+        size: 4Gi
+
+    addons:
+      codeserver:
+        enabled: true
+        ingress:
+          enabled: true
+          annotations:
+            nginx.ingress.kubernetes.io/auth-signin: https://auth.zro.io/oauth2/start
+            nginx.ingress.kubernetes.io/auth-url: https://auth.zro.io/oauth2/auth
+            nginx.ingress.kubernetes.io/proxy-body-size: 0
+          hosts:
+          - host: home-vscode.zro.io
+            paths:
+            - path: /
+              pathType: Prefix
+        workingDir: /config
+        volumeMounts:
+        - name: config
+          mountPath: /config
+        - name: deploykey
+          mountPath: /root/.ssh/id_ed25519
+          subPath: id_ed25519
