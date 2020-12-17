@@ -21,10 +21,14 @@ spec:
       TZ: America/Chicago
     extraSecretForEnvFrom:
     - home-assistant-env
+    hostNetwork: true
     ingress:
       enabled: true
       hosts:
-      - home-assistant.zro.io
+      - host: home-assistant.zro.io
+        paths:
+        - path: /
+          pathType: Prefix
     monitoring:
       enabled: true
       serviceMonitor:
