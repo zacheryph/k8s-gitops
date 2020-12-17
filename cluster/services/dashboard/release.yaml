@@ -21,6 +21,10 @@ spec:
     ingress:
       enabled: true
       hosts:
+      - host: dash.zro.io
+        paths:
+        - path: /
+          pathType: Prefix
       - dash.zro.io
       annotations:
         nginx.ingress.kubernetes.io/auth-url: "https://auth.zro.io/oauth2/auth"
