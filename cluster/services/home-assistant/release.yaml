@@ -58,3 +58,6 @@ spec:
         - name: deploykey
           mountPath: /root/.ssh/id_ed25519
           subPath: id_ed25519
+  valuesFrom:
+  - kind: Secret
+    name: home-assistant-values
