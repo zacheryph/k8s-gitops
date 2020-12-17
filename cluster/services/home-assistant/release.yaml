@@ -38,6 +38,12 @@ spec:
         enabled: true
         size: 4Gi
 
+    additionalVolumes:
+    - name: sshkeys
+      secret:
+        secretName: github-credentials
+        defaultMode: 0700
+
     addons:
       codeserver:
         enabled: true
@@ -55,9 +61,5 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
-        - name: deploykey
-          mountPath: /root/.ssh/id_rsa
-          subPath: id_rsa
-  valuesFrom:
-  - kind: Secret
-    name: home-assistant-values
+        - name: sshkeys
+          mountPath: /root/.ssh

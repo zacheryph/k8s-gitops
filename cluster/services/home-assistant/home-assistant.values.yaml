@@ -1,3 +1,0 @@
-git:
-  deployKey: |
-    {{- include "files" "id_rsa" | printf "\n%v" | indent 4 }}
