@@ -63,3 +63,4 @@ spec:
           mountPath: /config
         - name: sshkeys
           mountPath: /root/.ssh
+          readOnly: true
