@@ -23,6 +23,7 @@ spec:
     - secretRef:
         name: home-assistant-env
     hostNetwork: true
+    dnsPolicy: ClusterFirstWithHostNet
     ingress:
       enabled: true
       hosts:
