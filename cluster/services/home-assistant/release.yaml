@@ -17,10 +17,11 @@ spec:
     image:
       repository: homeassistant/home-assistant
       tag: 2020.12.1
-    extraEnv:
+    env:
       TZ: America/Chicago
-    extraSecretForEnvFrom:
-    - home-assistant-env
+    envFrom:
+    - secretRef:
+        name: home-assistant-env
     hostNetwork: true
     ingress:
       enabled: true
