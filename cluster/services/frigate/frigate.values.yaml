@@ -6,6 +6,15 @@ config: |
     host: vernemq.home-assistant
     user: {{ .FRIGATE_MQTT_USERNAME }}
     password: {{ .FRIGATE_MQTT_PASSWORD }}
+  objects:
+    track:
+    - person
+    - bicycle
+    - car
+    - motorcycle
+    - bus
+    - cat
+    - dog
   cameras:
     front:
       ffmpeg:
