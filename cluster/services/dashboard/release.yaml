@@ -25,7 +25,6 @@ spec:
         paths:
         - path: /
           pathType: Prefix
-      - dash.zro.io
       annotations:
         nginx.ingress.kubernetes.io/auth-url: "https://auth.zro.io/oauth2/auth"
         nginx.ingress.kubernetes.io/auth-signin: "https://auth.zro.io/oauth2/start"
