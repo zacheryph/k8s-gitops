@@ -35,9 +35,3 @@ config: |
       record:
         enabled: True
         retain_days: 30
-
-
-        input:
-      height: 480
-      width: 640
-      fps: 7
