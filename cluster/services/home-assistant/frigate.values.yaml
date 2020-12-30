@@ -1,7 +1,6 @@
 rtspPassword: {{ .FRIGATE_RTSP_PASSWORD }}
 
 config: |
-  web_port: 5000
   mqtt:
     host: vernemq.home-assistant
     user: {{ .FRIGATE_MQTT_USERNAME }}
