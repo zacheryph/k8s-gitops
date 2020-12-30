@@ -1,0 +1,44 @@
+rtspPassword: {{ .FRIGATE_RTSP_PASSWORD }}
+
+config: |
+  web_port: 5000
+  mqtt:
+    host: vernemq.home-assistant
+    user: {{ .FRIGATE_MQTT_USERNAME }}
+    password: {{ .FRIGATE_MQTT_PASSWORD }}
+  save_clips:
+    max_seconds: 300
+    retain:
+      default: 30
+  objects:
+    track:
+    - person
+    - bicycle
+    - car
+    - motorcycle
+    - bus
+    - cat
+    - dog
+  cameras:
+    front:
+      ffmpeg:
+        inputs:
+        - path: rtsp://frigate:{{ .CAMERA_410_1_PASSWORD }}@{{ .CAMERA_410_1_ADDRESS }}//h264Preview_01_sub
+          roles:
+          - detect
+          - rtmp
+          - record
+        - path: rtsp://frigate:{{ .CAMERA_410_1_PASSWORD }}@{{ .CAMERA_410_1_ADDRESS }}//h264Preview_01_main
+          roles:
+          - clips
+      save_clips:
+        enabled: True
+      record:
+        enabled: True
+        retain_days: 30
+
+
+        input:
+      height: 480
+      width: 640
+      fps: 7
