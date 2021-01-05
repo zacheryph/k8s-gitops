@@ -91,3 +91,7 @@ Cluster is 3 built 1u servers with the following hardware.
   * gitea - git management server
   * registry - harbor docker registry
   * sonarqube - source code scanner
+
+## Thanks
+
+Most of the inspiration came from other folks that have shared their clusters at [awesome-home-kubernetes](https://github.com/k8s-at-home/awesome-home-kubernetes)
