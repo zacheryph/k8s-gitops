@@ -26,6 +26,8 @@ spec:
     extraVolumeMounts:
     - name: media
       mountPath: /media/frigate
+    - name: cache
+      mountPath: /tmp/cache
     ingress:
       enabled: true
       hosts:
