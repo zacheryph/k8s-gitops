@@ -11,6 +11,9 @@ spec:
   - ReadWriteMany
   capacity:
     storage: 2Ti
+  mountOptions:
+  - vers=4.1
+  - noresvport
   nfs:
     path: /export/nvr-media
     server: 10.43.111.111
@@ -27,6 +30,9 @@ spec:
   - ReadWriteMany
   capacity:
     storage: 2Ti
+  mountOptions:
+  - vers=4.1
+  - noresvport
   nfs:
     path: /export/nvr-media
     server: 10.43.111.111
