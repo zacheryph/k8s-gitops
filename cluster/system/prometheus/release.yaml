@@ -18,26 +18,11 @@ spec:
     grafana:
       plugins:
       - grafana-piechart-panel
-      # persistence:
-      #   enabled: true
-      #   size: 2Gi
       dashboards:
       env:
-        # auth proxy settings
-        GF_USERS_ALLOW_SIGN_UP: false
-        GF_USERS_AUTO_ASSIGN_ORG: true
-        GF_USERS_AUTO_ASSIGN_ORG_ROLE: Editor
-        GF_AUTH_PROXY_ENABLED: true
-        GF_AUTH_PROXY_HEADER_NAME: X-Forwarded-Email
-        GF_AUTH_PROXY_HEADER_PROPERTY: email
-        GF_AUTH_PROXY_AUTO_SIGN_UP: true
-        # other settings
         GF_PANELS_DISABLE_SANITIZE_HTML: true
       ingress:
         enabled: true
-        annotations:
-          nginx.ingress.kubernetes.io/auth-signin: https://auth.zro.io/oauth2/sign_in
-          nginx.ingress.kubernetes.io/auth-url: https://auth.zro.io/oauth2/auth
         hosts:
         - grafana.zro.io
     alertmanager:
@@ -60,3 +45,7 @@ spec:
               resources:
                 requests:
                   storage: 50Gi
+
+  valuesFrom:
+  - kind: Secret
+    name: prometheus-stack-values

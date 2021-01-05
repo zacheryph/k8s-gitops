@@ -1,0 +1,2 @@
+grafana:
+  adminPassword: {{ .PROMETHEUS_ADMIN_PASSWORD }}
