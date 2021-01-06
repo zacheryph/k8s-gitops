@@ -5,7 +5,6 @@ namespace: home-assistant
 resources:
 - namespace.yaml
 - release.yaml
-- frigate.yaml
 - vernemq.yaml
 - zwave2mqtt.yaml
 - ../../../shared/postgres
