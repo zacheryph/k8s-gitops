@@ -20,19 +20,18 @@ All secrets are able to use environment variables from `.secrets.env` which
 is secured by git-crypt.
 
 Refreshing of secrets have the caveat of only knowing if the source file is
-newer than the sealed secret. This does not account for changed to
+newer than the sealed secret. This does not account for changes to
 `.secrets.env` that affect the secret. If changes are made to existing values
 you will need to touch the secret[s] affected or remove their sealed secret
 counterparts.
 
-Secrets are generated into `cluster/secrets`, and the `kustomization.yaml`
-automatically generated containing them all. Each secret exists in their
+Secrets are generated into `cluster/secrets`. The `kustomization.yaml`
+is automatically generated to contain them all. Each secret exists in their
 respective namespace which is extracted from the `kustomization.yaml` within
 the same directory the secret exists in.
 
 As an added bonus there is a pre-commit hook to ensure all sealed secrets
-exist and are up to date so that you do not forget to generate any new
-ones.
+exist and are up to date so that you do not forget to generate any new ones.
 
 ### Secret Commands
 
@@ -43,17 +42,17 @@ ones.
 
 ### Secret Types
 
-#### `secret-name.crypt.env`
+#### `secret-name.secrets.yaml`
 
-> env format file that creates a secret with a key for each
-> _environment variable_. The secret name is the name of the
-> file less the crypt.env suffix.
+> yaml file to be used as the data: for the secret. All values
+> within these types of secrets must be base64 encoded. The secret
+> name is the name of the file less the secrets.yaml suffix.
 
 #### `secret-name.values.yaml`
 
 > this is for `HelmRelease` style values. They will generate a secret
 > with a `values.yaml` key containing the contents of this file. The
-> secret generated will be names `secret-name-values`.
+> secret generated will be named `secret-name-values`.
 
 ## Hardware
 
