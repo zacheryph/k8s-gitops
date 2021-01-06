@@ -16,6 +16,7 @@ spec:
   values:
     persistence:
       defaultClassReplicaCount: 2
+      reclaimPolicy: Retain
     csi:
       kubeletRootDir: /var/lib/kubelet
     defaultSettings:
