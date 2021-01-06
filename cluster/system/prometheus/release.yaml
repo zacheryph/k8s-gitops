@@ -16,11 +16,19 @@ spec:
   values:
     fullnameOverride: stack
     grafana:
+      image:
+        repository: grafana/grafana
+        tag: 7.3.6
       plugins:
       - grafana-piechart-panel
-      dashboards:
       env:
         GF_PANELS_DISABLE_SANITIZE_HTML: true
+      sidecar:
+        datasources:
+          enabled: true
+        dashboards:
+          enabled: true
+          searchNamespace: ALL
       ingress:
         enabled: true
         hosts:
@@ -37,6 +45,10 @@ spec:
                   storage: 2Gi
     prometheus:
       prometheusSpec:
+        serviceMonitorSelectorNilUsesHelmValues: false
+        serviceMonitorSelector: {}
+        serviceMonitorNamespaceSelector: {}
+        walCompression: true
         storageSpec:
           volumeClaimTemplate:
             spec:
