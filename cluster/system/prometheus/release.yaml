@@ -22,7 +22,7 @@ spec:
       plugins:
       - grafana-piechart-panel
       env:
-        GF_PANELS_DISABLE_SANITIZE_HTML:
+        GF_PANELS_DISABLE_SANITIZE_HTML: true
         VAR_BLOCKY_URL: "http://blocky.blocky.svc:4000"
       sidecar:
         datasources:
