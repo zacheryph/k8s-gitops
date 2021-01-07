@@ -24,7 +24,7 @@ spec:
     - 10.72.143.0/24
     persistence:
       data:
-        claimName: media-pool
+        claimName: pool-media
       extraData:
       - name: nvr
         claimName: pool-nvr

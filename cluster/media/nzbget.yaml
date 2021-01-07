@@ -45,7 +45,7 @@ spec:
     additionalVolumes:
     - name: media
       persistentVolumeClaim:
-        claimName: media-pool
+        claimName: pool-media
     resources:
       requests:
         memory: 500Mi

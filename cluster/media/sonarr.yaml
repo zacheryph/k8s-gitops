@@ -48,7 +48,7 @@ spec:
         size: 10Gi
       media:
         enabled: true
-        existingClaim: media-pool
+        existingClaim: pool-media
     resources:
       requests:
         memory: 350Mi
