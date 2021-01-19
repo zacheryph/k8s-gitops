@@ -28,7 +28,7 @@ spec:
       privileged: false
     postgresql:
       enabled: false
-      postgresqlServer: postgres.sonarqube.svc
+      postgresqlServer: postgres
       postgresqlDatabase: postgres
       postgresqlUsername: postgres
   valuesFrom:
