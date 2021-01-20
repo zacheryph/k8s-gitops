@@ -47,9 +47,9 @@ spec:
           NAME: postgres
           USER: postgres
         cache:
-          ADAPTER: memcache
+          ADAPTER: memory
           ENABLED: true
-          HOST: memcached:11211
+          # HOST: memcached:11211
   valuesFrom:
   - kind: Secret
     name: postgres-auth
