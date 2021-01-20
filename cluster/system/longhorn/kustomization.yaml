@@ -5,6 +5,3 @@ namespace: longhorn-system
 resources:
 - namespace.yaml
 - release.yaml
-- nfs-security.yaml
-- nfs-provisioner.yaml
-- nfs-storage.yaml
