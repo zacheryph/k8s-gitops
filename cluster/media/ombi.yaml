@@ -35,8 +35,7 @@ spec:
     persistence:
       config:
         enabled: true
-        accessMode: ReadWriteOnce
-        size: 10Gi
+        existingClaim: ombi-config
     resources:
       requests:
         memory: 250Mi

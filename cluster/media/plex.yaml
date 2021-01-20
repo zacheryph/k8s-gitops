@@ -23,6 +23,8 @@ spec:
     - 10.42.0.0/16
     - 10.72.143.0/24
     persistence:
+      config:
+        claimName: plex-config
       data:
         claimName: pool-media
       extraData:

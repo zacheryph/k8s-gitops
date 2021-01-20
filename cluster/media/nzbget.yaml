@@ -37,8 +37,7 @@ spec:
     persistence:
       config:
         enabled: true
-        accessMode: ReadWriteOnce
-        size: 50Gi
+        existingClaim: nzbget-config
     additionalVolumeMounts:
     - name: media
       mountPath: /media

@@ -44,8 +44,7 @@ spec:
     persistence:
       config:
         enabled: true
-        accessMode: ReadWriteOnce
-        size: 10Gi
+        existingClaim: radarr-config
     additionalVolumeMounts:
     - name: media
       mountPath: /media

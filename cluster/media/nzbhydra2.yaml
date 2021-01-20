@@ -36,8 +36,7 @@ spec:
     persistence:
       config:
         enabled: true
-        accessMode: ReadWriteOnce
-        size: 2Gi
+        existingClaim: nzbhydra-config
     resources:
       requests:
         memory: 250Mi
