@@ -38,7 +38,7 @@ spec:
     persistence:
       config:
         enabled: true
-        size: 4Gi
+        existingClaim: home-assistant-config
 
     additionalVolumes:
     - name: sshkeys

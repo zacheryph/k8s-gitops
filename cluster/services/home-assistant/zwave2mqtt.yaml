@@ -23,7 +23,7 @@ spec:
     persistence:
       config:
         enabled: true
-        size: 1Gi
+        existingClaim: zwave2mqtt-config
     ingress:
       enabled: true
       annotations:

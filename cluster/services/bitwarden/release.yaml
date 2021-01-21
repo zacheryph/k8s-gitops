@@ -21,7 +21,7 @@ spec:
       domain: https://warden.zro.io
     persistence:
       enabled: true
-      existingClaim: bitwarden-database
+      existingClaim: bitwarden-data
     ingress:
       enabled: true
       hosts:

@@ -28,3 +28,6 @@ spec:
     metrics:
       serviceMonitor:
         enabled: true
+    persistence:
+      enabled: true
+      existingClaim: minio-external
