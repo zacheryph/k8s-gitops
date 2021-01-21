@@ -32,7 +32,7 @@ spec:
       enabled: true
 
     # blocky configuration
-    config:
+    config: |
       upstream:
         # these external DNS resolvers will be used. Blocky picks 2 random resolvers from the list for each query
         # format for resolver: net:host:[port][/path]. net could be tcp, udp, tcp-tls or https (DoH). If port is empty, default port will be used (53 for udp and tcp, 853 for tcp-tls, 443 for https (Doh))
@@ -82,6 +82,7 @@ spec:
           - https://s3.amazonaws.com/lists.disconnect.me/simple_tracking.txt
           special:
           - https://hosts-file.net/ad_servers.txt
+          - https://raw.githubusercontent.com/StevenBlack/hosts/master/alternates/fakenews
 
         # definition of whitelist groups. Attention: if the same group has black and whitelists,
         # whitelists will be used to disable particular blacklist entries. If a group has only
