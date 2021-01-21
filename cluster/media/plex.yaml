@@ -29,7 +29,7 @@ spec:
         claimName: pool-media
       extraData:
       - name: nvr
-        claimName: pool-nvr
+        claimName: nvr-pool
     ingress:
       enabled: true
       hosts:

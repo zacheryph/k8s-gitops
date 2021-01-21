@@ -19,7 +19,7 @@ spec:
     extraVolumes:
     - name: media
       persistentVolumeClaim:
-        claimName: pool-nvr
+        claimName: nvr-pool
     - name: cache
       emptyDir:
         medium: Memory
