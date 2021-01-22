@@ -47,7 +47,7 @@ spec:
         existingClaim: sonarr-config
       media:
         enabled: true
-        existingClaim: pool-media
+        existingClaim: media-pool
     resources:
       requests:
         memory: 350Mi
