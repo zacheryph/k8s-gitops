@@ -15,8 +15,8 @@ spec:
         namespace: flux-system
   values:
     image:
-      repository: zwavejs/zwavejs2mqtt
-      tag: 1.0.0-beta.0
+      repository: robertslando/zwave2mqtt
+      tag: 4.1.1
     env:
       TZ: "America/Chicago"
       OZW_AUTO_UPDATE_CONFIG: true
