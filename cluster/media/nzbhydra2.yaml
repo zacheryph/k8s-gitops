@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: k8sathome/nzbhydra2
-      tag: v3.9.2
+      tag: v3.11.3
     env:
       TZ: "America/Chicago"
     podSecurityContext:
