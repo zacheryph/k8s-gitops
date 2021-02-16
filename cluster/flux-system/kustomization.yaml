@@ -15,6 +15,7 @@ resources:
 - ./helm-repositories/loki.yaml
 - ./helm-repositories/longhorn.yaml
 - ./helm-repositories/minio.yaml
+- ./helm-repositories/nextcloud.yaml
 - ./helm-repositories/oteemo.yaml
 - ./helm-repositories/prometheus-community.yaml
 - ./helm-repositories/sonatype.yaml
