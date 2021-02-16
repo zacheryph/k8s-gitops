@@ -2,6 +2,9 @@ nextcloud:
   host: cloud.zro.io
   username: {{ .USER_NAME }}
   password: {{ .NEXTCLOUD_ADMIN_PASSWORD }}
+  defaultConfigs:
+    autoconfig.php: false
+    redis.config.php: false
   configs:
     custom.config.php: |-
       <?php
