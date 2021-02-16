@@ -27,10 +27,10 @@ nextcloud:
       );
     s3.config.php: |-
       <?php
-      $CONFIG = aray(
-        'objectstorage' => array(
+      $CONFIG = array(
+        'objectstore' => array(
           'class' => '\\OC\\Files\\ObjectStore\\S3',
-          'arguments' = array(
+          'arguments' => array(
             'bucket' => 'nextcloud',
             'autocreate' => true,
             'key' => '{{ .MINIO_INTERNAL_ACCESS_KEY }}',
@@ -39,7 +39,7 @@ nextcloud:
             'hostname' => '{{ .MINIO_INTERNAL_HOSTNAME }}',
             'use_ssl' => false,
             'use_path_style' => true
-           );
+          )
         )
       );
 internalDatabase:
