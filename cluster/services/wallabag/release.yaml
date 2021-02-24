@@ -21,9 +21,13 @@ spec:
       enabled: true
       hosts:
       - host: wallabag.zro.io
-        paths: [ "/" ]
-    wallabag:
-      public_url: "https://wallabag.zro.io"
+        paths:
+        - path: /
+          pathType: Prefix
+    persistence:
+      images:
+        enabled: true
+        existingClaim: wallabag-images
   valuesFrom:
   - kind: Secret
     name: wallabag-values
