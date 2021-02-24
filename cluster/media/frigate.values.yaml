@@ -40,22 +40,3 @@ config: |
       record:
         enabled: True
         retain_days: 30
-    garage:
-      ffmpeg:
-        inputs:
-        - path: rtsp://neolink.neolink.svc:8554/garage/subStream
-          roles:
-          - detect
-          - rtmp
-          - record
-        - path: rtsp://neolink.neolink.svc:8554/garage/mainStream
-          roles:
-          - clips
-      width: 704
-      height: 480
-      fps: 6
-      clips:
-        enabled: True
-      record:
-        enabled: True
-        retain_days: 15
