@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: wallabag/wallabag
-      tag: 2.4.1
+      tag: 2.3.8
     ingress:
       enabled: true
       hosts:
