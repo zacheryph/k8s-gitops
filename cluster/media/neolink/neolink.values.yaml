@@ -1,0 +1,8 @@
+config: |
+  bind = "0.0.0.0"
+
+  [[cameras]]
+  name = "garage"
+  username = "neolink"
+  password = "{{ .CAMERA_GARAGE_PASSWORD }}"
+  address = "{{ .CAMERA_GARAGE_ADDRESS }}:9000"
