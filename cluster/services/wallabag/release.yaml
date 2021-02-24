@@ -1,0 +1,26 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: wallabag
+spec:
+  interval: 1h
+  chart:
+    spec:
+      # registryUrl=https://halkeye.github.io/helm-charts/
+      chart: wallabag
+      version: 0.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: halkeye
+        namespace: flux-system
+  values:
+    image:
+      repository: wallabag/wallabag
+      tag: 2.4.1
+    ingress:
+      enabled: true
+      hosts:
+      - host: wallabag.zro.io
+        paths: [ "/" ]
+    wallabag:
+      public_url: "https://wallabag.zro.io"

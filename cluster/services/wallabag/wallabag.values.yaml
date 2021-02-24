@@ -1,0 +1,7 @@
+wallabag:
+  postgres:
+    name: postgres
+    user: {{ .WALLABAG_POSTGRES_USERNAME }}
+    password: {{ .WALLABAG_POSTGRES_PASSWORD }}
+    host: postgres
+    port: 5432
