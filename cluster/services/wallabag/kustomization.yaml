@@ -8,5 +8,5 @@ resources:
 - ../../../shared/postgres
 - ../../../shared/redis
 
-# patchesStrategicMerge:
-# - postgres.yaml
+patchesStrategicMerge:
+- postgres.yaml
