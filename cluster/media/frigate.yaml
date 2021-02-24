@@ -14,7 +14,7 @@ spec:
   values:
     image:
       repository: blakeblackshear/frigate
-      tag: 0.8.0-beta3-amd64
+      tag: 0.8.3-amd64
     timezone: 'America/Chicago'
     extraVolumes:
     - name: media
