@@ -24,3 +24,6 @@ spec:
         paths: [ "/" ]
     wallabag:
       public_url: "https://wallabag.zro.io"
+  valuesFrom:
+  - kind: Secret
+    name: wallabag-values
