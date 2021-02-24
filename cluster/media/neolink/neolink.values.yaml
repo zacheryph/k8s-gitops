@@ -6,3 +6,4 @@ config: |
   username = "neolink"
   password = "{{ .CAMERA_GARAGE_PASSWORD }}"
   address = "{{ .CAMERA_GARAGE_ADDRESS }}:9000"
+  format = "h264"
