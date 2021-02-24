@@ -5,10 +5,12 @@ config: |
     host: vernemq.home-assistant
     user: {{ .FRIGATE_MQTT_USERNAME }}
     password: {{ .FRIGATE_MQTT_PASSWORD }}
-  save_clips:
+  clips:
     max_seconds: 300
     retain:
-      default: 30
+      default: 10
+      objects:
+        person: 60
   objects:
     track:
     - person
@@ -30,11 +32,11 @@ config: |
         - path: rtsp://frigate:{{ .CAMERA_410_1_PASSWORD }}@{{ .CAMERA_410_1_ADDRESS }}//h264Preview_01_main
           roles:
           - clips
-      save_clips:
+      width: 704
+      height: 480
+      fps: 6
+      clips:
         enabled: True
       record:
         enabled: True
         retain_days: 30
-      width: 640
-      height: 480
-      fps: 7
