@@ -20,6 +20,9 @@ config: |
     - bus
     - cat
     - dog
+  detectors:
+    cpu1:
+      type: cpu
   cameras:
     front:
       ffmpeg:
