@@ -1,33 +1,13 @@
 # https://taskfile.dev
+---
+version: '2.6'
 
-version: '2'
+includes:
+  upgrade: .taskfiles/upgrade.yaml
+  secrets: .taskfiles/secrets.yaml
 
 tasks:
   default:
     cmds:
     - go-task -l
     silent: true
-  upgrade-flux:
-    desc: upgrade flux component manifest
-    cmds:
-    - flux install --export > cluster/flux-system/gotk-components.yaml
-  upgrade-flux-cli:
-    desc: upgrade local flux command line binary
-    cmds:
-    - ./bin/update.sh flux
-  upgrade-sealed-secrets:
-    desc: upgrade flux controller manifest
-    cmds:
-    - ./bin/update.sh sealed
-  secrets-check:
-    desc: check all secrets are up to date
-    cmds:
-    - ./bin/secrets.sh check
-  secrets-refresh:
-    desc: refresh secrets
-    cmds:
-    - ./bin/secrets.sh refresh
-  secrets-write:
-    desc: recreate all sealed secrets
-    cmds:
-    - ./bin/secrets.sh write
