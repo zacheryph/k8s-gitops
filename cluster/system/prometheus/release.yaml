@@ -76,6 +76,7 @@ spec:
                   storage: 2Gi
     prometheus:
       prometheusSpec:
+        shards: null
         serviceMonitorSelectorNilUsesHelmValues: false
         serviceMonitorSelector: {}
         serviceMonitorNamespaceSelector: {}
