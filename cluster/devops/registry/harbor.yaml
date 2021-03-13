@@ -41,7 +41,8 @@ spec:
       external:
         addr: "redis.registry.svc:6379"
     jobservice:
-      jobLogger: database
+      jobLoggers:
+      - database
   valuesFrom:
   - kind: Secret
     name: harbor-values
