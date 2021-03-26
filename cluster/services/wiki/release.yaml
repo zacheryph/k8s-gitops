@@ -13,7 +13,7 @@ spec:
   values:
     image:
       repository: requarks/wiki
-      tag: 2.5.191
+      tag: 2.5.197
     replicaCount: 2
     ingress:
       enabled: true
