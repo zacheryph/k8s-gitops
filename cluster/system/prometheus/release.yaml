@@ -18,7 +18,7 @@ spec:
     grafana:
       image:
         repository: grafana/grafana
-        tag: 7.5.1
+        tag: 7.5.2
       plugins:
       - grafana-piechart-panel
       env:
