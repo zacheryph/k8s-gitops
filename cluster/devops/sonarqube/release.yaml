@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: sonarqube
-      tag: 8.7.1-community
+      tag: 8.8.0-community
     service:
       externalPort: 80
     ingress:
