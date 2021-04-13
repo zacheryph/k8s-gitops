@@ -1,0 +1,46 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: sharry
+spec:
+  interval: 1h
+  chart:
+    spec:
+      # registryUrl=https://k8s-at-home.com/charts/
+      chart: sharry
+      version: 2.2.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+  values:
+    image:
+      repository: eikek0/sharry
+      tag: 1.6.0
+    controllerType: deployment
+    strategy:
+      type: Recreate
+    ingress:
+      enabled: true
+      hosts:
+      - host: sharry.zro.io
+        paths:
+        - path: /
+          pathType: Prefix
+    sharry:
+      baseUrl: https://sharry.zro.io
+      chunkSize: "512K"
+      maxSize: "1G"
+      maxValidity: "31 days"
+      signup: "closed"
+      jdbcUrl: jdbc:postgresql://postgres:5432/postgres
+
+  valuesFrom:
+  - kind: Secret
+    name: sharry-values
+    valuesKey: username
+    targetPath: sharry.jdbcUser
+  - kind: Secret
+    name: sharry-values
+    valuesKey: password
+    targetPath: sharry.jdbcPassword
