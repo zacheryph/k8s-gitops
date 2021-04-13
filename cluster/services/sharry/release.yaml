@@ -37,10 +37,10 @@ spec:
 
   valuesFrom:
   - kind: Secret
-    name: sharry-values
+    name: postgres-auth
     valuesKey: username
     targetPath: sharry.jdbcUser
   - kind: Secret
-    name: sharry-values
+    name: postgres-auth
     valuesKey: password
     targetPath: sharry.jdbcPassword
