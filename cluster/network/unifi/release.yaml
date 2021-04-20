@@ -1,0 +1,50 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: unifi
+spec:
+  interval: 1h
+  chart:
+    spec:
+      # registryUrl=https://k8s-at-home.com/charts/
+      chart: unifi
+      version: 2.0.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+  values:
+    image:
+      repository: jacobalberty/unifi
+      tag: 6.1.71
+    persistence:
+      enabled: true
+      existingClaim: unifi-data
+    timezone: "America/Chicago"
+    runAsRoot: false
+    resources:
+      requests:
+        cpu: 30m
+        memory: 500Mi
+      limits:
+        memory: 750Mi
+    ingress:
+      enabled: true
+      hosts:
+      - unifi.zro.io
+    guiService:
+      type: LoadBalancer
+      annotations:
+        metallb.universe.tf/allow-shared-ip: unifi
+    controllerService:
+      type: LoadBalancer
+      annotations:
+        metallb.universe.tf/allow-shared-ip: unifi
+    stunService:
+      type: LoadBalancer
+      annotations:
+        metallb.universe.tf/allow-shared-ip: unifi
+    discoveryService:
+      type: LoadBalancer
+      annotations:
+        metallb.universe.tf/allow-shared-ip: unifi
