@@ -32,6 +32,8 @@ spec:
       enabled: true
       hosts:
       - unifi.zro.io
+      annotations:
+        nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     guiService:
       type: LoadBalancer
       annotations:
