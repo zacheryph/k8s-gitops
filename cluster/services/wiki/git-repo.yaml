@@ -1,9 +1,0 @@
-apiVersion: source.toolkit.fluxcd.io/v1beta1
-kind: GitRepository
-metadata:
-  name: requarks
-spec:
-  interval: 12h
-  url: https://github.com/Requarks/wiki
-  ref:
-    branch: latest
