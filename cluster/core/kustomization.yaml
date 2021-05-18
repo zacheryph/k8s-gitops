@@ -7,4 +7,5 @@ resources:
 - kubedb
 - longhorn
 - metallb
+- rook-ceph
 - sealed-secrets
