@@ -1,0 +1,47 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: k10
+  namespace: system-kasten
+spec:
+  interval: 5m
+  releaseName: k10
+  chart:
+    spec:
+      # renovate: registryUrl=https://charts.kasten.io
+      chart: k10
+      version: 4.0.2
+      sourceRef:
+        kind: HelmRepository
+        name: kasten-charts
+        namespace: flux-system
+      interval: 5m
+  values:
+    eula:
+      accept: true
+      company: ZRO
+      email: ${EMAIL_1}
+
+    clusterName: inwin
+
+    auth:
+      tokenAuth:
+        enabled: true
+
+    ingress:
+      create: true
+      host: k10.zro.io
+      urlPath: k10
+      hosts:
+      - k10.zro.io
+
+    prometheus:
+      enabled: true
+      server:
+        persistentVolume:
+          enabled: false
+
+  valuesFrom:
+  - kind: Secret
+    name: kasten-values

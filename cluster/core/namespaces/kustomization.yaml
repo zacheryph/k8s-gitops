@@ -23,6 +23,7 @@ resources:
 - prometheus-system.yaml
 - registry.yaml
 - sonarqube.yaml
+- system-kasten.yaml
 - system-rook-ceph.yaml
 - unifi.yaml
 - wallabag.yaml

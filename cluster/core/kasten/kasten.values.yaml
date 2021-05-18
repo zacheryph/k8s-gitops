@@ -1,0 +1,2 @@
+eula:
+  email: {{ .USER_EMAIL }}

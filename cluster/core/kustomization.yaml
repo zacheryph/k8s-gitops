@@ -4,6 +4,7 @@ kind: Kustomization
 resources:
 - namespaces
 - cert-manager
+- kasten
 - kubedb
 - longhorn
 - metallb
