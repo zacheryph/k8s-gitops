@@ -3,7 +3,6 @@ kind: Kustomization
 
 namespace: kubedb-system
 resources:
-- namespace.yaml
 - release.yaml
 - catalog.yaml
 
