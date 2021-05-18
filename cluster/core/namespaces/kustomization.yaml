@@ -16,7 +16,6 @@ resources:
 - kubedb-system.yaml
 - longhorn-system.yaml
 - media.yaml
-- metallb-system.yaml
 - minio.yaml
 - neolink.yaml
 - nextcloud.yaml
