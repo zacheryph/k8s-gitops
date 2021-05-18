@@ -3,9 +3,10 @@ kind: Kustomization
 
 namespace: wallabag
 resources:
-- release.yaml
-- ../../../../shared/postgres
-- ../../../../shared/redis
+- volumes
+# - release.yaml
+# - ../../../../shared/postgres
+# - ../../../../shared/redis
 
-patchesStrategicMerge:
-- postgres.yaml
+# patchesStrategicMerge:
+# - postgres.yaml

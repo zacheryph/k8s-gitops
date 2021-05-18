@@ -3,10 +3,11 @@ kind: Kustomization
 
 namespace: home-assistant
 resources:
-- release.yaml
-- vernemq.yaml
-- zwave2mqtt.yaml
-- ../../../../shared/postgres
+- volumes
+# - release.yaml
+# - vernemq.yaml
+# - zwave2mqtt.yaml
+# - ../../../../shared/postgres
 
-patchesStrategicMerge:
-- postgres.yaml
+# patchesStrategicMerge:
+# - postgres.yaml

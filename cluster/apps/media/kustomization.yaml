@@ -3,10 +3,10 @@ kind: Kustomization
 
 namespace: media
 resources:
-- frigate.yaml
-- nzbget.yaml
-- nzbhydra2.yaml
-- ombi.yaml
-- plex.yaml
-- radarr.yaml
-- sonarr.yaml
+- volumes
+# - frigate.yaml
+# - nzbget.yaml
+# - nzbhydra2.yaml
+# - plex.yaml
+# - radarr.yaml
+# - sonarr.yaml

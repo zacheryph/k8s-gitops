@@ -3,6 +3,7 @@ kind: Kustomization
 
 namespace: gitea
 resources:
-- memcached.yaml
-- release.yaml
-- ../../../../shared/postgres
+- volumes
+# - memcached.yaml
+# - release.yaml
+# - ../../../../shared/postgres
