@@ -14,6 +14,8 @@ spec:
     /*
     # include deploy dir
     !/cluster
+    # include shared
+    !/shared
     # exclude file extensions from deploy dir
     /cluster/**/*.md
     /cluster/**/*.tmpl
