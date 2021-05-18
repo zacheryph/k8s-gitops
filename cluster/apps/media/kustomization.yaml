@@ -4,9 +4,9 @@ kind: Kustomization
 namespace: media
 resources:
 - volumes
-# - frigate.yaml
+- frigate.yaml
 # - nzbget.yaml
 # - nzbhydra2.yaml
-# - plex.yaml
+- plex.yaml
 # - radarr.yaml
 # - sonarr.yaml

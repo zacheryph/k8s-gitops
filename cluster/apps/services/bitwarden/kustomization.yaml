@@ -4,4 +4,4 @@ kind: Kustomization
 namespace: bitwarden
 resources:
 - volumes
-# - release.yaml
+- release.yaml
