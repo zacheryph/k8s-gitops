@@ -5,12 +5,18 @@ metadata:
   name: flux-system
   namespace: flux-system
 spec:
-  interval: 5m0s
+  interval: 1m0s
   ref:
     branch: main
-  secretRef:
-    name: flux-system
   url: https://github.com/zacheryph/k8s-gitops
+  ignore: |
+    # exclude all
+    /*
+    # include deploy dir
+    !/cluster
+    # exclude file extensions from deploy dir
+    /cluster/**/*.md
+    /cluster/**/*.tmpl
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1beta1
 kind: Kustomization
@@ -19,9 +25,13 @@ metadata:
   namespace: flux-system
 spec:
   interval: 10m0s
-  path: ./cluster
-  prune: false
+  path: ./cluster/base
+  prune: true
   sourceRef:
     kind: GitRepository
     name: flux-system
   validation: client
+  # decryption:
+  #   provider: sops
+  #   secretRef:
+  #     name: sops-gpg
