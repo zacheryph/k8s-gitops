@@ -3,5 +3,4 @@ kind: Kustomization
 
 namespace: blocky
 resources:
-- namespace.yaml
 - release.yaml

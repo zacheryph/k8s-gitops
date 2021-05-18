@@ -3,7 +3,6 @@ kind: Kustomization
 
 namespace: home-assistant
 resources:
-- namespace.yaml
 - release.yaml
 - vernemq.yaml
 - zwave2mqtt.yaml

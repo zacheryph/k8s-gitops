@@ -3,5 +3,4 @@ kind: Kustomization
 
 namespace: neolink
 resources:
-- namespace.yaml
 - release.yaml

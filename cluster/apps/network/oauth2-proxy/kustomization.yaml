@@ -3,5 +3,4 @@ kind: Kustomization
 
 namespace: oauth2-proxy
 resources:
-- namespace.yaml
 - release.yaml

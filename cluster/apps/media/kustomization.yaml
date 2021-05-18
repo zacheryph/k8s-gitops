@@ -3,7 +3,6 @@ kind: Kustomization
 
 namespace: media
 resources:
-- namespace.yaml
 - frigate.yaml
 - nzbget.yaml
 - nzbhydra2.yaml

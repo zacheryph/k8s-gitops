@@ -3,5 +3,4 @@ kind: Kustomization
 
 namespace: drone-build
 resources:
-- namespace.yaml
 - services.yaml

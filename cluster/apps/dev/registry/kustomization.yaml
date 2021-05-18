@@ -3,7 +3,6 @@ kind: Kustomization
 
 namespace: registry
 resources:
-- namespace.yaml
 - harbor.yaml
 - service.yaml
 - ../../../../shared/postgres

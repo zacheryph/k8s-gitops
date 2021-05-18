@@ -3,7 +3,6 @@ kind: Kustomization
 
 namespace: ingress-system
 resources:
-- namespace.yaml
 - issuer.yaml
 - ingress-nginx.yaml
 - wildcard-certificate.yaml
