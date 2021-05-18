@@ -5,8 +5,8 @@ namespace: wallabag
 resources:
 - namespace.yaml
 - release.yaml
-- ../../../shared/postgres
-- ../../../shared/redis
+- ../../../../shared/postgres
+- ../../../../shared/redis
 
 patchesStrategicMerge:
 - postgres.yaml

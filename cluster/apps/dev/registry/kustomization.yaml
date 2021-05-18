@@ -6,8 +6,8 @@ resources:
 - namespace.yaml
 - harbor.yaml
 - service.yaml
-- ../../../shared/postgres
-- ../../../shared/redis
+- ../../../../shared/postgres
+- ../../../../shared/redis
 
 generatorOptions:
   disableNameSuffixHash: true

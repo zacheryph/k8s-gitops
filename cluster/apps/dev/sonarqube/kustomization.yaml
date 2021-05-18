@@ -5,4 +5,4 @@ namespace: sonarqube
 resources:
 - namespace.yaml
 - release.yaml
-- ../../../shared/postgres
+- ../../../../shared/postgres

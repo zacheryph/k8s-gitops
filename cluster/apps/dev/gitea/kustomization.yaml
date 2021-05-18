@@ -6,4 +6,4 @@ resources:
 - namespace.yaml
 - memcached.yaml
 - release.yaml
-- ../../../shared/postgres
+- ../../../../shared/postgres
