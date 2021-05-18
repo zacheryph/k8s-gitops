@@ -6,3 +6,4 @@ metadata:
 spec:
   interval: 30m0s
   url: https://charts.longhorn.io
+  timeout: 3m

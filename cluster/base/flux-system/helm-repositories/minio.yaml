@@ -6,3 +6,4 @@ metadata:
 spec:
   interval: 30m0s
   url: https://helm.min.io/
+  timeout: 3m

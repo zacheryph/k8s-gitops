@@ -6,3 +6,4 @@ metadata:
 spec:
   interval: 30m0s
   url: https://vernemq.github.io/docker-vernemq
+  timeout: 3m

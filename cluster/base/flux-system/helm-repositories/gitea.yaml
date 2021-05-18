@@ -6,3 +6,4 @@ metadata:
 spec:
   interval: 30m0s
   url: https://dl.gitea.io/charts/
+  timeout: 3m

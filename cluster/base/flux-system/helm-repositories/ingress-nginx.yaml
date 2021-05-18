@@ -6,3 +6,4 @@ metadata:
 spec:
   interval: 30m0s
   url: https://kubernetes.github.io/ingress-nginx
+  timeout: 3m

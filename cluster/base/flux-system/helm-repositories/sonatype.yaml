@@ -6,3 +6,4 @@ metadata:
 spec:
   interval: 30m0s
   url: https://sonatype.github.io/helm3-charts/
+  timeout: 3m
