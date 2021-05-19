@@ -14,7 +14,8 @@ spec:
     /*
     # include deploy dir
     !/cluster
-    # include shared
+    # include charts/shared
+    !/charts
     !/shared
     # exclude file extensions from deploy dir
     /cluster/**/*.md
