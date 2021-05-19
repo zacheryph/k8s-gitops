@@ -32,9 +32,6 @@ spec:
     ingress:
       create: true
       host: k10.zro.io
-      urlPath: /
-      hosts:
-      - k10.zro.io
 
     prometheus:
       enabled: true
