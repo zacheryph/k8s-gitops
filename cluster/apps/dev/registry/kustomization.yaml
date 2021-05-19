@@ -3,18 +3,18 @@ kind: Kustomization
 
 namespace: registry
 resources:
-- harbor.yaml
-- service.yaml
-- ../../../../shared/postgres
-- ../../../../shared/redis
+# - harbor.yaml
+# - service.yaml
+# - ../../../../shared/postgres
+# - ../../../../shared/redis
 
 generatorOptions:
   disableNameSuffixHash: true
 
-configMapGenerator:
-- name: postgres-init
-  files:
-  - create-databases.sql
+# configMapGenerator:
+# - name: postgres-init
+#   files:
+#   - create-databases.sql
 
-patchesStrategicMerge:
-- postgres.yaml
+# patchesStrategicMerge:
+# - postgres.yaml

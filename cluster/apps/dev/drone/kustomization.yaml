@@ -6,7 +6,7 @@ resources:
 - release.yaml
 - runner.yaml
 - secrets-provider.yaml
-- ../../../../shared/postgres
+# - ../../../../shared/postgres
 
-patchesStrategicMerge:
-- postgres.yaml
+# patchesStrategicMerge:
+# - postgres.yaml
