@@ -5,7 +5,7 @@ resources:
 - dev
 - media
 - network
-# - prometheus
 - services
 - system
 - system-ingress
+- system-monitor

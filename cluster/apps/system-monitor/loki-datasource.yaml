@@ -10,4 +10,4 @@ data:
     datasources:
     - name: Loki
       type: loki
-      url: http://loki.prometheus-system.svc:3100/
+      url: http://loki.system-monitor.svc:3100/
