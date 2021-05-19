@@ -3,7 +3,7 @@ kind: Postgres
 metadata:
   name: postgres
 spec:
-  version: 13.2
+  version: "13.2"
   storageType: Durable
   replicas: 2
   standbyMode: Hot
