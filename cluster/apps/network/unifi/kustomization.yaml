@@ -4,4 +4,4 @@ kind: Kustomization
 namespace: unifi
 resources:
 - volumes
-# - release.yaml
+- release.yaml
