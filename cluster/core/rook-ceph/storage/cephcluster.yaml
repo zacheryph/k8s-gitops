@@ -62,10 +62,13 @@ spec:
     nodes:
     - name: k3os-11441
       devices:
+      - name: sdb
       - name: sdc
     - name: k3os-15317
       devices:
+      - name: sdb
       - name: sdc
     - name: k3os-28049
       devices:
+      - name: sdb
       - name: sdc
