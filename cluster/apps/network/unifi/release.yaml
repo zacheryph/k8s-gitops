@@ -36,17 +36,21 @@ spec:
         nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     guiService:
       type: LoadBalancer
+      loadBalancerIP: "${LB_UNIFI}"
       annotations:
         metallb.universe.tf/allow-shared-ip: unifi
     controllerService:
       type: LoadBalancer
+      loadBalancerIP: "${LB_UNIFI}"
       annotations:
         metallb.universe.tf/allow-shared-ip: unifi
     stunService:
       type: LoadBalancer
+      loadBalancerIP: "${LB_UNIFI}"
       annotations:
         metallb.universe.tf/allow-shared-ip: unifi
     discoveryService:
       type: LoadBalancer
+      loadBalancerIP: "${LB_UNIFI}"
       annotations:
         metallb.universe.tf/allow-shared-ip: unifi

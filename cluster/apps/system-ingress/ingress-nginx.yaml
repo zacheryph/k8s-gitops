@@ -18,6 +18,10 @@ spec:
       replicaCount: 2
       extraArgs:
         default-ssl-certificate: "ingress-system/zro-wildcard-certificate"
+      service:
+        enabled: true
+        type: LoadBalancer
+        loadBalancerIP: "${LB_INGRESS}"
       metrics:
         enabled: true
         serviceMonitor:

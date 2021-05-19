@@ -21,11 +21,13 @@ spec:
     serviceTCP:
       enabled: true
       type: LoadBalancer
+      loadBalancerIP: "${LB_BLOCKY}"
       annotations:
         metallb.universe.tf/allow-shared-ip: blocky-svc
     serviceUDP:
       enabled: true
       type: LoadBalancer
+      loadBalancerIP: "${LB_BLOCKY}"
       annotations:
         metallb.universe.tf/allow-shared-ip: blocky-svc
     serviceMonitor:

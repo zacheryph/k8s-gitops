@@ -36,10 +36,12 @@ spec:
       - plex.zro.io
     serviceTCP:
       type: LoadBalancer
+      loadBalancerIP: "${LB_PLEX}"
       annotations:
         metallb.universe.tf/allow-shared-ip: plex-svc
     serviceUDP:
       type: LoadBalancer
+      loadBalancerIP: "${LB_PLEX}"
       annotations:
         metallb.universe.tf/allow-shared-ip: plex-svc
     resources:
