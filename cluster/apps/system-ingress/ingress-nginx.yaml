@@ -17,7 +17,7 @@ spec:
     controller:
       replicaCount: 2
       extraArgs:
-        default-ssl-certificate: "ingress-system/zro-wildcard-certificate"
+        default-ssl-certificate: "system-ingress/zro-wildcard-certificate"
       service:
         enabled: true
         type: LoadBalancer
