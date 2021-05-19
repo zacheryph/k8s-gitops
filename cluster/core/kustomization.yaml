@@ -6,7 +6,6 @@ resources:
 - cert-manager
 - kasten
 - kubedb
-- longhorn
 - metallb
 - rook-ceph
 - sealed-secrets
