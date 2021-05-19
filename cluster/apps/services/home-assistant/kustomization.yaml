@@ -5,8 +5,8 @@ namespace: home-assistant
 resources:
 - volumes
 # - release.yaml
-- vernemq.yaml
-- zwave2mqtt.yaml
+# - vernemq.yaml
+# - zwave2mqtt.yaml
 # - ../../../../shared/postgres
 
 # patchesStrategicMerge:
