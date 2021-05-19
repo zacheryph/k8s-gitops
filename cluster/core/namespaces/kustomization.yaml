@@ -9,7 +9,6 @@ resources:
 - flux-system.yaml
 - gitea.yaml
 - home-assistant.yaml
-- ingress-system.yaml
 - kube-system.yaml
 - longhorn-system.yaml
 - media.yaml
