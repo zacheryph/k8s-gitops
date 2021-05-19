@@ -1,5 +1,5 @@
 apiVersion: cert-manager.io/v1
-kind: Issuer
+kind: ClusterIssuer
 metadata:
   name: letsencrypt-cloudflare
 spec:
@@ -11,7 +11,7 @@ spec:
     solvers:
     - dns01:
         cloudflare:
-          email: zacheryph@gmail.com
+          email: ${USER_EMAIL}
           apiTokenSecretRef:
             name: cloudflare-token
             key: api-token

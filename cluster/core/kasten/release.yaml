@@ -21,7 +21,7 @@ spec:
     eula:
       accept: true
       company: ZRO
-      email: ${EMAIL_1}
+      email: ${USER_EMAIL}
 
     clusterName: inwin
 
