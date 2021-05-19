@@ -54,3 +54,16 @@ parameters:
   csi.storage.k8s.io/controller-expand-secret-namespace: system-rook-ceph
 
 reclaimPolicy: Delete
+
+---
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: rook-ceph-bucket
+# Change "rook-ceph" provisioner prefix to match the operator namespace if needed
+provisioner: system-rook-ceph.ceph.rook.io/bucket
+reclaimPolicy: Delete
+parameters:
+  objectStoreName: object-store
+  objectStoreNamespace: system-rook-ceph
+  region: us-east-1
