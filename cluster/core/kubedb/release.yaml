@@ -8,34 +8,54 @@ spec:
     spec:
       # registryUrl=https://charts.appscode.com/stable/
       chart: kubedb
-      version: v0.15.2
+      version: v2021.04.16
       sourceRef:
         kind: HelmRepository
         name: appscode
         namespace: flux-system
   values:
-    enableAnalytics: false
-    monitoring:
+    global:
+      license: |
+        -----BEGIN CERTIFICATE-----
+        MIIDojCCAoqgAwIBAgIIDkXawgDRSEQwDQYJKoZIhvcNAQELBQAwJTEWMBQGA1UE
+        ChMNQXBwc0NvZGUgSW5jLjELMAkGA1UEAxMCY2EwHhcNMjEwNTE5MTQwMzM4WhcN
+        MjIwNTE5MTQwMzM4WjBlMRkwFwYDVQQKExBrdWJlZGItY29tbXVuaXR5MRkwFwYD
+        VQQLExBrdWJlZGItY29tbXVuaXR5MS0wKwYDVQQDEyQ1ODhiNTUxNS1jMzY3LTRm
+        MmYtYWZiNy1lNDM0OTc3MWNhNjkwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEK
+        AoIBAQCr6vWE6PId3Tf84Ss/Kkh068Y0SHc60VFwYWvvBVc0CkPRovWq2xE3lWG5
+        Qjrv+2+m7byxRLG5pZKcFJvvzyjTFjW4eX89k8K9jVOTrQEO6fWSBmDeKDL730Je
+        fqu6OtlFssAkokoDaltcifUr24JxcLQC5asfhGJQxQcXPz4LMFDOV23nbd/H3HXA
+        H5smqq8jiTItpA++9YSKlRbuIhB8BnkuiNbAvexRBfoaIcVd0f6D12zTqg71znD0
+        0HoXdSJgYzHiUXYmR+jiCITYt7JUhg+Mry99eyD7SRu5T86INwCUSUG6JYssVU6F
+        5r6+O8VQT2497nxat0uD20wFGy3/AgMBAAGjgZUwgZIwDgYDVR0PAQH/BAQDAgWg
+        MBMGA1UdJQQMMAoGCCsGAQUFBwMCMGsGA1UdEQRkMGKCJDU4OGI1NTE1LWMzNjct
+        NGYyZi1hZmI3LWU0MzQ5NzcxY2E2OYElWmFjaGVyeSBIb3N0ZW5zIDx6YWNoZXJ5
+        cGhAZ21haWwuY29tPoETemFjaGVyeXBoQGdtYWlsLmNvbTANBgkqhkiG9w0BAQsF
+        AAOCAQEAFlTcYoFFz0IpWj2dtMV/A5esgcoMxs1smVEcHTBQvKKWrm2pfNloVOAv
+        F0CD23ddbEC4ECgFxaQotyNE0nd1W1tIloiPow3qTJ5UX7g4Yn9K3p9/O6SzenrU
+        RnO+qobPToNCxzM9pot19G/QcNumqDoeK0z7poDIwHnQ598q0UuKAC9MMfgVcuiZ
+        2JQnEslhV1A8FFiDY88TJlWv9/k/aUNBhDLHZNfEmucDKiBq4x1SBXCpzpO+s4Yl
+        rydnrkyio+APzuUH/FhDc3AiavqG7cfrDVQtq1kaARILr2x7uGJu2/OR49WHqBYk
+        rlP/wGeyr0UACF/Fpa3CYNNDGpk7MA==
+        -----END CERTIFICATE-----
+
+    kubedb-catalog:
       enabled: true
-      agent: prometheus.io/operator
-    license: |
-      -----BEGIN CERTIFICATE-----
-      MIIDSTCCAjGgAwIBAgIIPuVCGHuUdGcwDQYJKoZIhvcNAQELBQAwJTEWMBQGA1UE
-      ChMNQXBwc0NvZGUgSW5jLjELMAkGA1UEAxMCY2EwHhcNMjAxMDI5MTYzMDM4WhcN
-      MjExMDI5MTYzMDM4WjBKMRkwFwYDVQQKExBrdWJlZGItY29tbXVuaXR5MS0wKwYD
-      VQQDEyQ1ODhiNTUxNS1jMzY3LTRmMmYtYWZiNy1lNDM0OTc3MWNhNjkwggEiMA0G
-      CSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCmGhtvOpYHwvLhRFbyJsSmHjQn6b8f
-      gD50mClu26oR30AAIa8c+iJCWKKmZE5GJ+GokURyxH75iwbGw7JjZ0VbwPPwzVBF
-      Cx4vSrpYoHeRWlS9xnAdIZef1JLChyB6+rAUZxe9Tam4sqrNKWk973e3vD9WOUGR
-      ADTp4AAR3MlAdVw8TV403ji4xioUAulMOgDy24a3Acknh8EE1i5OsPfgEFfSs45u
-      oTy+QpGF/Ri603DSf2X5MZ52VHDtcetiwHUf4OUO/Hg0KwyVzcJyjzq+OtREQUHc
-      trVzGT5b9x397gUtUhrFxEfgirsrWXGXmILeP9PKpdQes42LrafSnR9dAgMBAAGj
-      WDBWMA4GA1UdDwEB/wQEAwIFoDATBgNVHSUEDDAKBggrBgEFBQcDAjAvBgNVHREE
-      KDAmgiQ1ODhiNTUxNS1jMzY3LTRmMmYtYWZiNy1lNDM0OTc3MWNhNjkwDQYJKoZI
-      hvcNAQELBQADggEBAGQanuFXl8cdlSM1dpzSy1E2nlUCh6MQNGiCdqS8iBmeeuWa
-      ou7szXdIGj0I0JOP1Sld9lyUQQNoeHn8pRA9H705N30WtaLvzKE+rjYCwZveJFR7
-      x1F83EQCEntqhmrO/8cSUk83vXuT2sV3lyZaGMzSKrguC0M1m9AdddFPzdqrHha+
-      nQkV8apxnbylwIjktCTK2qGm+yR4jy718ZS93wjC235Sjax5zweZl9tGrVy7f3F5
-      62J32dFRNW9q6+5rAjZ7VRunhfj9U5clYqaHStw7RsLgAWspTI6jxVGSY7exdpp5
-      lM1JlCuKQh+mc5L8dxx97SY38FjhwMnzrMlz0N8=
-      -----END CERTIFICATE-----
+      catalog:
+        elasticsearch: false
+        etcd: false
+        memcached: true
+        mongodb: true
+        mysql: false
+        mariadb: true
+        perconaxtradb: false
+        pgbouncer: false
+        proxysql: false
+        redis: true
+
+    kubedb-community:
+      enabled: true
+      enableAnalytics: false
+      monitoring:
+        enabled: true
+        agent: prometheus.io/operator

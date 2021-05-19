@@ -1,21 +1,16 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: catalog
+  name: kubedb-crds
 spec:
   interval: 1h
   chart:
     spec:
       # registryUrl=https://charts.appscode.com/stable/
-      chart: kubedb-catalog
-      version: v0.15.2
+      chart: kubedb-crds
+      version: v2021.04.16
       sourceRef:
         kind: HelmRepository
         name: appscode
         namespace: flux-system
-  values:
-    catalog:
-      # disable catalogs we will never use
-      mysql: false
-      perconaxtradb: false
-      proxysql: false
+  values: {}
