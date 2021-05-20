@@ -23,13 +23,6 @@ spec:
     env:
       DRONE_NAMESPACE_DEFAULT: drone-build
       DRONE_RPC_HOST: drone.drone.svc
+      DRONE_RPC_SECRET: ${DRONE_RPC_SECRET}
       DRONE_SECRET_PLUGIN_ENDPOINT: http://drone-kubernetes-secrets.drone.svc:3000
-  valuesFrom:
-  - kind: Secret
-    name: drone
-    valuesKey: rpcSecret
-    targetPath: env.DRONE_RPC_SECRET
-  - kind: Secret
-    name: drone
-    valuesKey: pluginToken
-    targetPath: env.DRONE_SECRET_PLUGIN_TOKEN
+      DRONE_SECRET_PLUGIN_TOKEN: ${DRONE_PLUGIN_SECRET}
