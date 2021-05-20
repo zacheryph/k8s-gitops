@@ -16,6 +16,7 @@ spec:
       repository: blakeblackshear/frigate
       tag: 0.8.4-amd64
     timezone: 'America/Chicago'
+    rtspPassword: ${FRIGATE_RTSP_PASSWORD}
     extraVolumes:
     - name: media
       persistentVolumeClaim:
@@ -36,5 +37,5 @@ spec:
         nginx.ingress.kubernetes.io/auth-url: "https://auth.zro.io/oauth2/auth"
         nginx.ingress.kubernetes.io/auth-signin: "https://auth.zro.io/oauth2/start"
   valuesFrom:
-  - kind: Secret
-    name: frigate-values
+  - kind: ConfigMap
+    name: frigate-config
