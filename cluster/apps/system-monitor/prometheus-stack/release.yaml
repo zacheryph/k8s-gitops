@@ -1,7 +1,7 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: stack
+  name: prometheus-stack
 spec:
   interval: 1h
   chart:
@@ -14,7 +14,7 @@ spec:
         name: prometheus-community
         namespace: flux-system
   values:
-    fullnameOverride: prometheus-stack
+    fullnameOverride: stack
     grafana:
       adminPassword: ${PROMETHEUS_ADMIN_PASSWORD}
       image:
