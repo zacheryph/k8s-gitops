@@ -90,7 +90,3 @@ spec:
               resources:
                 requests:
                   storage: 500Gi
-
-  valuesFrom:
-  - kind: Secret
-    name: prometheus-stack-values
