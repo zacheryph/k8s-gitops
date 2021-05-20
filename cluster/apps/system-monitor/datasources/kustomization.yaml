@@ -3,6 +3,4 @@ kind: Kustomization
 
 namespace: system-monitor
 resources:
-- datasources
-- loki-stack
-- prometheus-stack
+- loki.yaml
