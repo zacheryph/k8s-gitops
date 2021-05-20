@@ -1,0 +1,16 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ceph-s3-gateway
+spec:
+  rules:
+  - host: s3.zro.io
+    http:
+      paths:
+      - backend:
+          service:
+            name: rook-ceph-rgw-object-store
+            port:
+              number: 80
+        path: /
+        pathType: Prefix
