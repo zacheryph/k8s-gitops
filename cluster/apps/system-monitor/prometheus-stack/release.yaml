@@ -14,7 +14,7 @@ spec:
         name: prometheus-community
         namespace: flux-system
   values:
-    fullnameOverride: stack
+    fullnameOverride: prometheus-stack
     grafana:
       adminPassword: ${PROMETHEUS_ADMIN_PASSWORD}
       image:
