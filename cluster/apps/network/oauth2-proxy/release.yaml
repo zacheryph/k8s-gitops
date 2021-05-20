@@ -32,6 +32,7 @@ spec:
       login-url: "https://git.zro.io/login/oauth/authorize"
       redeem-url: "https://git.zro.io/login/oauth/access_token"
       validate-url: "https://git.zro.io/api/v1"
-  valuesFrom:
-  - kind: Secret
-    name: oauth2-proxy-values
+    config:
+      cookieSecret: ${OAUTH_COOKIE_SECRET}
+      clientID: ${OAUTH_CLIENT_ID}
+      clientSecret: ${OAUTH_CLIENT_SECRET}

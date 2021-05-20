@@ -18,6 +18,7 @@ spec:
       repository: plexinc/pms-docker
       tag: 1.22.3.4523-d0ce30438
     timezone: "America/Chicago"
+    claimToken: ${PLEX_CLAIM_TOKEN}
     allowedNetworks:
     - 127.0.0.1
     - 10.42.0.0/16
@@ -51,6 +52,3 @@ spec:
       limits:
         gpu.intel.com/i915: 1
         memory: 8Gi
-  valuesFrom:
-  - kind: Secret
-    name: plex-values
