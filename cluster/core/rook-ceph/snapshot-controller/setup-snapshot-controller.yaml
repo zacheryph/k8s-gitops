@@ -10,7 +10,7 @@ kind: StatefulSet
 apiVersion: apps/v1
 metadata:
   name: snapshot-controller
-  namespace: system-rook-ceph
+  namespace: kube-system
 spec:
   serviceName: "snapshot-controller"
   replicas: 1
