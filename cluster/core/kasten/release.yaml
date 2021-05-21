@@ -38,7 +38,3 @@ spec:
       server:
         persistentVolume:
           enabled: false
-
-  valuesFrom:
-  - kind: Secret
-    name: kasten-values

@@ -1,0 +1,24 @@
+---
+apiVersion: config.kio.kasten.io/v1alpha1
+kind: Profile
+metadata:
+  name: offsite
+  namespace: system-kasten
+spec:
+  type: Location
+  locationSpec:
+    type: ObjectStore
+    objectStore:
+      endpoint: ${OFFSITE_BACKUP_ENDPOINT}
+      name: ${OFFSITE_BACKUP_BUCKET}
+      objectStoreType: S3
+      path: k10/b8181e47-9ded-42ee-be56-2b18289d29a9/migration
+      pathType: Directory
+      region: ${OFFSITE_BACKUP_REGION}
+    credential:
+      secretType: AwsAccessKey
+      secret:
+        apiVersion: v1
+        kind: secret
+        name: offsite-credentials
+        namespace: system-kasten
