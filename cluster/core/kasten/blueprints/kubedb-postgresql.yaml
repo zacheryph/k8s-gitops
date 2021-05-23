@@ -20,7 +20,7 @@ actions:
           name: '{{ index .Object.metadata.labels "app.kubernetes.io/instance" }}-auth'
           namespace: '{{ .StatefulSet.Namespace }}'
       args:
-        image: ghcr.io/kanisterio/postgres-kanister-tools:0.58.0
+        image: zacheryph/postgres-kanister-tools:13.0.0
         namespace: '{{ .StatefulSet.Namespace }}'
         command:
         - bash
@@ -49,7 +49,7 @@ actions:
           name: '{{ index .Object.metadata.labels "app.kubernetes.io/instance" }}-auth'
           namespace: '{{ .StatefulSet.Namespace }}'
       args:
-        image: ghcr.io/kanisterio/postgres-kanister-tools:0.58.0
+        image: zacheryph/postgres-kanister-tools:13.0.0
         namespace: '{{ .StatefulSet.Namespace }}'
         command:
         - bash
