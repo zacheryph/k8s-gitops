@@ -2,6 +2,8 @@ apiVersion: cr.kanister.io/v1alpha1
 kind: Blueprint
 metadata:
   name: kubedb-postgresql
+  labels:
+    kustomize.toolkit.fluxcd.io/substitute: disabled
 actions:
   backup:
     kind: StatefulSet
