@@ -36,4 +36,4 @@ spec:
     - name: DOCKER_VERNEMQ_ACCEPT_EULA
       value: "yes"
     - name: DOCKER_VERNEMQ_ALLOW_ANONYMOUS
-      value: "off"
+      value: "on"
