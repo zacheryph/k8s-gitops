@@ -3,4 +3,5 @@ kind: Kustomization
 
 namespace: system-monitor
 resources:
+- datasource.yaml
 - release.yaml
