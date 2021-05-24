@@ -6,7 +6,9 @@ resources:
 - bitwarden.yaml
 - drone.yaml
 - gitea.yaml
+- harbor.yaml
 - home-assistant.yaml
 - media.yaml
 - sonarqube.yaml
 - unifi.yaml
+- wallabag.yaml
