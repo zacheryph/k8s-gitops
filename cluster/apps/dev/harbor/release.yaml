@@ -27,26 +27,35 @@ spec:
         disableredirect: true
         type: s3
         s3:
-          bucket: registry
-          regionendpoint: http://internal.minio.svc
           secure: false
+          bucket: harbor-registry
     database:
       type: external
       external:
-        host: postgres.registry.svc
+        host: postgresql.registry.svc
         username: postgres
-        # password: valuesFrom:Secret:postgres-auth
+        password: ${HARBOR_POSTGRESQL_PASSWORD}
     redis:
       type: external
       external:
-        addr: "redis.registry.svc:6379"
+        addr: "redis-master.harbor.svc:6379"
     jobservice:
       jobLoggers:
       - database
   valuesFrom:
+  - kind: ConfigMap
+    name: harbor-bucket
+    valuesKey: BUCKET_HOST
+    targetPath: persistence.imageChartStorage.s3.regionendpoint
+  - kind: ConfigMap
+    name: harbor-bucket
+    valuesKey: BUCKET_NAME
+    targetPath: persistence.imageChartStorage.s3.bucket
   - kind: Secret
-    name: harbor-values
+    name: harbor-bucket
+    valuesKey: AWS_ACCESS_KEY_ID
+    targetPath: persistence.imageChartStorage.s3.accesskey
   - kind: Secret
-    name: postgres-auth
-    valuesKey: password
-    targetPath: database.external.password
+    name: harbor-bucket
+    valuesKey: AWS_SECRET_ACCESS_KEY
+    targetPath: persistence.imageChartStorage.s3.secretkey

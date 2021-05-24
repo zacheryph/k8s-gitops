@@ -8,12 +8,12 @@ resources:
 - drone.yaml
 - flux-system.yaml
 - gitea.yaml
+- harbor.yaml
 - home-assistant.yaml
 - kube-system.yaml
 - media.yaml
 - neolink.yaml
 - oauth2-proxy.yaml
-- registry.yaml
 - sonarqube.yaml
 - system-ingress.yaml
 - system-kasten.yaml

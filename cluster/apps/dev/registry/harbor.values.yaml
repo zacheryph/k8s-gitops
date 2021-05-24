@@ -1,5 +1,0 @@
-persistence:
-  imageChartStorage:
-    s3:
-      accesskey: {{ .MINIO_INTERNAL_ACCESS_KEY }}
-      secretkey: {{ .MINIO_INTERNAL_SECRET_KEY }}
