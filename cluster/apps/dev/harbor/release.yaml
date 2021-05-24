@@ -32,7 +32,7 @@ spec:
     database:
       type: external
       external:
-        host: postgresql.registry.svc
+        host: postgresql.harbor.svc
         username: postgres
         password: ${HARBOR_POSTGRESQL_PASSWORD}
     redis:
