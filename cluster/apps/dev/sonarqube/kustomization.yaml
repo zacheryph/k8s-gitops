@@ -3,5 +3,5 @@ kind: Kustomization
 
 namespace: sonarqube
 resources:
+- postgresql.yaml
 - release.yaml
-- ../../../../shared/postgres

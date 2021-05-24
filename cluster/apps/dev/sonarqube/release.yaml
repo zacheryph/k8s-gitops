@@ -28,11 +28,7 @@ spec:
       privileged: false
     postgresql:
       enabled: false
-      postgresqlServer: postgres
+      postgresqlServer: postgresql
       postgresqlDatabase: postgres
       postgresqlUsername: postgres
-  valuesFrom:
-  - kind: Secret
-    name: postgres-auth
-    valuesKey: password
-    targetPath: postgresql.postgresqlPassword
+      postgresqlPassword: ${SONARQUBE_POSTGRESQL_PASSWORD}

@@ -27,6 +27,7 @@ spec:
         - "/"
     env:
       DRONE_DATABASE_DRIVER: postgres
+      DRONE_DATABASE_DATASOURCE: postgres://postgres:${DRONE_POSTGRESQL_PASSWORD}@postgresql.drone.svc/postgres?sslmode=disable
       DRONE_GIT_ALWAYS_AUTH: true
       DRONE_GITEA_CLIENT_ID: ${DRONE_GITEA_CLIENT_ID}
       DRONE_GITEA_CLIENT_SECRET: ${DRONE_GITEA_CLIENT_SECRET}
@@ -37,9 +38,3 @@ spec:
       DRONE_SERVER_PROXY_HOST: drone.drone.svc
       DRONE_SERVER_PROXY_PROTO: http
       DRONE_USER_CREATE: username:context,admin:true
-
-  valuesFrom:
-  - kind: Secret
-    name: postgres-auth
-    valuesKey: datasource
-    targetPath: env.DRONE_DATABASE_DATASOURCE

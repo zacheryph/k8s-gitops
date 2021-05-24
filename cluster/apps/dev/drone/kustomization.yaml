@@ -3,11 +3,7 @@ kind: Kustomization
 
 namespace: drone
 resources:
-- postgres-auth.yaml
+- postgresql.yaml
 - release.yaml
 - runner.yaml
 - secrets-provider.yaml
-- ../../../../shared/postgres
-
-patchesStrategicMerge:
-- postgres.yaml

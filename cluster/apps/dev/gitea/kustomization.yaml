@@ -5,5 +5,5 @@ namespace: gitea
 resources:
 - volumes
 - memcached.yaml
+- postgresql.yaml
 - release.yaml
-- ../../../../shared/postgres

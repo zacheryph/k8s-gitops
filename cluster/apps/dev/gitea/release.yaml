@@ -43,15 +43,11 @@ spec:
           DISABLE_SSH: true
         database:
           DB_TYPE: postgres
-          HOST: postgres.gitea.svc:5432
+          HOST: postgresql.gitea.svc:5432
           NAME: postgres
           USER: postgres
+          PASSWD: ${GITEA_POSTGRESQL_PASSWORD}
         cache:
           ADAPTER: memcache
           ENABLED: true
           HOST: memcached:11211
-  valuesFrom:
-  - kind: Secret
-    name: postgres-auth
-    valuesKey: password
-    targetPath: gitea.config.database.PASSWD
