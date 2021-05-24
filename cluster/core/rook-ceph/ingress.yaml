@@ -3,6 +3,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ceph-dashboard
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
 spec:
   rules:
   - host: ceph.zro.io
@@ -21,6 +23,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: ceph-s3-gateway
+  annotations:
+    nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
 spec:
   rules:
   - host: s3.zro.io
