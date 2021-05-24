@@ -20,7 +20,7 @@ spec:
     env:
       TZ: America/Chicago
     envFrom:
-    - configMapRef:
+    - secretRef:
         name: home-assistant-env
     hostNetwork: true
     dnsPolicy: ClusterFirstWithHostNet
