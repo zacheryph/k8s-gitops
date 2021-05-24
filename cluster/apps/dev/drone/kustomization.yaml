@@ -7,3 +7,4 @@ resources:
 - release.yaml
 - runner.yaml
 - secrets-provider.yaml
+- secrets
