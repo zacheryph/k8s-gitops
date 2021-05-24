@@ -28,6 +28,27 @@ spec:
       images:
         enabled: true
         existingClaim: wallabag-images
-  valuesFrom:
-  - kind: Secret
-    name: wallabag-values
+    env:
+      TZ: "America/Chicago"
+      SYMFONY__ENV__DATABASE_DRIVER: pdo_pgsql
+      SYMFONY__ENV__DATABASE_HOST: postgresql
+      SYMFONY__ENV__DATABASE_PORT: "5432"
+      SYMFONY__ENV__DATABASE_NAME: postgres
+      SYMFONY__ENV__DATABASE_USER: ${WALLABAG_POSTGRES_USERNAME}
+      SYMFONY__ENV__DATABASE_PASSWORD: ${WALLABAG_POSTGRES_PASSWORD}
+      SYMFONY__ENV__DATABASE_CHARSET: utf8
+      SYMFONY__ENV__DOMAIN_NAME: https://wallabag.zro.io
+      SYMFONY__ENV__REDIS_HOST: redis-master
+      SYMFONY__ENV__SECRET: ${WALLABAG_SECRET}
+      SYMFONY__ENV__FOSUSER_REGISTRATION: false
+      SYMFONY__ENV__SERVER_NAME: Zro Wallabag
+      SYMFONY__ENV__MAILER_TRANSPORT: "smtp"
+      SYMFONY__ENV__MAILER_HOST: ${MAIL_SMTP_HOST}
+      SYMFONY__ENV__MAILER_PORT: ${MAIL_SMTP_PORT}
+      SYMFONY__ENV__MAILER_USER: ${MAIL_SMTP_USER}
+      SYMFONY__ENV__MAILER_PASSWORD: ${MAIL_SMTP_PASSWORD}
+      SYMFONY__ENV__MAILER_ENCRYPTION: tls
+      SYMFONY__ENV__TWOFACTOR_AUTH: false
+      # wallabag doesnt use the user/password above at all?
+      POSTGRES_USER: ${WALLABAG_POSTGRES_USERNAME}
+      POSTGRES_PASSWORD: ${WALLABAG_POSTGRES_PASSWORD}
