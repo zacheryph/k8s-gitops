@@ -7,7 +7,6 @@ metadata:
 spec:
   dependsOn:
   - name: cluster-core
-  - name: cluster-secrets
   interval: 10m0s
   path: ./cluster/apps
   prune: false
