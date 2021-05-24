@@ -7,3 +7,4 @@ resources:
 - postgresql.yaml
 - redis.yaml
 - release.yaml
+- service.yaml
