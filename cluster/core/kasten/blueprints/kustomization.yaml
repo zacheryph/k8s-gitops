@@ -3,4 +3,4 @@ kind: Kustomization
 
 namespace: system-kasten
 resources:
-- kubedb-postgresql.yaml
+- bitnami-postgresql.yaml
