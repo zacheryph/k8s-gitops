@@ -4,6 +4,9 @@ kind: Kustomization
 namespace: system-kasten
 resources:
 - bitwarden.yaml
+- drone.yaml
+- gitea.yaml
 - home-assistant.yaml
 - media.yaml
+- sonarqube.yaml
 - unifi.yaml

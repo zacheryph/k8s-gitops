@@ -1,0 +1,46 @@
+apiVersion: config.kio.kasten.io/v1alpha1
+kind: Policy
+metadata:
+  name: gitea
+spec:
+  frequency: '@daily'
+  retention:
+    daily: 7
+    monthly: 12
+    weekly: 4
+    yearly: 7
+
+  selector:
+    matchExpressions:
+    - key: k10.kasten.io/appNamespace
+      operator: In
+      values:
+      - gitea
+
+  actions:
+  - action: backup
+    backupParameters:
+      filters:
+        includeResources:
+        - resource: persistentvolumeclaims
+        - resource: statefulsets
+          name: postgresql
+        excludeResources:
+        - resource: persistentvolumeclaims
+          matchExpressions:
+          - key: app.kubernetes.io/name
+            operator: In
+            values:
+            - postgresql
+      profile:
+        name: ceph
+        namespace: system-kasten
+  - action: export
+    exportParameters:
+      frequency: '@daily'
+      exportData:
+        enabled: true
+      profile:
+        name: ceph
+        namespace: system-kasten
+    retention: {}

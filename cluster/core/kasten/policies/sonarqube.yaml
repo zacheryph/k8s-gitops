@@ -1,0 +1,38 @@
+apiVersion: config.kio.kasten.io/v1alpha1
+kind: Policy
+metadata:
+  name: sonarqube
+spec:
+  frequency: '@daily'
+  retention:
+    daily: 7
+    monthly: 12
+    weekly: 4
+    yearly: 7
+
+  selector:
+    matchExpressions:
+    - key: k10.kasten.io/appNamespace
+      operator: In
+      values:
+      - sonarqube
+
+  actions:
+  - action: backup
+    backupParameters:
+      filters:
+        includeResources:
+        - resource: statefulsets
+          name: postgresql
+      profile:
+        name: ceph
+        namespace: system-kasten
+  - action: export
+    exportParameters:
+      frequency: '@daily'
+      exportData:
+        enabled: true
+      profile:
+        name: ceph
+        namespace: system-kasten
+    retention: {}
