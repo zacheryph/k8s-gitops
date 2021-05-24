@@ -5,7 +5,7 @@ metadata:
 spec:
   accessModes:
     - ReadWriteOnce
-  storageClassName: longhorn
+  storageClassName: rook-ceph-block
   resources:
     requests:
-      storage: 6Ti
+      storage: 10Gi

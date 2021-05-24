@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: pg-tools
+spec:
+  containers:
+  - name: tools
+    image: zacheryph/postgres-kanister-tools:13.0.0
+    command:
+    - sleep
+    - "36000"
+    imagePullPolicy: IfNotPresent
+  restartPolicy: Always
