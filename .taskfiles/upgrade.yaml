@@ -5,7 +5,7 @@ tasks:
   flux:
     desc: upgrade flux component manifest
     cmds:
-    - flux install --export > cluster/flux-system/gotk-components.yaml
+    - flux install --export > cluster/base/flux-system/gotk-components.yaml
   flux-cli:
     desc: upgrade local flux command line binary
     cmds:
