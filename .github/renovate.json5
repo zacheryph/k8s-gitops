@@ -18,13 +18,16 @@
       "datasourceTemplate": "helm"
     },
 
-    // crds: cert-manager
+    // kustomization github release resources
     {
-      "fileMatch": ["cluster/crds/cert-manager/.+\\.yaml$"],
-      "matchStrings": [
-        "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*?)\n.*\\/(?<currentValue>.*?)\\/",
+      "fileMatch": [
+        "cluster/crds/.+/.+\\.yaml",
+        "cluster/operators/.+/.+\\.yaml"
       ],
-      "datasourceTemplate": "helm"
+      "matchStrings": [
+        "https://github.com/(?<depName>.*?)/releases/download/(?<currentValue>[^/]*)/"
+      ],
+      "datasourceTemplate": "github-releases"
     },
 
     // crds: kube-prometheus-stack
@@ -49,6 +52,10 @@
     {
       "addLabels": ["renovate/image-release"],
       "matchUpdateTypes": ["docker"]
+    },
+    {
+      "addLabels": ["renovate/github-release"],
+      "matchUpdateTypes": ["github-releases"]
     },
     {
       "addLabels": ["renovate/helm-release"],
