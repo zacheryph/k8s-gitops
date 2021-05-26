@@ -50,12 +50,6 @@ spec:
               path: /var/lib/grafana/dashboards/default
       dashboards:
         default:
-          vernemq:
-            url: https://raw.githubusercontent.com/vernemq/vernemq/master/metrics_scripts/grafana/VerneMQ%20Node%20Metrics.json
-            datasource: Prometheus
-          nginx-dashboard:
-            url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
-            datasource: Prometheus
           blocky:
             url: https://raw.githubusercontent.com/0xERR0R/blocky/master/docs/blocky-grafana.json
             datasource: Prometheus
@@ -64,6 +58,30 @@ spec:
             datasource: Prometheus
           flux-control-panel:
             url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/grafana/dashboards/control-plane.json
+            datasource: Prometheus
+          istio-extension-dashboard:
+            url: https://raw.githubusercontent.com/istio/istio/master/manifests/addons/dashboards/istio-extension-dashboard.json
+            datasource: Prometheus
+          istio-mesh-dashboard:
+            url: https://raw.githubusercontent.com/istio/istio/master/manifests/addons/dashboards/istio-mesh-dashboard.json
+            datasource: Prometheus
+          istio-performance-dashboard:
+            url: https://raw.githubusercontent.com/istio/istio/master/manifests/addons/dashboards/istio-performance-dashboard.json
+            datasource: Prometheus
+          istio-service-dashboard:
+            url: https://raw.githubusercontent.com/istio/istio/master/manifests/addons/dashboards/istio-service-dashboard.json
+            datasource: Prometheus
+          istio-workload-dashboard:
+            url: https://raw.githubusercontent.com/istio/istio/master/manifests/addons/dashboards/istio-workload-dashboard.json
+            datasource: Prometheus
+          istio-pilot-dashboard:
+            url: https://raw.githubusercontent.com/istio/istio/master/manifests/addons/dashboards/pilot-dashboard.json
+            datasource: Prometheus
+          nginx-dashboard:
+            url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
+            datasource: Prometheus
+          vernemq:
+            url: https://raw.githubusercontent.com/vernemq/vernemq/master/metrics_scripts/grafana/VerneMQ%20Node%20Metrics.json
             datasource: Prometheus
     alertmanager:
       alertmanagerSpec:
