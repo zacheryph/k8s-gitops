@@ -3,3 +3,4 @@ kind: Kustomization
 # istio 1.10.0
 resources:
 - manifest.yaml
+- servicemonitor.yaml
