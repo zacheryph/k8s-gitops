@@ -7,4 +7,3 @@ resources:
 - kasten
 - metallb
 - rook-ceph
-- sealed-secrets

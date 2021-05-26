@@ -28,10 +28,3 @@ repos:
   rev: v2.0.3
   hooks:
   - id: forbid-secrets
-- repo: local
-  hooks:
-  - id: check-secrets
-    name: Ensure Secrets Exist
-    entry: bin/secrets.sh check
-    language: script
-    files: \.(crypt\.env|values\.yaml)$

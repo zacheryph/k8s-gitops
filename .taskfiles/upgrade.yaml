@@ -10,7 +10,3 @@ tasks:
     desc: upgrade local flux command line binary
     cmds:
     - ./bin/update.sh flux
-  sealed-secrets:
-    desc: upgrade flux controller manifest
-    cmds:
-    - ./bin/update.sh sealed
