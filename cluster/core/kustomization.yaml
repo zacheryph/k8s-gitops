@@ -5,7 +5,6 @@ resources:
 - cert-manager
 - istio
 - kasten
-- kubedb
 - metallb
 - rook-ceph
 - sealed-secrets

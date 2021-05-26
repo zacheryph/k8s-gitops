@@ -71,7 +71,6 @@ Cluster is 3 built 1u servers with the following hardware.
   * helm-repositories - `HelmRepository` resources
 * System
   * ingress - ingress-nginx / cert-manager
-  * kubedb - kubedb operator
   * longhorn - persistent storage
   * metallb - metallb running in bgp mode
   * prometheus - prometheus / grafana / loki
