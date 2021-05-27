@@ -6,4 +6,4 @@ resources:
 - volumes
 - home-assistant
 - vernemq
-- zwave2mqtt
+- zwavejs2mqtt

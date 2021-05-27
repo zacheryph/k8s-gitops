@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
 - home-assistant-config.yaml
 - zwave2mqtt-config.yaml
+- zwavejs2mqtt-config.yaml
