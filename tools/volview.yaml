@@ -11,25 +11,10 @@ spec:
     - "3600"
     imagePullPolicy: IfNotPresent
     volumeMounts:
-    - name: pool-media
-      mountPath: /mnt/old-media
-    - name: media-pool
-      mountPath: /mnt/new-media
-    - name: pool-nvr
-      mountPath: /mnt/old-nvr
-    - name: nvr-pool
-      mountPath: /mnt/new-nvr
+    - name: volume
+      mountPath: /data
   restartPolicy: Always
   volumes:
-  - name: pool-media
+  - name: volume
     persistentVolumeClaim:
-      claimName: pool-media
-  - name: media-pool
-    persistentVolumeClaim:
-      claimName: media-pool
-  - name: pool-nvr
-    persistentVolumeClaim:
-      claimName: pool-nvr
-  - name: nvr-pool
-    persistentVolumeClaim:
-      claimName: nvr-pool
+      claimName: zwave2mqtt-config
