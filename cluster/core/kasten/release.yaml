@@ -34,7 +34,4 @@ spec:
       host: k10.zro.io
 
     prometheus:
-      enabled: true
-      server:
-        persistentVolume:
-          enabled: false
+      enabled: false
