@@ -24,6 +24,7 @@ kind: Ingress
 metadata:
   name: ceph-s3-gateway
   annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: 4G
     nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
 spec:
   rules:
