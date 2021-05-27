@@ -2,16 +2,7 @@ ssh_authorized_keys:
 - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICeSruiFMkOCQfEQ9aNXXWbXHPhzM2tLwQSJIv/vOido context@sixteen
 - ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHiU2Zlk4BDumkUvHu7SdzH8nIOE5O9JHt7/iuzI/MY3 cardno:000611447418
 - github:zacheryph
-boot_cmd:
-- "mkdir -p /disk/01"
-- "mkdir -p /disk/02"
 write_files:
-- owner: root
-  path: /etc/fstab
-  permissions: '0644'
-  content: |-
-    /dev/sdb1 /disk/01 ext4 defaults 0 0
-    /dev/sdc1 /disk/02 ext4 defaults 0 0
 - owner: root
   path: /etc/modprobe.d/local-blacklist.conf
   permissions: '0644'
