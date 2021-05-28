@@ -1,0 +1,32 @@
+ssh_authorized_keys:
+- ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAICeSruiFMkOCQfEQ9aNXXWbXHPhzM2tLwQSJIv/vOido context@sixteen
+- ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHiU2Zlk4BDumkUvHu7SdzH8nIOE5O9JHt7/iuzI/MY3 cardno:000611447418
+- github:zacheryph
+write_files:
+- owner: root
+  path: /etc/modprobe.d/local-blacklist.conf
+  permissions: '0644'
+  content: |-
+    # connman currently uses the ipmi interface
+    # as default route even with autoconf ip.
+    # disabling until finding a way to interact with.
+    blacklist cdc_ether
+k3os:
+  password: $1$GsYBI0St$lB9k74HIjVxgMALv2e0aE0
+  data_sources:
+  - cdrom
+  modules:
+  - nvme
+  - i915
+  sysctl:
+    fs.inotify.max_user_instances: 8192
+  dns_nameservers:
+  - 1.1.1.1
+  ntp_servers:
+  - 0.us.pool.ntp.org
+  - 1.us.pool.ntp.org
+  token: kubernetes
+  k3s_args:
+  - "agent"
+  - "--server"
+  - "https://10.72.13.11:6443"
