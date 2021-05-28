@@ -4,11 +4,5 @@ kind: Kustomization
 namespace: system-metallb
 resources:
 - github.com/metallb/metallb/manifests?ref=v0.9.6
-
-configMapGenerator:
-- name: config
-  files:
-  - config=config.yaml
-
-generatorOptions:
-  disableNameSuffixHash: true
+- memberlist.yaml
+- config.yaml
