@@ -21,4 +21,5 @@ kind: Namespace
 metadata:
   name: knative-test
   labels:
+    eventing.knative.dev/injection: enabled
     istio-injection: enabled
