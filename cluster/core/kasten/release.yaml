@@ -32,6 +32,3 @@ spec:
     ingress:
       create: true
       host: k10.zro.io
-
-    prometheus:
-      enabled: false
