@@ -23,15 +23,15 @@ spec:
       filters:
         includeResources:
         - resource: persistentvolumeclaims
-        - resource: statefulsets
-          name: postgresql
-        excludeResources:
-        - resource: persistentvolumeclaims
-          matchExpressions:
-          - key: app.kubernetes.io/name
-            operator: In
-            values:
-            - postgresql
+        # - resource: statefulsets
+        #   name: postgresql
+        # excludeResources:
+        # - resource: persistentvolumeclaims
+        #   matchExpressions:
+        #   - key: app.kubernetes.io/name
+        #     operator: In
+        #     values:
+        #     - postgresql
       profile:
         name: ceph
         namespace: system-kasten

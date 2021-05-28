@@ -22,8 +22,9 @@ spec:
     backupParameters:
       filters:
         includeResources:
-        - resource: statefulsets
-          name: postgresql
+        - resource: persistentvolumeclaims
+        # - resource: statefulsets
+        #   name: postgresql
       profile:
         name: ceph
         namespace: system-kasten
