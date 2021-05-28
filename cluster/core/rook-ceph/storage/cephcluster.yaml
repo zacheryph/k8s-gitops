@@ -50,9 +50,9 @@ spec:
     osd:
       requests:
         cpu: "35m"
-        memory: "2048Mi"
+        memory: "1Gi"
       limits:
-        memory: "4096Mi"
+        memory: "3Gi"
   storage:
     useAllNodes: false
     useAllDevices: false
