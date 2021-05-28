@@ -2,6 +2,9 @@ peers:
 - peer-address: 10.72.13.254
   peer-asn: 64542
   my-asn: 64552
+- peer-address: 10.72.13.1
+  peer-asn: 64550
+  my-asn: 64552
 address-pools:
 - name: default
   protocol: bgp
