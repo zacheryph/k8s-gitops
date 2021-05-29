@@ -28,7 +28,7 @@ spec:
       enabled: true
       existingClaim: gitea-data
     gitea:
-      podAnnotations:
+      labels:
         sidecar.istio.io/inject: "true"
       database:
         builtIn:
