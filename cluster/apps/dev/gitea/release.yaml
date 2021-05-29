@@ -27,9 +27,10 @@ spec:
     persistence:
       enabled: true
       existingClaim: gitea-data
-    gitea:
+    statefulset:
       labels:
         sidecar.istio.io/inject: "true"
+    gitea:
       database:
         builtIn:
           postgresql:
