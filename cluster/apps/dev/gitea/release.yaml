@@ -28,6 +28,8 @@ spec:
       enabled: true
       existingClaim: gitea-data
     gitea:
+      podAnnotations:
+        sidecar.istio.io/inject: "true"
       database:
         builtIn:
           postgresql:
