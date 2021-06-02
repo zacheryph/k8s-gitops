@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: plexinc/pms-docker
-      tag: 1.23.1.4602-280ab6053
+      tag: 1.23.2.4625-a83d2d0f9
     timezone: "America/Chicago"
     claimToken: ${PLEX_CLAIM_TOKEN}
     allowedNetworks:
