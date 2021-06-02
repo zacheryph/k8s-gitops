@@ -28,25 +28,25 @@ data:
         cpu1:
           type: cpu
       cameras:
-        front:
-          ffmpeg:
-            inputs:
-            - path: rtsp://frigate:${CAMERA_410_1_PASSWORD}@${CAMERA_410_1_ADDRESS}//h264Preview_01_sub
-              roles:
-              - detect
-              - rtmp
-              - record
-            - path: rtsp://frigate:${CAMERA_410_1_PASSWORD}@${CAMERA_410_1_ADDRESS}//h264Preview_01_main
-              roles:
-              - clips
-          width: 640
-          height: 480
-          fps: 7
-          clips:
-            enabled: True
-          record:
-            enabled: True
-            retain_days: 30
+        # front:
+        #   ffmpeg:
+        #     inputs:
+        #     - path: rtsp://frigate:${CAMERA_410_1_PASSWORD}@${CAMERA_410_1_ADDRESS}//h264Preview_01_sub
+        #       roles:
+        #       - detect
+        #       - rtmp
+        #       - record
+        #     - path: rtsp://frigate:${CAMERA_410_1_PASSWORD}@${CAMERA_410_1_ADDRESS}//h264Preview_01_main
+        #       roles:
+        #       - clips
+        #   width: 640
+        #   height: 480
+        #   fps: 7
+        #   clips:
+        #     enabled: True
+        #   record:
+        #     enabled: True
+        #     retain_days: 30
         garage:
           ffmpeg:
             inputs:
