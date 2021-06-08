@@ -5,7 +5,7 @@ metadata:
   name: tekton-dashboard
 spec:
   rules:
-  - host: tekton.${CLUSTER_DOMAIN}
+  - host: tekton.${DOMAIN_CLUSTER}
     http:
       paths:
       - backend:
