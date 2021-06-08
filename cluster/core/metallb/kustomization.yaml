@@ -3,6 +3,6 @@ kind: Kustomization
 
 namespace: system-metallb
 resources:
-- github.com/metallb/metallb/manifests?ref=v0.9.6
+- github.com/metallb/metallb/manifests?ref=v0.10.0
 - memberlist.yaml
 - config.yaml
