@@ -8,7 +8,7 @@ metadata:
     nginx.ingress.kubernetes.io/auth-url: https://auth.zro.io/oauth2/auth
 spec:
   rules:
-  - host: tekton.${DOMAIN_CLUSTER}
+  - host: tekton.${CLUSTER_DOMAIN}
     http:
       paths:
       - backend:
