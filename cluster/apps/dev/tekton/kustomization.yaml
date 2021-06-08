@@ -4,3 +4,4 @@ kind: Kustomization
 namespace: tekton-pipelines
 resources:
 - secrets
+- serviceaccount.yaml
