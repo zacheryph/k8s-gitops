@@ -19,9 +19,9 @@ spec:
         certSource: none
       ingress:
         hosts:
-          core: r.zro.io
-          notary: notary.zro.io
-    externalURL: https://r.zro.io
+          core: r.${CLUSTER_DOMAIN}
+          notary: notary.${CLUSTER_DOMAIN}
+    externalURL: https://r.${CLUSTER_DOMAIN}
     persistence:
       imageChartStorage:
         disableredirect: true

@@ -7,7 +7,7 @@ metadata:
     nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
 spec:
   rules:
-  - host: ceph.zro.io
+  - host: ceph.${CLUSTER_DOMAIN}
     http:
       paths:
       - backend:
@@ -28,7 +28,7 @@ metadata:
     nginx.ingress.kubernetes.io/force-ssl-redirect: 'true'
 spec:
   rules:
-  - host: s3.zro.io
+  - host: s3.${CLUSTER_DOMAIN}
     http:
       paths:
       - backend:

@@ -22,7 +22,7 @@ spec:
     ingress:
       enabled: true
       hosts:
-      - host: drone.zro.io
+      - host: drone.${CLUSTER_DOMAIN}
         paths:
         - "/"
     env:
@@ -31,9 +31,9 @@ spec:
       DRONE_GIT_ALWAYS_AUTH: true
       DRONE_GITEA_CLIENT_ID: ${DRONE_GITEA_CLIENT_ID}
       DRONE_GITEA_CLIENT_SECRET: ${DRONE_GITEA_CLIENT_SECRET}
-      DRONE_GITEA_SERVER: https://git.zro.io
+      DRONE_GITEA_SERVER: https://git.${CLUSTER_DOMAIN}
       DRONE_RPC_SECRET: ${DRONE_RPC_SECRET}
-      DRONE_SERVER_HOST: drone.zro.io
+      DRONE_SERVER_HOST: drone.${CLUSTER_DOMAIN}
       DRONE_SERVER_PROTO: https
       DRONE_SERVER_PROXY_HOST: drone.drone.svc
       DRONE_SERVER_PROXY_PROTO: http

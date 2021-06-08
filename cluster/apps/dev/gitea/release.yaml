@@ -21,7 +21,7 @@ spec:
     ingress:
       enabled: true
       hosts:
-      - git.zro.io
+      - git.${CLUSTER_DOMAIN}
       annotations:
         nginx.ingress.kubernetes.io/proxy-body-size: 128m
     persistence:

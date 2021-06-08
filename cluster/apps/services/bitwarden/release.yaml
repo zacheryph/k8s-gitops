@@ -26,7 +26,7 @@ spec:
     ingress:
       enabled: true
       hosts:
-      - host: warden.zro.io
+      - host: warden.${CLUSTER_DOMAIN}
         paths:
         - path: "/"
           pathType: Prefix

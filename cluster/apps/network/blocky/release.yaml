@@ -53,7 +53,7 @@ spec:
         mapping:
           localhost: 127.0.0.1
           zro.net: 10.72.48.1
-          zro.io: 10.72.48.1
+          ${CLUSTER_DOMAIN}: 10.72.48.1
 
       # optional: definition, which DNS resolver should be used for queries to the domain (with all sub-domains).
       # Example: Query client.fritz.box will ask DNS server 192.168.178.1. This is necessary for local network, to resolve clients by host name

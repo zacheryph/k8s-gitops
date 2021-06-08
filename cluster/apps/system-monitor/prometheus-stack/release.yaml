@@ -34,7 +34,7 @@ spec:
       ingress:
         enabled: true
         hosts:
-        - grafana.zro.io
+        - grafana.${CLUSTER_DOMAIN}
       dashboardProviders:
         dashboardproviders.yaml:
           apiVersion: 1

@@ -20,7 +20,7 @@ spec:
     ingress:
       enabled: true
       hosts:
-      - host: wallabag.zro.io
+      - host: wallabag.${CLUSTER_DOMAIN}
         paths:
         - path: /
           pathType: Prefix
@@ -37,7 +37,7 @@ spec:
       SYMFONY__ENV__DATABASE_USER: ${WALLABAG_POSTGRESQL_USERNAME}
       SYMFONY__ENV__DATABASE_PASSWORD: ${WALLABAG_POSTGRESQL_PASSWORD}
       SYMFONY__ENV__DATABASE_CHARSET: utf8
-      SYMFONY__ENV__DOMAIN_NAME: https://wallabag.zro.io
+      SYMFONY__ENV__DOMAIN_NAME: https://wallabag.${CLUSTER_DOMAIN}
       SYMFONY__ENV__REDIS_HOST: redis-master
       SYMFONY__ENV__SECRET: ${WALLABAG_SECRET}
       SYMFONY__ENV__FOSUSER_REGISTRATION: false

@@ -34,7 +34,7 @@ spec:
     ingress:
       enabled: true
       hosts:
-      - plex.zro.io
+      - plex.${CLUSTER_DOMAIN}
     serviceTCP:
       type: LoadBalancer
       loadBalancerIP: "${LB_PLEX}"

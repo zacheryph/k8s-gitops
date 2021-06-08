@@ -22,16 +22,16 @@ spec:
       enabled: true
       path: /
       hosts:
-      - auth.zro.io
+      - auth.${CLUSTER_DOMAIN}
     extraArgs:
       provider: "github"
       provider-display-name: "Gitea"
       email-domain: "*"
-      cookie-domain: ".zro.io"
-      whitelist-domain: ".zro.io"
-      login-url: "https://git.zro.io/login/oauth/authorize"
-      redeem-url: "https://git.zro.io/login/oauth/access_token"
-      validate-url: "https://git.zro.io/api/v1"
+      cookie-domain: ".${CLUSTER_DOMAIN}"
+      whitelist-domain: ".${CLUSTER_DOMAIN}"
+      login-url: "https://git.${CLUSTER_DOMAIN}/login/oauth/authorize"
+      redeem-url: "https://git.${CLUSTER_DOMAIN}/login/oauth/access_token"
+      validate-url: "https://git.${CLUSTER_DOMAIN}/api/v1"
     config:
       cookieSecret: ${OAUTH_COOKIE_SECRET}
       clientID: ${OAUTH_CLIENT_ID}

@@ -31,4 +31,4 @@ spec:
 
     ingress:
       create: true
-      host: k10.zro.io
+      host: k10.${CLUSTER_DOMAIN}

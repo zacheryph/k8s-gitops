@@ -22,7 +22,7 @@ spec:
     ingress:
       enabled: true
       hosts:
-      - name: sonarqube.zro.io
+      - name: sonarqube.${CLUSTER_DOMAIN}
         path: /
     initContainersSecurityContext:
       privileged: false

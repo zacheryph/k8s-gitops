@@ -9,13 +9,13 @@ spec:
   subject:
     organizations:
     - Routine LLC
-  commonName: zro.io
+  commonName: ${CLUSTER_DOMAIN}
   dnsNames:
-  - zro.io
+  - ${CLUSTER_DOMAIN}
   - zro.net
-  - "*.zro.io"
+  - "*.${CLUSTER_DOMAIN}"
   - "*.zro.net"
-  - "*.inwin-cluster.zro.io"
+  - "*.inwin-cluster.${CLUSTER_DOMAIN}"
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt-cloudflare

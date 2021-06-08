@@ -31,7 +31,7 @@ spec:
     ingress:
       enabled: true
       hosts:
-      - unifi.zro.io
+      - unifi.${CLUSTER_DOMAIN}
       annotations:
         nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
     guiService:

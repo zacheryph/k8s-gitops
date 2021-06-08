@@ -21,10 +21,10 @@ spec:
     ingress:
       enabled: true
       hosts:
-      - host: dash.zro.io
+      - host: dash.${CLUSTER_DOMAIN}
         paths:
         - path: /
           pathType: Prefix
       annotations:
-        nginx.ingress.kubernetes.io/auth-url: "https://auth.zro.io/oauth2/auth"
-        nginx.ingress.kubernetes.io/auth-signin: "https://auth.zro.io/oauth2/start"
+        nginx.ingress.kubernetes.io/auth-url: "https://auth.${CLUSTER_DOMAIN}/oauth2/auth"
+        nginx.ingress.kubernetes.io/auth-signin: "https://auth.${CLUSTER_DOMAIN}/oauth2/start"
