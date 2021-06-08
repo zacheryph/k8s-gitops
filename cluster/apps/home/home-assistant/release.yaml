@@ -24,6 +24,10 @@ spec:
         name: home-assistant-env
     hostNetwork: true
     dnsPolicy: ClusterFirstWithHostNet
+    dnsConfig:
+      options:
+      - name: ndots
+        value: "2"
     ingress:
       enabled: true
       hosts:
