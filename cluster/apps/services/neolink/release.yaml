@@ -19,12 +19,20 @@ spec:
       pullPolicy: Always
       tag: latest
 
+    resources:
+      requests:
+        memory: 50Mi
+        cpu: 50m
+      limits:
+      cpu: 500m
+      memory: 200Mi
+
     config: |
       bind = "0.0.0.0"
 
       [[cameras]]
       name = "garage"
+      stream = "both"
       username = "neolink"
       password = "${CAMERA_GARAGE_PASSWORD}"
       address = "${CAMERA_GARAGE_ADDRESS}:9000"
-      format = "h264"
