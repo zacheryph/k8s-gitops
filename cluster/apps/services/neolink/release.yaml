@@ -24,8 +24,8 @@ spec:
         memory: 50Mi
         cpu: 50m
       limits:
-      cpu: 500m
-      memory: 200Mi
+        cpu: 500m
+        memory: 200Mi
 
     config: |
       bind = "0.0.0.0"
