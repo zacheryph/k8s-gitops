@@ -5,4 +5,6 @@ namespace: system-tekton
 resources:
 - dashboard.yaml
 - https://github.com/tektoncd/pipeline/releases/download/v0.24.1/release.yaml
+- https://github.com/tektoncd/triggers/releases/download/v0.14.2/release.yaml
+- https://github.com/tektoncd/triggers/releases/download/v0.14.2/interceptors.yaml
 - https://github.com/tektoncd/dashboard/releases/download/v0.17.0/tekton-dashboard-release.yaml
