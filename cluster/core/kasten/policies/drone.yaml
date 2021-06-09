@@ -23,8 +23,6 @@ spec:
       filters:
         includeResources:
         - resource: persistentvolumeclaims
-        # - resource: statefulsets
-        #   name: postgresql
       profile:
         name: ceph
         namespace: system-kasten
