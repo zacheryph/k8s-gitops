@@ -11,11 +11,12 @@ spec:
     - Routine LLC
   commonName: ${CLUSTER_DOMAIN}
   dnsNames:
-  - ${CLUSTER_DOMAIN}
-  - zro.net
+  - "${CLUSTER_DOMAIN}"
   - "*.${CLUSTER_DOMAIN}"
-  - "*.zro.net"
-  - "*.inwin-cluster.${CLUSTER_DOMAIN}"
+  - "${KNATIVE_DOMAIN}"
+  - "*.${KNATIVE_DOMAIN}"
+  - "*.api.${KNATIVE_DOMAIN}"
+  - "*.tekton-pipelines.${KNATIVE_DOMAIN}"
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt-cloudflare
