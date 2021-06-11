@@ -3,4 +3,5 @@ kind: Kustomization
 
 namespace: system-monitor
 resources:
+- etcd-certificates.yaml
 - release.yaml

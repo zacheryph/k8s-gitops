@@ -93,6 +93,14 @@ spec:
               resources:
                 requests:
                   storage: 2Gi
+    kubeEtcd:
+      enabled: true
+      serviceMonitor:
+        scheme: https
+        serverName: localhost
+        caFile: /etc/prometheus/secrets/etcd-certificates/ca.crt
+        certFile: /etc/prometheus/secrets/etcd-certificates/client.crt
+        keyFile: /etc/prometheus/secrets/etcd-certificates/client.key
     prometheus:
       prometheusSpec:
         shards: null
