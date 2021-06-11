@@ -93,14 +93,32 @@ spec:
               resources:
                 requests:
                   storage: 2Gi
-    kubeEtcd:
+    nodeExporter:
+      serviceMonitor:
+        relabelings:
+        - action: replace
+          regex: (.*)
+          replacement: $1
+          sourceLabels:
+          - __meta_kubernetes_pod_node_name
+          targetLabel: kubernetes_node
+    kubelet:
       enabled: true
       serviceMonitor:
-        scheme: https
-        serverName: localhost
-        caFile: /etc/prometheus/secrets/etcd-certificates/ca.crt
-        certFile: /etc/prometheus/secrets/etcd-certificates/client.crt
-        keyFile: /etc/prometheus/secrets/etcd-certificates/client.key
+      - action: replace
+        sourceLabels:
+        - node
+        targetLabel: instance
+    kubeApiServer:
+      enabled: true
+    kubeControllerManager:
+      enabled: true
+    kubeScheduler:
+      enabled: false
+    kubeProxy:
+      enabled: false
+    kubeEtcd:
+      enabled: false
     prometheus:
       prometheusSpec:
         shards: null
@@ -114,8 +132,6 @@ spec:
         probeSelector: {}
         probeNamespaceSelector: {}
         walCompression: true
-        secrets:
-        - etcd-certificates
         storageSpec:
           volumeClaimTemplate:
             spec:
