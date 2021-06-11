@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
 - eventing.yaml
 - serving.yaml
+- https://github.com/knative-sandbox/eventing-github/releases/download/v0.23.0/github.yaml
