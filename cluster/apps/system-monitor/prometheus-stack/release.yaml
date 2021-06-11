@@ -114,6 +114,8 @@ spec:
         probeSelector: {}
         probeNamespaceSelector: {}
         walCompression: true
+        secrets:
+        - etcd-certificates
         storageSpec:
           volumeClaimTemplate:
             spec:
