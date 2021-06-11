@@ -4,4 +4,4 @@ kind: Kustomization
 namespace: system-knative
 resources:
 - https://github.com/knative/operator/releases/download/v0.23.0/operator.yaml
-# - https://github.com/knative-sandbox/eventing-github/releases/download/v0.23.0/github.yaml
+- https://github.com/knative-sandbox/eventing-github/releases/download/v0.23.0/github.yaml
