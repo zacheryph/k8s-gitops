@@ -19,7 +19,7 @@ spec:
       adminPassword: ${PROMETHEUS_ADMIN_PASSWORD}
       image:
         repository: grafana/grafana
-        tag: 8.0.1
+        tag: 8.0.2
       plugins:
       - grafana-piechart-panel
       env:
