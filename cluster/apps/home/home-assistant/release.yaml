@@ -66,9 +66,6 @@ spec:
         volumeMounts:
         - name: config
           mountPath: /config
-        - name: sshkeys
-          mountPath: /root/.ssh
-          readOnly: true
 
         resources:
           requests:

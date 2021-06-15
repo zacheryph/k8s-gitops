@@ -38,7 +38,7 @@ spec:
         annotations:
           metallb.universe.tf/allow-shared-ip: plex-svc
         loadBalancerIP: "${LB_PLEX}"
-        externalTrafficPolicy: local
+        externalTrafficPolicy: Local
 
     ingress:
       main:
