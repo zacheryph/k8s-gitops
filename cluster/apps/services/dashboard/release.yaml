@@ -8,7 +8,7 @@ spec:
     spec:
       # registryUrl=https://k8s-at-home.com/charts/
       chart: heimdall
-      version: 6.4.0
+      version: 7.1.0
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home
@@ -17,14 +17,20 @@ spec:
     image:
       repository: linuxserver/heimdall
       tag: 2.2.2-ls107
-    timezone: 'America/Chicago'
+    env:
+      TZ: 'America/Chicago'
+    persistence:
+      config:
+        enabled: true
+        existingClaim: heimdall-config
     ingress:
-      enabled: true
-      hosts:
-      - host: dash.${CLUSTER_DOMAIN}
-        paths:
-        - path: /
-          pathType: Prefix
-      annotations:
-        nginx.ingress.kubernetes.io/auth-url: "https://auth.${CLUSTER_DOMAIN}/oauth2/auth"
-        nginx.ingress.kubernetes.io/auth-signin: "https://auth.${CLUSTER_DOMAIN}/oauth2/start"
+      main:
+        enabled: true
+        hosts:
+        - host: dash.${CLUSTER_DOMAIN}
+          paths:
+          - path: /
+            pathType: Prefix
+        annotations:
+          nginx.ingress.kubernetes.io/auth-url: "https://auth.${CLUSTER_DOMAIN}/oauth2/auth"
+          nginx.ingress.kubernetes.io/auth-signin: "https://auth.${CLUSTER_DOMAIN}/oauth2/start"
