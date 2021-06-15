@@ -8,7 +8,7 @@ spec:
     spec:
       # registryUrl=https://k8s-at-home.com/charts/
       chart: home-assistant
-      version: 8.3.1
+      version: 9.1.1
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home
@@ -22,37 +22,35 @@ spec:
     envFrom:
     - secretRef:
         name: home-assistant-env
-    hostNetwork: true
-    dnsPolicy: ClusterFirstWithHostNet
-    dnsConfig:
-      options:
-      - name: ndots
-        value: "2"
-    ingress:
-      enabled: true
-      hosts:
-      - host: home-assistant.${CLUSTER_DOMAIN}
-        paths:
-        - path: /
-          pathType: Prefix
-    monitoring:
-      enabled: true
-      serviceMonitor:
-        enabled: true
+
+
+    # hostNetwork: true
+    # dnsPolicy: ClusterFirstWithHostNet
+    # dnsConfig:
+    #   options:
+    #   - name: ndots
+    #     value: "2"
+
     persistence:
       config:
         enabled: true
         existingClaim: home-assistant-config
 
-    additionalVolumes:
-    - name: sshkeys
-      secret:
-        secretName: github-credentials
-        defaultMode: 0700
+    ingress:
+      main:
+        enabled: true
+        hosts:
+        - host: home-assistant.${CLUSTER_DOMAIN}
+          paths:
+          - path: /
+            pathType: Prefix
 
     addons:
       codeserver:
         enabled: true
+        git:
+          deploySecretKey: github-credentials
+
         ingress:
           enabled: true
           annotations:
@@ -63,6 +61,7 @@ spec:
             paths:
             - path: /
               pathType: Prefix
+
         workingDir: /config
         volumeMounts:
         - name: config
@@ -70,3 +69,10 @@ spec:
         - name: sshkeys
           mountPath: /root/.ssh
           readOnly: true
+
+        resources:
+          requests:
+            cpu: 35m
+            memory: 128Mi
+          limits:
+            memory: 512Mi
