@@ -8,7 +8,7 @@ spec:
     spec:
       # registryUrl=https://k8s-at-home.com/charts/
       chart: plex
-      version: 2.3.3
+      version: 5.1.1
       sourceRef:
         kind: HelmRepository
         name: k8s-at-home
@@ -17,34 +17,38 @@ spec:
     image:
       repository: plexinc/pms-docker
       tag: 1.23.2.4656-85f0adf5b
-    timezone: "America/Chicago"
-    claimToken: ${PLEX_CLAIM_TOKEN}
-    allowedNetworks:
-    - 127.0.0.1
-    - 10.42.0.0/16
-    - 10.72.143.0/24
+    env:
+      TZ: "America/Chicago"
+
     persistence:
       config:
-        claimName: plex-config
+        enabled: true
+        existingClaim: plex-config
       data:
-        claimName: media-pool
-      extraData:
-      - name: nvr
-        claimName: nvr-pool
+        enabled: true
+        type: pvc
+        existingClaim: media-pool
+        mountPath: /data
+        readOnly: true
+
+    service:
+      main:
+        enabled: true
+        type: LoadBalancer
+        annotations:
+          metallb.universe.tf/allow-shared-ip: plex-svc
+        loadBalancerIP: "${LB_PLEX}"
+        externalTrafficPolicy: local
+
     ingress:
-      enabled: true
-      hosts:
-      - plex.${CLUSTER_DOMAIN}
-    serviceTCP:
-      type: LoadBalancer
-      loadBalancerIP: "${LB_PLEX}"
-      annotations:
-        metallb.universe.tf/allow-shared-ip: plex-svc
-    serviceUDP:
-      type: LoadBalancer
-      loadBalancerIP: "${LB_PLEX}"
-      annotations:
-        metallb.universe.tf/allow-shared-ip: plex-svc
+      main:
+        enabled: true
+        hosts:
+        - host: plex.${CLUSTER_DOMAIN}
+          paths:
+          - path: /
+            pathType: Prefix
+
     resources:
       requests:
         cpu: 500m
