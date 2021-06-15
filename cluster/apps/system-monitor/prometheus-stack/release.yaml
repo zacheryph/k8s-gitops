@@ -104,11 +104,6 @@ spec:
           targetLabel: kubernetes_node
     kubelet:
       enabled: true
-      serviceMonitor:
-      - action: replace
-        sourceLabels:
-        - node
-        targetLabel: instance
     kubeApiServer:
       enabled: true
     kubeControllerManager:

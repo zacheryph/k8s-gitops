@@ -46,13 +46,11 @@ spec:
       config:
         enabled: true
         existingClaim: radarr-config
-    additionalVolumeMounts:
-    - name: media
-      mountPath: /media
-    additionalVolumes:
-    - name: media
-      persistentVolumeClaim:
-        claimName: media-pool
+      media:
+        enabled: true
+        type: pvc
+        existingClaim: media-pool
+        mountPath: /media
     resources:
       requests:
         memory: 250Mi
