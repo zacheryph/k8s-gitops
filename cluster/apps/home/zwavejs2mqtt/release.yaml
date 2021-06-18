@@ -30,21 +30,17 @@ spec:
         enabled: true
         type: hostPath
         hostPath: /dev/ttyACM0
-
-    service:
-      additionalPorts:
-      - name: websocket
-        port: 3000
     ingress:
-      enabled: true
-      annotations:
-        nginx.ingress.kubernetes.io/auth-signin: https://auth.${CLUSTER_DOMAIN}/oauth2/start
-        nginx.ingress.kubernetes.io/auth-url: https://auth.${CLUSTER_DOMAIN}/oauth2/auth
-      hosts:
-      - host: zwave2mqtt.${CLUSTER_DOMAIN}
-        paths:
-        - path: /
-          pathType: Prefix
+      main:
+        enabled: true
+        annotations:
+          nginx.ingress.kubernetes.io/auth-signin: https://auth.${CLUSTER_DOMAIN}/oauth2/start
+          nginx.ingress.kubernetes.io/auth-url: https://auth.${CLUSTER_DOMAIN}/oauth2/auth
+        hosts:
+        - host: zwave2mqtt.${CLUSTER_DOMAIN}
+          paths:
+          - path: /
+            pathType: Prefix
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
