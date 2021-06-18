@@ -17,6 +17,9 @@ spec:
     fullnameOverride: prometheus-stack
     grafana:
       enabled: false
+    kubeStateMetrics:
+      enabled: false
+
     alertmanager:
       alertmanagerSpec:
         storage:
