@@ -7,3 +7,4 @@ resources:
 - kube-state-metrics
 - loki-stack
 - prometheus-stack
+- victoria-metrics
