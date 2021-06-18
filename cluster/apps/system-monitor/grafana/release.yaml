@@ -34,7 +34,7 @@ spec:
         enabled: true
         searchNamespace: ALL
       datasources:
-        enabled: false
+        enabled: true
         searchNamespace: ALL
 
     plugins:
