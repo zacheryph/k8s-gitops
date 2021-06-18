@@ -1,0 +1,89 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: grafana
+spec:
+  interval: 1h
+  chart:
+    spec:
+      # registryUrl=https://grafana.github.io/helm-charts
+      chart: grafana
+      version: 6.13.2
+      sourceRef:
+        kind: HelmRepository
+        name: grafana
+        namespace: flux-system
+  values:
+    adminPassword: ${PROMETHEUS_ADMIN_PASSWORD}
+
+    image:
+      repository: grafana/grafana
+      tag: 8.0.3
+      pullPolicy: IfNotPresent
+    ingress:
+      enabled: true
+      hosts:
+      - grafana.${CLUSTER_DOMAIN}
+
+    env:
+      GF_DISABLE_SANITIZE_HTML: true
+      GF_PANELS_DISABLE_SANITIZE_HTML: true
+
+    sidecar:
+      dashboards:
+        enabled: true
+        searchNamespace: ALL
+      datasources:
+        enabled: false
+        searchNamespace: ALL
+
+    plugins:
+    - grafana-piechart-panel
+
+    dashboardproviders.yaml:
+      apiVersion: 1
+      providers:
+      - name: 'default'
+        orgId: 1
+        folder: ''
+        type: file
+        disableDeletion: false
+        editable: true
+        options:
+          path: /var/lib/grafana/dashboards/default
+
+    dashboards:
+      default:
+        # blocky:
+        #   url: https://raw.githubusercontent.com/0xERR0R/blocky/master/docs/blocky-grafana.json
+        #   datasource: Prometheus
+        # flux-cluster:
+        #   url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/grafana/dashboards/cluster.json
+        #   datasource: Prometheus
+        # flux-control-panel:
+        #   url: https://raw.githubusercontent.com/fluxcd/flux2/main/manifests/monitoring/grafana/dashboards/control-plane.json
+        #   datasource: Prometheus
+        # istio-extension-dashboard:
+        #   url: https://raw.githubusercontent.com/istio/istio/master/manifests/addons/dashboards/istio-extension-dashboard.json
+        #   datasource: Prometheus
+        # istio-mesh-dashboard:
+        #   url: https://raw.githubusercontent.com/istio/istio/master/manifests/addons/dashboards/istio-mesh-dashboard.json
+        #   datasource: Prometheus
+        # istio-performance-dashboard:
+        #   url: https://raw.githubusercontent.com/istio/istio/master/manifests/addons/dashboards/istio-performance-dashboard.json
+        #   datasource: Prometheus
+        # istio-service-dashboard:
+        #   url: https://raw.githubusercontent.com/istio/istio/master/manifests/addons/dashboards/istio-service-dashboard.json
+        #   datasource: Prometheus
+        # istio-workload-dashboard:
+        #   url: https://raw.githubusercontent.com/istio/istio/master/manifests/addons/dashboards/istio-workload-dashboard.json
+        #   datasource: Prometheus
+        # istio-pilot-dashboard:
+        #   url: https://raw.githubusercontent.com/istio/istio/master/manifests/addons/dashboards/pilot-dashboard.json
+        #   datasource: Prometheus
+        # nginx-dashboard:
+        #   url: https://raw.githubusercontent.com/kubernetes/ingress-nginx/master/deploy/grafana/dashboards/nginx.json
+        #   datasource: Prometheus
+        # vernemq:
+        #   url: https://raw.githubusercontent.com/vernemq/vernemq/master/metrics_scripts/grafana/VerneMQ%20Node%20Metrics.json
+        #   datasource: Prometheus
