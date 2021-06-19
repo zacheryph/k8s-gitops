@@ -1,7 +1,7 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAgent
 metadata:
-  name: victoria-metrics-agent
+  name: vmagent
 spec:
   image:
     repository: victoriametrics/vmagent
@@ -10,3 +10,8 @@ spec:
 
   remoteWrite:
   - url: http://victoria-metrics-single-server:8428/api/v1/write
+
+  resources:
+    limits:
+      cpu: 500m
+      memory: 500Mi
