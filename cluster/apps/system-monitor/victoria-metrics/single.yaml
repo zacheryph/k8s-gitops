@@ -15,5 +15,6 @@ spec:
       requests:
         storage: 200Gi
 
+  retentionPeriod: "6"
   extraArgs:
-    maxLabelsPerTimeseries: 50
+    maxLabelsPerTimeseries: "50"

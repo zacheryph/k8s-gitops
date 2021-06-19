@@ -9,4 +9,4 @@ spec:
     pullPolicy: IfNotPresent
 
   remoteWrite:
-    url: http://victoria-metrics-single-server:8428/api/v1/write
+  - url: http://victoria-metrics-single-server:8428/api/v1/write
