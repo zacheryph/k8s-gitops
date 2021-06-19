@@ -1,23 +1,20 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: victoria-metrics-agent
+  name: victoria-metrics-alert
 spec:
   interval: 1h
   chart:
     spec:
       # registryUrl=https://victoriametrics.github.io/helm-charts/
-      chart: victoria-metrics-agent
-      version: 0.7.19
+      chart: victoria-metrics-alert
+      version: _
       sourceRef:
         kind: HelmRepository
         name: victoria-metrics
         namespace: flux-system
   values:
     image:
-      repository: victoriametrics/vmagent
-      tag: v1.61.1
+      repository: victoriametrics/_
+      tag: _
       pullPolicy: IfNotPresent
-
-    remoteWrite:
-      url: http://victoria-metrics-single-server:8428/api/v1/write
