@@ -4,3 +4,6 @@ resources:
 - datasource.yaml
 - operator.yaml
 - single.yaml
+
+- scrapes/kube-state-metrics.yaml
+- scrapes/node-exporter.yaml
