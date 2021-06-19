@@ -1,7 +1,7 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMAgent
 metadata:
-  name: vmagent
+  name: agent
 spec:
   image:
     repository: victoriametrics/vmagent
@@ -9,7 +9,7 @@ spec:
     pullPolicy: IfNotPresent
 
   remoteWrite:
-  - url: http://victoria-metrics-single-server:8428/api/v1/write
+  - url: http://vmsingle-vmsingle:8428/api/v1/write
 
   resources:
     limits:

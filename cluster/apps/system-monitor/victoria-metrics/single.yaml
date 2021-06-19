@@ -1,7 +1,7 @@
 apiVersion: operator.victoriametrics.com/v1beta1
 kind: VMSingle
 metadata:
-  name: vmsingle
+  name: store
 spec:
   image:
     repository: victoriametrics/victoria-metrics
