@@ -6,5 +6,6 @@ resources:
 - grafana
 - kube-state-metrics
 - loki-stack
+- node-exporter
 - prometheus-stack
 - victoria-metrics
