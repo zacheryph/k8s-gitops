@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: gitea/gitea
-      tag: 1.14.2
+      tag: 1.14.3
       pullPolicy: IfNotPresent
     ingress:
       enabled: true
