@@ -20,6 +20,9 @@ spec:
         tag: v1.61.1
         pullPolicy: IfNotPresent
 
+      extraArgs:
+        maxLabelsPerTimeseries: 50
+
       persistentVolume:
         enabled: true
         storageClass: rook-ceph-block
