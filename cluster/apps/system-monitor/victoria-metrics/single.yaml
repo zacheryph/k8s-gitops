@@ -1,32 +1,19 @@
-apiVersion: helm.toolkit.fluxcd.io/v2beta1
-kind: HelmRelease
+apiVersion: operator.victoriametrics.com/v1beta1
+kind: VMSingle
 metadata:
   name: victoria-metrics-single
 spec:
-  interval: 1h
-  chart:
-    spec:
-      # registryUrl=https://victoriametrics.github.io/helm-charts/
-      chart: victoria-metrics-single
-      version: 0.7.3
-      sourceRef:
-        kind: HelmRepository
-        name: victoria-metrics
-        namespace: flux-system
-  values:
-    server:
-      image:
-        repository: victoriametrics/victoria-metrics
-        tag: v1.61.1
-        pullPolicy: IfNotPresent
+  image:
+    repository: victoriametrics/victoria-metrics
+    tag: v1.61.1
+    pullPolicy: IfNotPresent
 
-      extraArgs:
-        maxLabelsPerTimeseries: 50
+  storage:
+    accessMode: ReadWriteOnce
+    storageClassName: rook-ceph-block
+    resources:
+      requests:
+        storage: 200Gi
 
-      persistentVolume:
-        enabled: true
-        storageClass: rook-ceph-block
-        size: 500Gi
-
-      scrape:
-        enabled: true
+  extraArgs:
+    maxLabelsPerTimeseries: 50
