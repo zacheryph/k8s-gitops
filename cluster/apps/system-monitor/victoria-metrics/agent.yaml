@@ -8,6 +8,11 @@ spec:
     tag: v1.61.1
     pullPolicy: IfNotPresent
 
+  extraArgs:
+    # i guess... we have a _big_ cluster.
+    # https://github.com/VictoriaMetrics/operator/issues/96
+    promscrape.maxScrapeSize: "64777216"
+
   remoteWrite:
   - url: http://vmsingle-store:8429/api/v1/write
 
