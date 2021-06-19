@@ -9,7 +9,7 @@ spec:
     pullPolicy: IfNotPresent
 
   remoteWrite:
-  - url: http://vmsingle-store:8428/api/v1/write
+  - url: http://vmsingle-store:8429/api/v1/write
 
   resources:
     limits:

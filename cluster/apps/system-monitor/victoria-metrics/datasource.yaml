@@ -12,4 +12,4 @@ data:
       type: prometheus
       access: proxy
       isDefault: true
-      url: http://victoria-metrics-single-server:8428/
+      url: http://vmsingle-store:8429/
