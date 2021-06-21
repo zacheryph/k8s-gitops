@@ -8,3 +8,4 @@ resources:
 - loki-stack
 - node-exporter
 - prometheus-stack
+- volumes
