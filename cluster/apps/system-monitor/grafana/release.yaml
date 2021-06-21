@@ -40,6 +40,10 @@ spec:
     plugins:
     - grafana-piechart-panel
 
+    persistence:
+      inMemory:
+        enabled: true
+
     dashboardproviders.yaml:
       apiVersion: 1
       providers:
