@@ -17,6 +17,12 @@ spec:
     operator:
       cleanupCRD: false
 
+    victoria-metrics-operator:
+      resources:
+        limits:
+          cpu: 250m
+          memory: 1Gi
+
     vmsingle:
       spec:
         storage:
