@@ -25,7 +25,8 @@
         "cluster/operators/.+/.+\\.yaml"
       ],
       "matchStrings": [
-        "https://github.com/(?<depName>.*?)/releases/download/(?<currentValue>[^/]*)/"
+        "https://github.com/(?<depName>.*?)/releases/download/(?<currentValue>[^/]*)/",
+        "https://raw.githubusercontent.com/(?<depName>.*?)/(?<currentValue>[^/]*)/manifests/grafana-dashboardDefinitions.yaml"
       ],
       "datasourceTemplate": "github-releases"
     },
