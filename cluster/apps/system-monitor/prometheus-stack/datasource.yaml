@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: datasource-prometheus
+  labels:
+    grafana_datasource: "1"
+data:
+  loki.yaml: |-
+    apiVersion: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      url: http://prometheus-server.system-monitor.svc:80/
+      jsonData:
+        httpMethod: POST
