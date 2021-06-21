@@ -11,6 +11,7 @@ data:
     - name: Prometheus
       type: prometheus
       access: proxy
+      default: true
       url: http://prometheus-server.system-monitor.svc:80/
       jsonData:
         httpMethod: POST
