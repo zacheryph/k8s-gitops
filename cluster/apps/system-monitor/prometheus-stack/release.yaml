@@ -18,7 +18,7 @@ spec:
       enabled: true
       image:
         repository: quay.io/prometheus/alertmanager
-        tag: v0.21.0
+        tag: v0.22.2
         pullPolicy: IfNotPresent
       persistentVolume:
         enabled: true
