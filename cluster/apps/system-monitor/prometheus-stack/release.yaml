@@ -34,7 +34,7 @@ spec:
       enabled: true
       image:
         repository: quay.io/prometheus/prometheus
-        tag: v2.26.0
+        tag: v2.28.0
         pullPolicy: IfNotPresent
       persistentVolume:
         enabled: true
