@@ -39,9 +39,9 @@ spec:
       persistentVolume:
         enabled: true
         existingClaim: prometheus-data
-      resources:
-        requests:
-          cpu: 100m
-          memory: 1500Mi
-        limits:
-          memory: 2Gi
+      # resources:
+      #   requests:
+      #     cpu: 100m
+      #     memory: 1500Mi
+      #   limits:
+      #     memory: 2Gi
