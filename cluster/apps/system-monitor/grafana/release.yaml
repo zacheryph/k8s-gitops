@@ -30,6 +30,8 @@ spec:
     env:
       GF_DISABLE_SANITIZE_HTML: true
       GF_PANELS_DISABLE_SANITIZE_HTML: true
+      GF_SERVER_DOMAIN: grafana.${CLUSTER_DOMAIN}
+      GF_SERVER_PROTOCOL: https
 
     sidecar:
       dashboards:
