@@ -18,6 +18,8 @@ spec:
       tls:
         certSource: none
       ingress:
+        annotations:
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
         hosts:
           core: r.${CLUSTER_DOMAIN}
           notary: notary.${CLUSTER_DOMAIN}

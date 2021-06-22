@@ -34,6 +34,7 @@ spec:
       - unifi.${CLUSTER_DOMAIN}
       annotations:
         nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     guiService:
       type: LoadBalancer
       loadBalancerIP: "${LB_UNIFI}"

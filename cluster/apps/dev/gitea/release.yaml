@@ -23,6 +23,7 @@ spec:
       hosts:
       - git.${CLUSTER_DOMAIN}
       annotations:
+        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
         nginx.ingress.kubernetes.io/proxy-body-size: 128m
     persistence:
       enabled: true

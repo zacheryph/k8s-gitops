@@ -19,6 +19,8 @@ spec:
       tag: 2.4.2
     ingress:
       enabled: true
+      annotations:
+        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       hosts:
       - host: wallabag.${CLUSTER_DOMAIN}
         paths:

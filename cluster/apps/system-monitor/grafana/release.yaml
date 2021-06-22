@@ -24,6 +24,8 @@ spec:
       enabled: true
       hosts:
       - grafana.${CLUSTER_DOMAIN}
+      annotations:
+        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
 
     env:
       GF_DISABLE_SANITIZE_HTML: true
