@@ -15,9 +15,13 @@ spec:
         namespace: flux-system
   values:
     loki:
+      image:
+        repository: grafana/loki
+        tag: 2.2.0
+        pullPolicy: IfNotPresent
       persistence:
         enabled: true
-        size: 200Gi
+        existingClaim: loki-data
     promtail:
       extraScrapeConfigs:
       - job_name: syslog
