@@ -16,6 +16,8 @@ spec:
   values:
     alertmanager:
       enabled: true
+      strategy:
+        type: Recreate
       image:
         repository: quay.io/prometheus/alertmanager
         tag: v0.22.2
@@ -32,6 +34,8 @@ spec:
 
     server:
       enabled: true
+      strategy:
+        type: Recreate
       image:
         repository: quay.io/prometheus/prometheus
         tag: v2.28.0
