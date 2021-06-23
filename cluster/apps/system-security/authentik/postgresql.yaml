@@ -14,6 +14,7 @@ spec:
         name: bitnami
         namespace: flux-system
   values:
+    fullnameOverride: authentik-postgresql
     postgresqlPassword: ${AUTHENTIK_POSTGRESQL_PASSWORD}
     image:
       registry: docker.io
