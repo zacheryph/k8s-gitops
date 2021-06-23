@@ -27,7 +27,7 @@ spec:
               pathType: Prefix
 
     authentik:
-      secet_key: ${AUTHENTIK_SECRET_KEY}
+      secret_key: ${AUTHENTIK_SECRET_KEY}
       email:
         host: ${MAIL_SMTP_HOST}
         port: ${MAIL_SMTP_PORT}
