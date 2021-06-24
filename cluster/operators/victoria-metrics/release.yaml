@@ -23,7 +23,6 @@ spec:
     operator:
       cleanupCRD: true
     victoria-metrics-operator:
-      createCRD: true
       image:
         repository: victoriametrics/operator
         tag: v0.15.1
