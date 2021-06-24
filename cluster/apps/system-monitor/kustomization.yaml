@@ -8,4 +8,5 @@ resources:
 - loki-stack
 - node-exporter
 # - prometheus-stack
+- victoria-metrics
 - volumes
