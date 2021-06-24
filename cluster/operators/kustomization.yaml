@@ -4,4 +4,3 @@ kind: Kustomization
 resources:
 - knative
 - tekton
-- victoria-metrics
