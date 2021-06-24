@@ -4,8 +4,6 @@ kind: Kustomization
 namespace: system-monitor
 resources:
 - grafana
-- kube-state-metrics
 - loki-stack
-- node-exporter
-# - prometheus-stack
+- prometheus-stack
 - volumes

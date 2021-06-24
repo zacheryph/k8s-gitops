@@ -1,51 +1,114 @@
 apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
-  name: prometheus
+  name: prometheus-stack
 spec:
   interval: 1h
   chart:
     spec:
       # registryUrl=https://prometheus-community.github.io/helm-charts
-      chart: prometheus
-      version: 14.2.1
+      chart: kube-prometheus-stack
+      version: 16.10.0
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
         namespace: flux-system
   values:
+    fullnameOverride: prometheus-stack
+    grafana:
+      enabled: false
+
     alertmanager:
-      enabled: true
-      strategy:
-        type: Recreate
-      image:
-        repository: quay.io/prometheus/alertmanager
-        tag: v0.22.2
-        pullPolicy: IfNotPresent
-      persistentVolume:
+      ingress:
         enabled: true
-        existingClaim: alertmanager-data
+        hosts:
+        - alertmanager.${CLUSTER_DOMAIN}
+        annotations:
+          nginx.ingress.kubernetes.io/auth-signin: https://auth.${CLUSTER_DOMAIN}/oauth2/start
+          nginx.ingress.kubernetes.io/auth-url: https://auth.${CLUSTER_DOMAIN}/oauth2/auth
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      alertmanagerSpec:
+        image:
+          repository: quay.io/prometheus/alertmanager
+          tag: v0.22.2
+        storage:
+          volumeClaimTemplate:
+            spec:
+              accessModes:
+              - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 4Gi
 
     kubeStateMetrics:
-      enabled: false
+      enabled: true
+    kube-state-metrics:
+      image:
+        repository: k8s.gcr.io/kube-state-metrics/kube-state-metrics
+        tag: v2.1.0
+        pullPolicy: IfNotPresent
 
     nodeExporter:
-      enabled: false
-
-    server:
       enabled: true
-      strategy:
-        type: Recreate
+    prometheus-node-exporter:
       image:
-        repository: quay.io/prometheus/prometheus
-        tag: v2.28.0
+        repository: quay.io/prometheus/node-exporter
+        tag: v1.1.2
         pullPolicy: IfNotPresent
-      persistentVolume:
+
+    prometheusOperator:
+      enabled: true
+      image:
+        repository: quay.io/prometheus-operator/prometheus-operator
+        tag: v0.48.1
+        pullPolicy: IfNotPresent
+
+    prometheus:
+      enabled: true
+      ingress:
         enabled: true
-        existingClaim: prometheus-data
-      # resources:
-      #   requests:
-      #     cpu: 100m
-      #     memory: 1500Mi
-      #   limits:
-      #     memory: 2Gi
+        hosts:
+        - prometheus.${CLUSTER_DOMAIN}
+        annotations:
+          nginx.ingress.kubernetes.io/auth-signin: https://auth.${CLUSTER_DOMAIN}/oauth2/start
+          nginx.ingress.kubernetes.io/auth-url: https://auth.${CLUSTER_DOMAIN}/oauth2/auth
+          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      prometheusSpec:
+        image:
+          repository: quay.io/prometheus/prometheus
+          tag: v2.27.1
+          pullPolicy: IfNotPresent
+        retention: 90d
+        shards: null
+        serviceMonitorSelectorNilUsesHelmValues: false
+        serviceMonitorSelector: {}
+        serviceMonitorNamespaceSelector: {}
+        podMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelector: {}
+        podMonitorNamespaceSelector: {}
+        probeSelectorNilUsesHelmValues: false
+        probeSelector: {}
+        probeNamespaceSelector: {}
+        walCompression: true
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              accessModes:
+              - ReadWriteOnce
+              resources:
+                requests:
+                  storage: 200Gi
+
+    # scrapers
+    kubelet:
+      enabled: true
+    kubeApiServer:
+      enabled: true
+    kubeControllerManager:
+      enabled: true
+    kubeScheduler:
+      enabled: false
+    kubeProxy:
+      enabled: false
+    kubeEtcd:
+      enabled: false
