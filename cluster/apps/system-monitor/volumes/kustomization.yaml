@@ -4,3 +4,4 @@ resources:
 - alertmanager-data.yaml
 - loki-data.yaml
 - prometheus-data.yaml
+- victoria-data.yaml
