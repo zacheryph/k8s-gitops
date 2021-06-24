@@ -1,0 +1,33 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: victoria-metrics-agent
+spec:
+  interval: 1h
+  chart:
+    spec:
+      # registryUrl=https://victoriametrics.github.io/helm-charts/
+      chart: victoria-metrics-agent
+      version: 0.7.19
+      sourceRef:
+        kind: HelmRepository
+        name: victoria-metrics
+        namespace: flux-system
+  values:
+    image:
+      repository: victoriametrics/vmagent
+      tag: v1.61.1
+      pullPolicy: IfNotPresent
+    remoteWriteUrls:
+    - http://victoria-metrics-single:8428/api/v1/write
+    extraArgs:
+      # i guess... we have a _big_ cluster.
+      # https://github.com/VictoriaMetrics/operator/issues/96
+      promscrape.maxScrapeSize: "64777216"
+    resources:
+      requests:
+        cpu: 100m
+        memory: 1Gi
+      limits:
+        cpu: 500m
+        memory: 2Gi
