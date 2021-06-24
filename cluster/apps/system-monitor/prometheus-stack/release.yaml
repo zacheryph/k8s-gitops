@@ -14,11 +14,12 @@ spec:
         name: prometheus-community
         namespace: flux-system
   values:
-    fullnameOverride: prometheus-stack
+    fullnameOverride: prometheus
     grafana:
       enabled: false
 
     alertmanager:
+      enabled: true
       ingress:
         enabled: true
         hosts:
@@ -46,6 +47,7 @@ spec:
     kubeStateMetrics:
       enabled: true
     kube-state-metrics:
+      fullnameOverride: kube-state-metrics
       image:
         repository: k8s.gcr.io/kube-state-metrics/kube-state-metrics
         tag: v2.1.0
@@ -54,6 +56,7 @@ spec:
     nodeExporter:
       enabled: true
     prometheus-node-exporter:
+      fullnameOverride: prometheus-node-exporter
       image:
         repository: quay.io/prometheus/node-exporter
         tag: v1.1.2
