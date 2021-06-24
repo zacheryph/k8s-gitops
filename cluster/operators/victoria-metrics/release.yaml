@@ -17,12 +17,11 @@ spec:
   # we are only interested in this chart for
   # the operator and k8s specific monitors/rules
   values:
-    fullnameOverride: victoria
-
     # Operator
     operator:
       cleanupCRD: true
     victoria-metrics-operator:
+      fullnameOverride: victoria-metrics-operator
       image:
         repository: victoriametrics/operator
         tag: v0.15.1
