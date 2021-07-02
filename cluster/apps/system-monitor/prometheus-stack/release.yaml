@@ -85,7 +85,7 @@ spec:
       prometheusSpec:
         image:
           repository: quay.io/prometheus/prometheus
-          tag: v2.27.1
+          tag: v2.28.1
           pullPolicy: IfNotPresent
         retention: 90d
         shards: null
