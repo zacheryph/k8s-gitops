@@ -23,9 +23,6 @@ spec:
       filters:
         includeResources:
         - resource: persistentvolumeclaims
-      profile:
-        name: ceph
-        namespace: system-kasten
   - action: export
     exportParameters:
       frequency: '@daily'

@@ -28,9 +28,6 @@ spec:
           name: media-pool
         - resource: persistentvolumeclaims
           name: nvr-pool
-      profile:
-        name: ceph
-        namespace: system-kasten
   - action: export
     exportParameters:
       frequency: '@daily'
