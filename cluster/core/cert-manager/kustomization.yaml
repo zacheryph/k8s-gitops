@@ -4,5 +4,4 @@ kind: Kustomization
 namespace: kube-system
 resources:
 - cloudflare-token.yaml
-- release.yaml
 - issuer.yaml
