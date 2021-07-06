@@ -4,4 +4,5 @@ namespace: system-ingress
 resources:
 - ingress-nginx
 - oauth2-proxy
+- traefik
 - wildcard-certificate.yaml
