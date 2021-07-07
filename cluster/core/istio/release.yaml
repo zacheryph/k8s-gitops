@@ -1,0 +1,33 @@
+---
+apiVersion: install.istio.io/v1alpha1
+kind: IstioOperator
+metadata:
+  name: istio
+  namespace: istio-system
+spec:
+  hub: docker.io/istio
+  tag: 1.10.2-distroless
+  profile: default
+
+  meshConfig:
+    extensionProviders:
+    - name: oauth2-proxy
+      envoyExtAuthzHttp:
+        service: oauth2-proxy.system-ingress.svc.cluster.local
+        port: 80
+        includeHeadersInCheck:
+        - authorization
+        - cookie
+        headersToUpstreamOnAllow:
+        - authorization
+        - path
+        - x-auth-request-user
+        - x-auth-request-email
+        - x-auth-request-access-token
+        headersToDownstreamOnDeny:
+        - content-type
+        - set-cookie
+    accessLogFile: /dev/stdout
+    enableTracing: false
+    outboundTrafficPolicy:
+      mode: ALLOW_ANY
