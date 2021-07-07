@@ -38,3 +38,16 @@ spec:
       cookieSecret: ${OAUTH_COOKIE_SECRET}
       clientID: ${OAUTH_CLIENT_ID}
       clientSecret: ${OAUTH_CLIENT_SECRET}
+      configFile: |
+        auth_logging = true
+        cookie_httponly = true
+        cookie_refresh = 1h
+        cookie_secure = true
+        request_logging = true
+        set_authorization_header = true
+        silence_ping_logging = true
+        skip_provider_button = true
+        skip_auth_strip_headers = false
+        skip_jwt_bearer_tokens = false
+        standard_logging = true
+        upstreams = [ "static://200" ]
