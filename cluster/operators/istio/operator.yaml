@@ -20,6 +20,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: istio-operator
+  namespace: kube-system
 spec:
   interval: 1h
   chart:
@@ -30,5 +31,6 @@ spec:
         name: istio-source
         namespace: flux-system
   values:
+    enableCRDTemplates: true
     operatorNamespace: istio-operator
     istioNamespace: istio-system
