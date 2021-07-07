@@ -6,7 +6,7 @@ metadata:
   namespace: istio-system
 spec:
   hub: docker.io/istio
-  tag: 1.10.2-distroless
+  tag: 1.10.2
   profile: default
 
   meshConfig:
