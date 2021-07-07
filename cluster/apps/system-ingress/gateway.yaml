@@ -1,0 +1,36 @@
+# this is our istio-ingressgateway Gateway
+---
+apiVersion: networking.istio.io/v1beta1
+kind: Gateway
+metadata:
+  name: gateway
+spec:
+  selector:
+    istio: ingressgateway
+  servers:
+  - port:
+      number: 80
+      name: http
+      protocol: HTTP
+    hosts:
+    - "${CLUSTER_DOMAIN}"
+    - "*.${CLUSTER_DOMAIN}"
+    - "${KNATIVE_DOMAIN}"
+    - "*.${KNATIVE_DOMAIN}"
+    - "*.api.${KNATIVE_DOMAIN}"
+    - "*.tekton-pipelines.${KNATIVE_DOMAIN}"
+    tls:
+      httpsRedirect: true
+  - port:
+      number: 443
+      name: https
+      protocol: HTTPS
+    hosts:
+    - "${CLUSTER_DOMAIN}"
+    - "*.${CLUSTER_DOMAIN}"
+    - "${KNATIVE_DOMAIN}"
+    - "*.${KNATIVE_DOMAIN}"
+    - "*.api.${KNATIVE_DOMAIN}"
+    - "*.tekton-pipelines.${KNATIVE_DOMAIN}"
+    tls:
+      credentialName: zro-wildcard-certificate
