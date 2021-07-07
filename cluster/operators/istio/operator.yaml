@@ -1,0 +1,35 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta1
+kind: GitRepository
+metadata:
+  name: istio-source
+  namespace: flux-system
+spec:
+  interval: 30m
+  url: https://github.com/istio/istio.git
+  ref:
+    tag: 1.10.2
+  ignore: |
+    # exclude all
+    /*
+    # path to operator
+    !/manifests/charts/istio-operator
+
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: istio-operator
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: manifests/charts/istio-operator
+      sourceRef:
+        kind: GitRepository
+        name: istio-source
+        namespace: flux-system
+  values:
+    tag: 1.10.2
+    operatorNamespace: istio-system
+    istioNamespace: istio-system
