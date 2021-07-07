@@ -1,0 +1,28 @@
+---
+apiVersion: security.istio.io/v1beta1
+kind: AuthorizationPolicy
+metadata:
+  name: oauth-protected
+spec:
+  selector:
+    matchLabels:
+      app: istio-ingressgateway
+  action: CUSTOM
+  provider:
+    name: 'oauth2-proxy'
+
+  rules:
+  - to:
+    - operation:
+        hosts:
+        - alertmanager.${CLUSTER_DOMAIN}
+        - frigate.${CLUSTER_DOMAIN}
+        - home-vscode.${CLUSTER_DOMAIN}
+        - nzbget.${CLUSTER_DOMAIN}
+        - nzbhydra.${CLUSTER_DOMAIN}
+        - prometheus.${CLUSTER_DOMAIN}
+        - radarr.${CLUSTER_DOMAIN}
+        - sonarr.${CLUSTER_DOMAIN}
+        - tekton.${CLUSTER_DOMAIN}
+        - vernemq.${CLUSTER_DOMAIN}
+        - zwave2mqtt.${CLUSTER_DOMAIN}

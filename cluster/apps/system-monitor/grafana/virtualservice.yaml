@@ -1,0 +1,17 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: grafana
+  namespace: system-monitor
+spec:
+  hosts:
+  - grafana.${CLUSTER_DOMAIN}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        host: grafana.system-monitor.svc.cluster.local
+        port:
+          number: 80

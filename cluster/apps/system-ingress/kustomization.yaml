@@ -4,5 +4,6 @@ namespace: system-ingress
 resources:
 - ingress-nginx
 - oauth2-proxy
+- authorizationpolicy.yaml
 - gateway.yaml
 - wildcard-certificate.yaml

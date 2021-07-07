@@ -1,0 +1,34 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: home-assistant
+  namespace: home-assistant
+spec:
+  hosts:
+  - home-assistant.${CLUSTER_DOMAIN}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        host: home-assistant.home-assistant.svc.cluster.local
+        port:
+          number: 8123
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: home-assistant-codeserver
+  namespace: home-assistant
+spec:
+  hosts:
+  - home-vscode.${CLUSTER_DOMAIN}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        host: home-assistant-codeserver.home-assistant.svc.cluster.local
+        port:
+          number: 12321

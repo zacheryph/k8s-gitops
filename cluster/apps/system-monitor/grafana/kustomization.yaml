@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - dashboards
 - release.yaml
+- virtualservice.yaml

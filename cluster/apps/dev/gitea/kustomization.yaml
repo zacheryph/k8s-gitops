@@ -7,3 +7,4 @@ resources:
 - memcached.yaml
 - postgresql.yaml
 - release.yaml
+- virtualservice.yaml

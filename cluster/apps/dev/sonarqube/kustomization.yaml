@@ -5,3 +5,4 @@ namespace: sonarqube
 resources:
 - postgresql.yaml
 - release.yaml
+- virtualservice.yaml

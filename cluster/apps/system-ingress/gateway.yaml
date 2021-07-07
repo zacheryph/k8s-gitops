@@ -33,5 +33,7 @@ spec:
     - "*.api.${KNATIVE_DOMAIN}"
     - "*.tekton-pipelines.${KNATIVE_DOMAIN}"
     tls:
-      mode: SIMPLE
       credentialName: zro-wildcard-certificate
+      mode: SIMPLE
+      minProtocolVersion: TLSV1_2
+      maxProtocolVersion: TLSV1_3

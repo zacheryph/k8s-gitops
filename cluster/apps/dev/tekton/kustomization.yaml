@@ -5,3 +5,4 @@ namespace: tekton-pipelines
 resources:
 - secrets
 - serviceaccount.yaml
+- virtualservice.yaml

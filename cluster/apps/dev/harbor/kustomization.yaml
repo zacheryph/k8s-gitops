@@ -8,3 +8,4 @@ resources:
 - redis.yaml
 - release.yaml
 - service.yaml
+- virtualservice.yaml

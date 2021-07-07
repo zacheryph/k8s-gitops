@@ -1,0 +1,34 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: prometheus-alertmanager
+  namespace: system-monitor
+spec:
+  hosts:
+  - alertmanager.${CLUSTER_DOMAIN}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        host: prometheus-alertmanager.system-monitor.svc.cluster.local
+        port:
+          number: 9093
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: prometheus-prometheus
+  namespace: system-monitor
+spec:
+  hosts:
+  - prometheus.${CLUSTER_DOMAIN}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        host: prometheus-prometheus.system-monitor.svc.cluster.local
+        port:
+          number: 9090

@@ -5,3 +5,4 @@ namespace: unifi
 resources:
 - volumes
 - release.yaml
+- virtualservice.yaml

@@ -1,0 +1,17 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: zwavejs2mqtt
+  namespace: home-assistant
+spec:
+  hosts:
+  - zwave2mqtt.${CLUSTER_DOMAIN}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        host: zwavejs2mqtt.home-assistant.svc.cluster.local
+        port:
+          number: 8091

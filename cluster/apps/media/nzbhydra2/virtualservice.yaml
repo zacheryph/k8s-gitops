@@ -1,0 +1,17 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: nzbhydra2
+  namespace: media
+spec:
+  hosts:
+  - nzbhydra.${CLUSTER_DOMAIN}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        host: nzbhydra2.media.svc.cluster.local
+        port:
+          number: 5076

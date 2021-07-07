@@ -1,0 +1,17 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: vernemq
+  namespace: home-assistant
+spec:
+  hosts:
+  - vernemq.${CLUSTER_DOMAIN}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        host: vernemq.home-assistant.svc.cluster.local
+        port:
+          number: 8080

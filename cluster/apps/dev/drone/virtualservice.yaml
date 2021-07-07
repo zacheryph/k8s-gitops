@@ -1,0 +1,17 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: drone
+  namespace: drone
+spec:
+  hosts:
+  - drone.${CLUSTER_DOMAIN}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        host: drone.drone.svc.cluster.local
+        port:
+          number: 80

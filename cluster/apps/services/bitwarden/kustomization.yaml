@@ -5,3 +5,4 @@ namespace: bitwarden
 resources:
 - volumes
 - release.yaml
+- virtualservice.yaml

@@ -1,0 +1,17 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: tekton-dashboard
+  namespace: system-tekton
+spec:
+  hosts:
+  - tekton.${CLUSTER_DOMAIN}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        host: tekton-dashboard.system-tekton.svc.cluster.local
+        port:
+          number: 9097

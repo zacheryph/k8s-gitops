@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - datasource.yaml
 - release.yaml
+- virtualservice.yaml

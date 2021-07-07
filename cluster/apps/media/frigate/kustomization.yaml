@@ -3,3 +3,4 @@ kind: Kustomization
 resources:
 - config.yaml
 - release.yaml
+- virtualservice.yaml

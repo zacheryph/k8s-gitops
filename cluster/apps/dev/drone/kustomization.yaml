@@ -8,3 +8,4 @@ resources:
 - runner.yaml
 - secrets-provider.yaml
 - secrets
+- virtualservice.yaml

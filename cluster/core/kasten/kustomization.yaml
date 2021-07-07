@@ -7,3 +7,4 @@ resources:
 - profiles
 - policies
 - release.yaml
+- virtualservice.yaml

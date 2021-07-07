@@ -5,3 +5,4 @@ resources:
 - github-credentials.yaml
 - postgresql.yaml
 - release.yaml
+- virtualservice.yaml

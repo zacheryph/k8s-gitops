@@ -1,0 +1,17 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: vaultwarden
+  namespace: bitwarden
+spec:
+  hosts:
+  - warden.${CLUSTER_DOMAIN}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        host: vaultwarden.bitwarden.svc.cluster.local
+        port:
+          number: 80
