@@ -31,6 +31,5 @@ spec:
         name: istio-source
         namespace: flux-system
   values:
-    enableCRDTemplates: true
     operatorNamespace: istio-operator
     istioNamespace: istio-system
