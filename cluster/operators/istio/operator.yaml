@@ -3,6 +3,7 @@ apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: GitRepository
 metadata:
   name: istio-source
+  namespace: flux-system
 spec:
   interval: 30m
   url: https://github.com/istio/istio.git
@@ -27,8 +28,7 @@ spec:
       sourceRef:
         kind: GitRepository
         name: istio-source
-        namespace: istio-system
+        namespace: flux-system
   values:
-    tag: 1.10.2
-    operatorNamespace: istio-system
+    operatorNamespace: istio-operator
     istioNamespace: istio-system
