@@ -14,7 +14,7 @@ spec:
         name: prometheus-community
         namespace: flux-system
   values:
-    # fullnameOverride: prometheus
+    fullnameOverride: prometheus
     grafana:
       enabled: false
 
@@ -32,9 +32,9 @@ spec:
           nginx.ingress.kubernetes.io/auth-url: https://auth.${CLUSTER_DOMAIN}/oauth2/auth
           nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       alertmanagerSpec:
-        # image:
-        #   repository: quay.io/prometheus/alertmanager
-        #   tag: v0.22.2
+        image:
+          repository: quay.io/prometheus/alertmanager
+          tag: v0.22.2
         storage:
           volumeClaimTemplate:
             spec:
@@ -44,30 +44,30 @@ spec:
                 requests:
                   storage: 4Gi
 
-    # kubeStateMetrics:
-    #   enabled: true
-    # kube-state-metrics:
-    #   fullnameOverride: kube-state-metrics
-    #   image:
-    #     repository: k8s.gcr.io/kube-state-metrics/kube-state-metrics
-    #     tag: v2.1.0
-    #     pullPolicy: IfNotPresent
+    kubeStateMetrics:
+      enabled: true
+    kube-state-metrics:
+      fullnameOverride: kube-state-metrics
+      image:
+        repository: k8s.gcr.io/kube-state-metrics/kube-state-metrics
+        tag: v2.1.0
+        pullPolicy: IfNotPresent
 
-    # nodeExporter:
-    #   enabled: true
-    # prometheus-node-exporter:
-    #   fullnameOverride: prometheus-node-exporter
-    #   image:
-    #     repository: quay.io/prometheus/node-exporter
-    #     tag: v1.1.2
-    #     pullPolicy: IfNotPresent
+    nodeExporter:
+      enabled: true
+    prometheus-node-exporter:
+      fullnameOverride: prometheus-node-exporter
+      image:
+        repository: quay.io/prometheus/node-exporter
+        tag: v1.1.2
+        pullPolicy: IfNotPresent
 
-    # prometheusOperator:
-    #   enabled: true
-    #   image:
-    #     repository: quay.io/prometheus-operator/prometheus-operator
-    #     tag: v0.49.0
-    #     pullPolicy: IfNotPresent
+    prometheusOperator:
+      enabled: true
+      image:
+        repository: quay.io/prometheus-operator/prometheus-operator
+        tag: v0.49.0
+        pullPolicy: IfNotPresent
 
     prometheus:
       enabled: true
@@ -83,22 +83,22 @@ spec:
           nginx.ingress.kubernetes.io/auth-url: https://auth.${CLUSTER_DOMAIN}/oauth2/auth
           nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       prometheusSpec:
-        # image:
-        #   repository: quay.io/prometheus/prometheus
-        #   tag: v2.28.1
-        #   pullPolicy: IfNotPresent
-        # retention: 90d
-        # shards: null
-        # serviceMonitorSelectorNilUsesHelmValues: false
-        # serviceMonitorSelector: {}
-        # serviceMonitorNamespaceSelector: {}
-        # podMonitorSelectorNilUsesHelmValues: false
-        # podMonitorSelector: {}
-        # podMonitorNamespaceSelector: {}
-        # probeSelectorNilUsesHelmValues: false
-        # probeSelector: {}
-        # probeNamespaceSelector: {}
-        # walCompression: true
+        image:
+          repository: quay.io/prometheus/prometheus
+          tag: v2.28.1
+          pullPolicy: IfNotPresent
+        retention: 90d
+        shards: null
+        serviceMonitorSelectorNilUsesHelmValues: false
+        serviceMonitorSelector: {}
+        serviceMonitorNamespaceSelector: {}
+        podMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelector: {}
+        podMonitorNamespaceSelector: {}
+        probeSelectorNilUsesHelmValues: false
+        probeSelector: {}
+        probeNamespaceSelector: {}
+        walCompression: true
         storageSpec:
           volumeClaimTemplate:
             spec:
@@ -109,15 +109,15 @@ spec:
                   storage: 200Gi
 
     # scrapers
-    # kubelet:
-    #   enabled: true
-    # kubeApiServer:
-    #   enabled: true
-    # kubeControllerManager:
-    #   enabled: false
-    # kubeScheduler:
-    #   enabled: false
-    # kubeProxy:
-    #   enabled: false
-    # kubeEtcd:
-    #   enabled: false
+    kubelet:
+      enabled: true
+    kubeApiServer:
+      enabled: true
+    kubeControllerManager:
+      enabled: true
+    kubeScheduler:
+      enabled: false
+    kubeProxy:
+      enabled: false
+    kubeEtcd:
+      enabled: false
