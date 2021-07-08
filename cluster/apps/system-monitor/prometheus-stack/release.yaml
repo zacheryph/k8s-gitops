@@ -114,7 +114,7 @@ spec:
     kubeApiServer:
       enabled: true
     kubeControllerManager:
-      enabled: true
+      enabled: false
     kubeScheduler:
       enabled: false
     kubeProxy:
