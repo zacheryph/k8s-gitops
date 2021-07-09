@@ -31,16 +31,8 @@ spec:
     customCert:
       enabled: true
       certSecret: unifi-tls
-    ingress:
-      enabled: true
-      hosts:
-      - unifi.${CLUSTER_DOMAIN}
-      annotations:
-        nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
-        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
     guiService:
       type: LoadBalancer
-      port: 443
       loadBalancerIP: "${LB_UNIFI}"
       annotations:
         metallb.universe.tf/allow-shared-ip: unifi
