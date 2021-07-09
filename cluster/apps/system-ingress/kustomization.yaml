@@ -2,7 +2,6 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: system-ingress
 resources:
-- ingress-nginx
 - oauth2-proxy
 - gateway.yaml
 - wildcard-certificate.yaml
