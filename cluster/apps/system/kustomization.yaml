@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
 - intel-gpu-plugin
 - node-feature-discovery
+- flux-podmonitor.yaml
