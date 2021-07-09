@@ -4,7 +4,7 @@
 > GitOps state for my cluster using flux v2
 
 [![Discord](https://img.shields.io/badge/discord-chat-7289DA.svg?maxAge=60&style=flat-square)](https://discord.gg/DNCynrJ)
-[![k3s](https://img.shields.io/badge/k3s-v1.19.2-orange?style=flat-square)](https://k3s.io/)
+[![k3s](https://img.shields.io/badge/k3s-v1.21.0-orange?style=flat-square)](https://k3s.io/)
 [![GitHub issues](https://img.shields.io/github/issues/zacheryph/k8s-gitops?style=flat-square)](https://github.com/zacheryph/k8s-gitops/issues)
 [![GitHub last commit](https://img.shields.io/github/last-commit/zacheryph/k8s-gitops?color=purple&style=flat-square)](https://github.com/zacheryph/k8s-gitops/commits/master)
 
@@ -14,45 +14,7 @@
 
 ## Secret Management
 
-Secrets are managed by `bin/secrets.sh`. Below is a short description of
-the commands and the two types of files that are automatically generated.
-All secrets are able to use environment variables from `.secrets.env` which
-is secured by git-crypt.
-
-Refreshing of secrets have the caveat of only knowing if the source file is
-newer than the sealed secret. This does not account for changes to
-`.secrets.env` that affect the secret. If changes are made to existing values
-you will need to touch the secret[s] affected or remove their sealed secret
-counterparts.
-
-Secrets are generated into `cluster/secrets`. The `kustomization.yaml`
-is automatically generated to contain them all. Each secret exists in their
-respective namespace which is extracted from the `kustomization.yaml` within
-the same directory the secret exists in.
-
-As an added bonus there is a pre-commit hook to ensure all sealed secrets
-exist and are up to date so that you do not forget to generate any new ones.
-
-### Secret Commands
-
-* `./bin/secrets.sh check` -  ensures all `SealedSecret` resources exist
-* `./bin/secrets.sh refresh` -  create & update any secrets necessary
-* `./bin/secrets.sh write` -  recreate all secrets
-* `./bin/secrets.sh wipe` -  destroy all `SealedSecret` resources
-
-### Secret Types
-
-#### `secret-name.secrets.yaml`
-
-> yaml file to be used as the data: for the secret. All values
-> within these types of secrets must be base64 encoded. The secret
-> name is the name of the file less the secrets.yaml suffix.
-
-#### `secret-name.values.yaml`
-
-> this is for `HelmRelease` style values. They will generate a secret
-> with a `values.yaml` key containing the contents of this file. The
-> secret generated will be named `secret-name-values`.
+All secret management is handled via SOPS and Flux variable expansion.
 
 ## Hardware
 
@@ -65,31 +27,27 @@ Cluster is 3 built 1u servers with the following hardware.
 * 128GB M.2 2242 SSD (OS)
 * 2x 6TB HGST Ultrastar (longhorn)
 
-## Services
+## Cluster
 
-* Flux-System - The flux v2 manifests
-  * helm-repositories - `HelmRepository` resources
-* System
-  * ingress - ingress-nginx / cert-manager
-  * longhorn - persistent storage
-  * metallb - metallb running in bgp mode
-  * prometheus - prometheus / grafana / loki
-  * sealed-secrets - committable secrets
-* Network
-  * blocky - blocky dns server
-  * minio - minio instances for public and internal use
-* Services
-  * dashboard - heimdall dashboard
-  * home-assistant - hass / mosquitto-mqtt / openzwave
-  * wiki - wiki.js instance
-* Devops
-  * drone - ci server
-  * drone-build - namespace for done builds
-  * drone-secrets - houses secrets for drone pipelines
-  * gitea - git management server
-  * registry - harbor docker registry
-  * sonarqube - source code scanner
+Below is the layout of the cluster resource files and what
+is contained. they are listed in the order they get loaded.
 
-## Thanks
-
-Most of the inspiration came from other folks that have shared their clusters at [awesome-home-kubernetes](https://github.com/k8s-at-home/awesome-home-kubernetes)
+* base - _"flux bootstrap"_
+  * flux-system - flux gitops controllers & configuration
+* crds - custom resource definitions
+* namespaces - self explainatory
+* operators - operators that handle/manage resources
+* core - underlying infrastructure services
+  * cert-manager - handles tls certificates
+  * hardware - node feature discovery
+  * kasten - k10 backup system
+  * metallb - bgp load balancers
+  * rook-ceph - PVC storage
+* apps
+  * dev - development tools
+  * home - home automation
+  * media - media management
+  * network - networking related tools
+  * services - general services
+  * system-ingress - ingress related resources
+  * system-monitor - grafana/prometheus/loki stack
