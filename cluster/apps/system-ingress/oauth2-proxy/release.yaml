@@ -18,13 +18,6 @@ spec:
       repository: quay.io/pusher/oauth2_proxy
       tag: v6.1.1
     replicaCount: 2
-    ingress:
-      enabled: true
-      annotations:
-        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-      path: /
-      hosts:
-      - auth.${CLUSTER_DOMAIN}
     extraArgs:
       provider: "github"
       provider-display-name: "Gitea"

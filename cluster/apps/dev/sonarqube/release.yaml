@@ -19,13 +19,6 @@ spec:
       tag: 9.0.0-community
     service:
       externalPort: 80
-    ingress:
-      enabled: true
-      annotations:
-        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-      hosts:
-      - name: sonarqube.${CLUSTER_DOMAIN}
-        path: /
     initContainersSecurityContext:
       privileged: false
     postgresql:

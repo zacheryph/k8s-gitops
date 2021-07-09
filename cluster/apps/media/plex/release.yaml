@@ -39,18 +39,6 @@ spec:
           metallb.universe.tf/allow-shared-ip: plex-svc
         loadBalancerIP: "${LB_PLEX}"
         externalTrafficPolicy: Local
-
-    ingress:
-      main:
-        enabled: true
-        annotations:
-          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-        hosts:
-        - host: plex.${CLUSTER_DOMAIN}
-          paths:
-          - path: /
-            pathType: Prefix
-
     resources:
       requests:
         cpu: 500m

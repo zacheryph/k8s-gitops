@@ -19,14 +19,6 @@ spec:
       tag: 2.0.3
     persistentVolume:
       enabled: false
-    ingress:
-      enabled: true
-      annotations:
-        nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-      hosts:
-      - host: drone.${CLUSTER_DOMAIN}
-        paths:
-        - "/"
     env:
       DRONE_DATABASE_DRIVER: postgres
       DRONE_DATABASE_DATASOURCE: postgres://postgres:${DRONE_POSTGRESQL_PASSWORD}@postgresql.drone.svc/postgres?sslmode=disable

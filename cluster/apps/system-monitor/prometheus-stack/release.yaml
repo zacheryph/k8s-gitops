@@ -19,18 +19,7 @@ spec:
       enabled: false
 
     alertmanager:
-      # enabled: true
-      ingress:
-        enabled: true
-        hosts:
-        - alertmanager.${CLUSTER_DOMAIN}
-        paths:
-        - /
-        pathType: Prefix
-        annotations:
-          nginx.ingress.kubernetes.io/auth-signin: https://auth.${CLUSTER_DOMAIN}/oauth2/start
-          nginx.ingress.kubernetes.io/auth-url: https://auth.${CLUSTER_DOMAIN}/oauth2/auth
-          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+      enabled: true
       alertmanagerSpec:
         storage:
           volumeClaimTemplate:
@@ -56,17 +45,6 @@ spec:
 
     prometheus:
       enabled: true
-      ingress:
-        enabled: true
-        hosts:
-        - prometheus.${CLUSTER_DOMAIN}
-        paths:
-        - /
-        pathType: Prefix
-        annotations:
-          nginx.ingress.kubernetes.io/auth-signin: https://auth.${CLUSTER_DOMAIN}/oauth2/start
-          nginx.ingress.kubernetes.io/auth-url: https://auth.${CLUSTER_DOMAIN}/oauth2/auth
-          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
       prometheusSpec:
         retention: 90d
         shards: null
