@@ -15,7 +15,6 @@ spec:
         namespace: flux-system
   values:
     expose:
-      type: clusterIP
       tls:
         certSource: none
     externalURL: https://r.${CLUSTER_DOMAIN}
