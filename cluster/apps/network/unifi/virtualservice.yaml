@@ -9,9 +9,14 @@ spec:
   - unifi.${CLUSTER_DOMAIN}
   gateways:
   - system-ingress/gateway
-  http:
+  tls:
   - route:
     - destination:
         host: unifi-gui.unifi.svc.cluster.local
         port:
           number: 8443
+    match:
+    - gateways:
+      - system-ingress/gateway
+      sniHosts:
+      - unifi.zro.io

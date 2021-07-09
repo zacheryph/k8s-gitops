@@ -28,6 +28,9 @@ spec:
         memory: 500Mi
       limits:
         memory: 750Mi
+    customCert:
+      enabled: true
+      certSecret: unifi-tls
     ingress:
       enabled: true
       hosts:

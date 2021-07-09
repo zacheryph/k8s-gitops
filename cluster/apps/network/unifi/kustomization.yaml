@@ -4,5 +4,6 @@ kind: Kustomization
 namespace: unifi
 resources:
 - volumes
+- certificate.yaml
 - release.yaml
 - virtualservice.yaml
