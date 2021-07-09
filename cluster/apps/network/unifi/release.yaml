@@ -34,6 +34,7 @@ spec:
       certSecret: unifi-tls
     guiService:
       type: LoadBalancer
+      port: 443
       loadBalancerIP: "${LB_UNIFI}"
       annotations:
         metallb.universe.tf/allow-shared-ip: unifi
