@@ -8,6 +8,5 @@ resources:
 - media
 - network
 - services
-- system
 - system-ingress
 - system-monitor
