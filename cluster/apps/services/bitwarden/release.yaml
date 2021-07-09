@@ -23,13 +23,3 @@ spec:
       config:
         enabled: true
         existingClaim: bitwarden-data
-    ingress:
-      main:
-        enabled: true
-        annotations:
-          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-        hosts:
-        - host: warden.${CLUSTER_DOMAIN}
-          paths:
-          - path: "/"
-            pathType: Prefix

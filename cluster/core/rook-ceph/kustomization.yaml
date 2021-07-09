@@ -4,7 +4,6 @@ kind: Kustomization
 namespace: system-rook-ceph
 resources:
 - release.yaml
-- ingress.yaml
 - virtualservice.yaml
 - storage
 - snapshot-controller

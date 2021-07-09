@@ -28,7 +28,3 @@ spec:
     auth:
       tokenAuth:
         enabled: true
-
-    ingress:
-      create: true
-      host: k10.${CLUSTER_DOMAIN}

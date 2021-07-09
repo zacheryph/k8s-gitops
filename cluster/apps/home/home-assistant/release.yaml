@@ -25,43 +25,17 @@ spec:
 
     # hostNetwork: true
     # dnsPolicy: ClusterFirstWithHostNet
-    dnsConfig:
-      options:
-      - name: ndots
-        value: "2"
 
     persistence:
       config:
         enabled: true
         existingClaim: home-assistant-config
 
-    ingress:
-      main:
-        enabled: true
-        annotations:
-          nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
-        hosts:
-        - host: home-assistant.${CLUSTER_DOMAIN}
-          paths:
-          - path: /
-            pathType: Prefix
-
     addons:
       codeserver:
         enabled: true
         git:
           deploySecretKey: github-credentials
-
-        ingress:
-          enabled: true
-          annotations:
-            nginx.ingress.kubernetes.io/auth-signin: https://auth.${CLUSTER_DOMAIN}/oauth2/start
-            nginx.ingress.kubernetes.io/auth-url: https://auth.${CLUSTER_DOMAIN}/oauth2/auth
-          hosts:
-          - host: home-vscode.${CLUSTER_DOMAIN}
-            paths:
-            - path: /
-              pathType: Prefix
 
         workingDir: /config
         volumeMounts:
