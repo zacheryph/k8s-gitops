@@ -8,7 +8,7 @@ spec:
   renewBefore: 360h
   subject:
     organizations:
-    - Routine LLC
+    - ${CERTIFICATE_ORG_NAME}
   commonName: ${CLUSTER_DOMAIN}
   dnsNames:
   - "${CLUSTER_DOMAIN}"
