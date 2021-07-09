@@ -14,4 +14,4 @@ spec:
     - destination:
         host: gateway.system-kasten.svc.cluster.local
         port:
-          number: 80
+          number: 8000
