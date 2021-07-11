@@ -17,6 +17,7 @@ spec:
     fullnameOverride: prometheus
     grafana:
       enabled: false
+      forceDeployDashboards: true
 
     alertmanager:
       enabled: true
