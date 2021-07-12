@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: plexinc/pms-docker
-      tag: 1.23.2.4656-85f0adf5b
+      tag: 1.23.4.4805-186bae04e
     env:
       TZ: "America/Chicago"
 
