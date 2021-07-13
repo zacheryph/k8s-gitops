@@ -27,7 +27,28 @@ spec:
   gateways:
   - system-ingress/gateway
   http:
-  - route:
+  - name: registry
+    match:
+    - uri:
+        prefix: "/api/"
+    - uri:
+        prefix: "/service/"
+    - uri:
+        prefix: "/v2"
+    - uri:
+        prefix: "/chartrepo/"
+    - uri:
+        prefix: "/c/"
+    route:
+    - destination:
+        host: harbor-core.harbor.svc.cluster.local
+        port:
+          number: 80
+  - name: portal
+    match:
+    - uri:
+        prefix: "/"
+    route:
     - destination:
         host: harbor-portal.harbor.svc.cluster.local
         port:
