@@ -3,7 +3,7 @@ kind: Kustomization
 
 namespace: system-kasten
 resources:
-# - blueprints
+- blueprints
 - profiles
 - policies
 - release.yaml
