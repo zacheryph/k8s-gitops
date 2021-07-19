@@ -4,6 +4,6 @@ kind: Kustomization
 namespace: system-tekton
 resources:
 - https://github.com/tektoncd/pipeline/releases/download/v0.26.0/release.yaml
-- https://github.com/tektoncd/triggers/releases/download/v0.14.2/release.yaml
-- https://github.com/tektoncd/triggers/releases/download/v0.14.2/interceptors.yaml
+- https://github.com/tektoncd/triggers/releases/download/v0.15.0/release.yaml
+- https://github.com/tektoncd/triggers/releases/download/v0.15.0/interceptors.yaml
 - https://github.com/tektoncd/dashboard/releases/download/v0.18.1/tekton-dashboard-release.yaml
