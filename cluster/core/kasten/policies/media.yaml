@@ -37,6 +37,6 @@ spec:
         name: media-migration-token-rwsfp
         namespace: system-kasten
       profile:
-        name: ceph
+        name: offsite
         namespace: system-kasten
     retention: {}

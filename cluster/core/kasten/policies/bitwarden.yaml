@@ -32,6 +32,6 @@ spec:
         name: bitwarden-migration-token-f22rp
         namespace: system-kasten
       profile:
-        name: ceph
+        name: offsite
         namespace: system-kasten
     retention: {}

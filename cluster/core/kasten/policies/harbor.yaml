@@ -32,6 +32,6 @@ spec:
         name: harbor-migration-token-8c2xl
         namespace: system-kasten
       profile:
-        name: ceph
+        name: offsite
         namespace: system-kasten
     retention: {}

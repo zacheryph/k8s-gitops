@@ -32,6 +32,6 @@ spec:
         name: home-assistant-migration-token-l98b7
         namespace: system-kasten
       profile:
-        name: ceph
+        name: offsite
         namespace: system-kasten
     retention: {}

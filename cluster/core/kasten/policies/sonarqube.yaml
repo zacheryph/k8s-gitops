@@ -32,6 +32,6 @@ spec:
         name: sonarqube-migration-token-njqg9
         namespace: system-kasten
       profile:
-        name: ceph
+        name: offsite
         namespace: system-kasten
     retention: {}

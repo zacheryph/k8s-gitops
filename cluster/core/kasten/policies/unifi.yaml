@@ -32,6 +32,6 @@ spec:
         name: unifi-migration-token-jjdm8
         namespace: system-kasten
       profile:
-        name: ceph
+        name: offsite
         namespace: system-kasten
     retention: {}

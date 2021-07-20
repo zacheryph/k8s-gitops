@@ -32,6 +32,6 @@ spec:
         name: drone-migration-token-mljnp
         namespace: system-kasten
       profile:
-        name: ceph
+        name: offsite
         namespace: system-kasten
     retention: {}
