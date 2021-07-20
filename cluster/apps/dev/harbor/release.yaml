@@ -38,6 +38,8 @@ spec:
     jobservice:
       jobLoggers:
       - database
+    notary:
+      enabled: false
   valuesFrom:
   - kind: ConfigMap
     name: harbor-bucket
