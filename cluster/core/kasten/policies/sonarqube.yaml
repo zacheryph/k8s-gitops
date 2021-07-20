@@ -28,6 +28,9 @@ spec:
       frequency: '@daily'
       exportData:
         enabled: true
+      migrationToken:
+        name: sonarqube-migration-token-njqg9
+        namespace: system-kasten
       profile:
         name: ceph
         namespace: system-kasten

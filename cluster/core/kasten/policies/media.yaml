@@ -33,6 +33,9 @@ spec:
       frequency: '@daily'
       exportData:
         enabled: true
+      migrationToken:
+        name: media-migration-token-rwsfp
+        namespace: system-kasten
       profile:
         name: ceph
         namespace: system-kasten

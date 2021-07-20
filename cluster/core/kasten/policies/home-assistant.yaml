@@ -28,6 +28,9 @@ spec:
       frequency: '@daily'
       exportData:
         enabled: true
+      migrationToken:
+        name: home-assistant-migration-token-l98b7
+        namespace: system-kasten
       profile:
         name: ceph
         namespace: system-kasten

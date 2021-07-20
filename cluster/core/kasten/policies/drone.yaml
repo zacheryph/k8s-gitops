@@ -28,6 +28,9 @@ spec:
       frequency: '@daily'
       exportData:
         enabled: true
+      migrationToken:
+        name: drone-migration-token-mljnp
+        namespace: system-kasten
       profile:
         name: ceph
         namespace: system-kasten

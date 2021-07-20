@@ -28,6 +28,9 @@ spec:
       frequency: '@daily'
       exportData:
         enabled: true
+      migrationToken:
+        name: gitea-migration-token-ndgjm
+        namespace: system-kasten
       profile:
         name: ceph
         namespace: system-kasten
