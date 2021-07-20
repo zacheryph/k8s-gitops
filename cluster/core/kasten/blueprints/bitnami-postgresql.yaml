@@ -35,7 +35,7 @@ actions:
           export PGUSER='postgres'
           export PGPASSWORD='{{ index .Phases.pgDump.Secrets.pgSecret.Data "postgresql-password" | toString }}'
           FILE_PATH=backup.sql
-          pg_dumpall --clean -U $PGUSER | kando location push --profile '{{ toJson .Profile }}' --path "${{ FILE_PATH }}" --output-name "kopiaOutput" -
+          pg_dumpall --clean -U $PGUSER | kando location push --profile '{{ toJson .Profile }}' --path "$FILE_PATH" --output-name "kopiaOutput" -
 
   restore:
     kind: StatefulSet
@@ -65,7 +65,7 @@ actions:
           export PGPASSWORD='{{ index .Phases.pgRestore.Secrets.pgSecret.Data "postgresql-password" | toString }}'
           FILE_PATH="backup.sql"
           KOPIA_SNAP='{{ .ArtifactsIn.pgBackup.KopiaSnapshot }}'
-          kando location pull --profile '{{ toJson .Profile }}' --path "${FILE_PATH}" --kopia-snapshot "${KOPIA_SNAP}" | psql -q -U "${PGUSER}"
+          kando location pull --profile '{{ toJson .Profile }}' --path "$FILE_PATH" --kopia-snapshot "$KOPIA_SNAP" | psql -q -U "$PGUSER"
 
   delete:
     inputArtifactNames:
@@ -86,4 +86,4 @@ actions:
         - |
           FILE_PATH="backup.sql"
           KOPIA_SNAP='{{ .ArtifactsIn.pgBackup.KopiaSnapshot }}'
-          kando location delete --profile '{{ toJson .Profile }}' --path "${FILE_PATH}" --kopia-snapshot "${KOPIA_SNAP}"
+          kando location delete --profile '{{ toJson .Profile }}' --path "$FILE_PATH" --kopia-snapshot "$KOPIA_SNAP"
