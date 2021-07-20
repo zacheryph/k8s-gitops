@@ -10,9 +10,8 @@ actions:
   backup:
     kind: StatefulSet
     outputArtifacts:
-      cloudObject:
-        keyValue:
-          backupLocation: "{{ .Phases.pgDump.Output.backupLocation }}"
+      pgBackup:
+        kopiaSnapshot: "{{ .Phases.pgDump.Output.kopiaOutput }}"
     phases:
     - func: KubeTask
       name: pgDump
@@ -35,13 +34,13 @@ actions:
           export PGHOST='postgresql.{{ .StatefulSet.Namespace }}.svc.cluster.local'
           export PGUSER='postgres'
           export PGPASSWORD='{{ index .Phases.pgDump.Secrets.pgSecret.Data "postgresql-password" | toString }}'
-          BACKUP_LOCATION=pg_backups/{{ .StatefulSet.Namespace }}/{{ .StatefulSet.Name }}/{{ toDate "2006-01-02T15:04:05.999999999Z07:00" .Time | date "2006-01-02T15:04:05Z07:00" }}/backup.sql.gz
-          pg_dumpall --clean -U $PGUSER | gzip -c | kando location push --profile '{{ toJson .Profile }}' --path "${BACKUP_LOCATION}" -
-          kando output backupLocation "${BACKUP_LOCATION}"
+          FILE_PATH=backup.sql
+          pg_dumpall --clean -U $PGUSER | kando location push --profile '{{ toJson .Profile }}' --path "${{ FILE_PATH }}" --output-name "kopiaOutput" -
+
   restore:
     kind: StatefulSet
     inputArtifactNames:
-    - cloudObject
+    - pgBackup
     phases:
     - func: KubeTask
       name: pgRestore
@@ -64,12 +63,13 @@ actions:
           export PGHOST='postgresql.{{ .StatefulSet.Namespace }}.svc.cluster.local'
           export PGUSER='postgres'
           export PGPASSWORD='{{ index .Phases.pgRestore.Secrets.pgSecret.Data "postgresql-password" | toString }}'
-          BACKUP_LOCATION={{ .ArtifactsIn.cloudObject.KeyValue.backupLocation }}
-          kando location pull --profile '{{ toJson .Profile }}' --path "${BACKUP_LOCATION}" - | gunzip -c -f | psql -q -U "${PGUSER}"
+          FILE_PATH="backup.sql"
+          KOPIA_SNAP='{{ .ArtifactsIn.pgBackup.KopiaSnapshot }}'
+          kando location pull --profile '{{ toJson .Profile }}' --path "${FILE_PATH}" --kopia-snapshot "${KOPIA_SNAP}" | psql -q -U "${PGUSER}"
+
   delete:
-    type: Namespace
     inputArtifactNames:
-    - cloudObject
+    - pgBackup
     phases:
     - func: KubeTask
       name: deleteDump
@@ -84,4 +84,6 @@ actions:
         - pipefail
         - -c
         - |
-          kando location delete --profile '{{ toJson .Profile }}' --path '{{ .ArtifactsIn.cloudObject.KeyValue.backupLocation }}'
+          FILE_PATH="backup.sql"
+          KOPIA_SNAP='{{ .ArtifactsIn.pgBackup.KopiaSnapshot }}'
+          kando location delete --profile '{{ toJson .Profile }}' --path "${FILE_PATH}" --kopia-snapshot "${KOPIA_SNAP}"
