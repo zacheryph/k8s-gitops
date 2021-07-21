@@ -5,6 +5,5 @@ namespace: system-kasten
 resources:
 - blueprints
 - profiles
-- policies
 - release.yaml
 - virtualservice.yaml
