@@ -7,4 +7,4 @@ resources:
 - harbor
 - knative
 - sonarqube
-- tekton
+# - tekton
