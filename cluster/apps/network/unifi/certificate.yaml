@@ -8,7 +8,7 @@ spec:
   renewBefore: 360h
   subject:
     organizations:
-    - ${CERTIFICATE_ORG_NAME}
+    - ${ORGANIZATION_NAME}
   commonName: unifi.${CLUSTER_DOMAIN}
   dnsNames:
   - "unifi.${CLUSTER_DOMAIN}"
