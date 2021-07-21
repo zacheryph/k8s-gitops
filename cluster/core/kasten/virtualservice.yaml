@@ -12,6 +12,6 @@ spec:
   http:
   - route:
     - destination:
-        host: gateway.system-kasten.svc.cluster.local
+        host: gateway.system-backup.svc.cluster.local
         port:
           number: 8000
