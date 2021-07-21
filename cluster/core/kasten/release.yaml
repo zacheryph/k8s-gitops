@@ -3,7 +3,6 @@ apiVersion: helm.toolkit.fluxcd.io/v2beta1
 kind: HelmRelease
 metadata:
   name: k10
-  namespace: system-kasten
 spec:
   interval: 5m
   releaseName: k10
@@ -20,7 +19,7 @@ spec:
   values:
     eula:
       accept: true
-      company: ZRO
+      company: ${ORGANIZATION_NAME}
       email: ${USER_EMAIL}
 
     clusterName: inwin
