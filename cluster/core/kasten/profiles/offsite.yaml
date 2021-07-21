@@ -3,7 +3,6 @@ apiVersion: config.kio.kasten.io/v1alpha1
 kind: Profile
 metadata:
   name: offsite
-  namespace: system-kasten
 spec:
   type: Location
   locationSpec:
@@ -21,4 +20,4 @@ spec:
         apiVersion: v1
         kind: secret
         name: offsite-credentials
-        namespace: system-kasten
+        namespace: system-backup

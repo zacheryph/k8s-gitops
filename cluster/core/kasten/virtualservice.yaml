@@ -3,7 +3,6 @@ apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
   name: k10-ingress
-  namespace: system-kasten
 spec:
   hosts:
   - k10.${CLUSTER_DOMAIN}
