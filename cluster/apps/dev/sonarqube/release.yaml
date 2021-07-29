@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: sonarqube
-      tag: 9.0.0-community
+      tag: 9.0.1-community
     service:
       externalPort: 80
     initContainersSecurityContext:
