@@ -39,8 +39,9 @@ spec:
           enabled: false
       config:
         APP_NAME: Zro
-        BRANCH: main
 
+        repository:
+          DEFAULT_BRANCH: main
         server:
           DISABLE_SSH: true
           DOMAIN: git.zro.io
