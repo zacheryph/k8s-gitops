@@ -38,11 +38,12 @@ spec:
         builtIn:
           enabled: false
       config:
-        default:
-          APP_NAME: Zro
-          BRANCH: main
+        APP_NAME: Zro
+        BRANCH: main
+
         server:
           DISABLE_SSH: true
+          DOMAIN: git.zro.io
         database:
           DB_TYPE: postgres
           HOST: postgresql.gitea.svc:5432
