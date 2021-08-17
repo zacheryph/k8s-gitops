@@ -25,6 +25,11 @@ spec:
       labels:
         sidecar.istio.io/inject: "true"
     gitea:
+      metrics:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+
       database:
         builtIn:
           postgresql:
