@@ -44,7 +44,7 @@ spec:
           DEFAULT_BRANCH: main
         server:
           DISABLE_SSH: true
-          DOMAIN: git.zro.io
+          DOMAIN: git.${CLUSTER_DOMAIN}
         database:
           DB_TYPE: postgres
           HOST: postgresql.gitea.svc:5432
