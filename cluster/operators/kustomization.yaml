@@ -5,4 +5,4 @@ resources:
 - cert-manager
 - istio
 - knative
-- tekton
+# - tekton
