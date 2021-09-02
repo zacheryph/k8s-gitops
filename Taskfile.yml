@@ -1,12 +1,18 @@
 # https://taskfile.dev
 ---
-version: '2.6'
-
-includes:
-  upgrade: .taskfiles/upgrade.yaml
+version: "3"
 
 tasks:
   default:
     cmds:
     - go-task -l
     silent: true
+
+  upgrade:flux:
+    desc: upgrade flux component manifest
+    cmds:
+    - flux install --export > cluster/base/flux-system/gotk-components.yaml
+  upgrade:flux-cli:
+    desc: upgrade local flux command line binary
+    cmds:
+    - ./bin/update.sh flux
