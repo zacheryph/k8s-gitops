@@ -25,3 +25,5 @@ spec:
       resources:
         requests:
           memory: 64Mi
+      persistence:
+        enabled: false
