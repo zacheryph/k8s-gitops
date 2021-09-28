@@ -8,7 +8,7 @@ spec:
     spec:
       # registryUrl=https://oteemo.github.io/charts
       chart: sonarqube
-      version: 9.6.5
+      version: 9.8.2
       sourceRef:
         kind: HelmRepository
         name: oteemo
@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: sonarqube
-      tag: 9.0.1-community
+      tag: 9.1.0-community
     service:
       externalPort: 80
     initContainersSecurityContext:
