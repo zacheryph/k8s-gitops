@@ -17,5 +17,5 @@ spec:
     image:
       registry: docker.io
       repository: bitnami/memcached
-      tag: 1.6.10
+      tag: 1.6.12
       pullPolicy: IfNotPresent
