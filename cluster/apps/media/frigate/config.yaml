@@ -9,12 +9,11 @@ data:
         host: vernemq.home-assistant
         user: ${FRIGATE_MQTT_USERNAME}
         password: ${FRIGATE_MQTT_PASSWORD}
-      clips:
-        max_seconds: 300
-        retain:
-          default: 10
-          objects:
-            person: 60
+      detectors:
+        cpu1:
+          type: cpu
+      database:
+        path: /media/frigate/frigate.db
       objects:
         track:
         - person
@@ -24,26 +23,26 @@ data:
         - bus
         - cat
         - dog
-      detectors:
-        cpu1:
-          type: cpu
+      timestamp_style:
+        format: "%Y-%m-%d %H:%M:%S"
+      record:
+        enabled: True
+        retain_days: 30
+        events:
+          retain:
+            default: 365
       cameras:
         garage:
+          detect:
+            height: 480
+            width: 708
+            fps: 6
           ffmpeg:
             inputs:
             - path: rtsp://neolink.media.svc:8554/garage/subStream
               roles:
               - detect
               - rtmp
-              - record
             - path: rtsp://neolink.media.svc:8554/garage/mainStream
               roles:
-              - clips
-          width: 704
-          height: 480
-          fps: 6
-          clips:
-            enabled: True
-          record:
-            enabled: True
-            retain_days: 15
+              - record
