@@ -5,7 +5,7 @@ resources:
 - cert-manager
 - hardware
 - istio
-- kasten
+# - kasten
 - metallb
 - rook-ceph
 - velero
