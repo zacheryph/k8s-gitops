@@ -7,4 +7,4 @@ resources:
 - istio
 - metallb
 - rook-ceph
-- triliovault
+# - triliovault
