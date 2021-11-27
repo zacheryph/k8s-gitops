@@ -6,5 +6,4 @@ resources:
 - gitea
 - harbor
 - knative
-- sonarqube
 # - tekton
