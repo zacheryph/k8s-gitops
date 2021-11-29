@@ -5,5 +5,5 @@ resources:
 - drone
 - gitea
 - harbor
-- knative
+# - knative
 # - tekton
