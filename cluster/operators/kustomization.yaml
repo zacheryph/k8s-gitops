@@ -6,4 +6,3 @@ resources:
 - istio
 - knative
 # - tekton
-- triliovault
