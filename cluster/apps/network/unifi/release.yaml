@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: jacobalberty/unifi
-      tag: v6.5.53
+      tag: v6.5.55
     persistence:
       enabled: true
       existingClaim: unifi-data
