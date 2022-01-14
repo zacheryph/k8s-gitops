@@ -24,19 +24,21 @@ spec:
     statefulset:
       labels:
         sidecar.istio.io/inject: "true"
+    memcached:
+      enabled: false
+    postgresql:
+      enabled: false
+    mysql:
+      enabled: false
+    mariadb:
+      enabled: false
+
     gitea:
       metrics:
         enabled: true
         serviceMonitor:
           enabled: true
 
-      database:
-        builtIn:
-          postgresql:
-            enabled: false
-      cache:
-        builtIn:
-          enabled: false
       config:
         APP_NAME: Zro
 
