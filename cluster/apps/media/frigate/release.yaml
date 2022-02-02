@@ -29,6 +29,8 @@ spec:
       mountPath: /media/frigate
     - name: cache
       mountPath: /tmp/cache
+    podAnnotations:
+      backup.velero.io/backup-volumes-excludes: media,cache
   valuesFrom:
   - kind: ConfigMap
     name: frigate-config
