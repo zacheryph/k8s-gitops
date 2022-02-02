@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: nvr-pool
   namespace: media
+  labels:
+    backup.velero.io/schedule: pool
 spec:
   accessModes:
   - ReadWriteMany

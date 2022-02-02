@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: nzbget-config
   namespace: media
+  labels:
+    backup.velero.io/schedule: config
 spec:
   accessModes:
   - ReadWriteOnce
