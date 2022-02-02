@@ -32,6 +32,8 @@ spec:
         type: pvc
         existingClaim: media-pool
         mountPath: /media
+    podAnnotations:
+      backup.velero.io/backup-volumes: config
     resources:
       requests:
         memory: 250Mi

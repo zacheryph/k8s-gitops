@@ -27,6 +27,8 @@ spec:
       config:
         enabled: true
         existingClaim: nzbhydra-config
+    podAnnotations:
+      backup.velero.io/backup-volumes: config
     resources:
       requests:
         memory: 250Mi
