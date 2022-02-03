@@ -31,6 +31,8 @@ spec:
       serviceMonitor:
         enabled: true
     configuration:
+      extraEnvVars:
+        TZ: "America/Chicago"
       provider: aws
       backupStorageLocation:
         name: default
