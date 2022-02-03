@@ -1,0 +1,60 @@
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: bitwarden
+spec:
+  schedule: "0 2 * * *"
+  template:
+    defaultVolumesToRestic: true
+    includedNamespaces: [ "bitwarden" ]
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: drone
+spec:
+  schedule: "0 2 * * *"
+  template:
+    defaultVolumesToRestic: true
+    includedNamespaces: [ "drone" ]
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: gitea
+spec:
+  schedule: "0 2 * * *"
+  template:
+    defaultVolumesToRestic: true
+    includedNamespaces: [ "gitea" ]
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: home-assistant
+spec:
+  schedule: "0 2 * * *"
+  template:
+    defaultVolumesToRestic: true
+    includedNamespaces: [ "home-assistant" ]
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: unifi
+spec:
+  schedule: "0 2 * * *"
+  template:
+    defaultVolumesToRestic: true
+    includedNamespaces: [ "unifi" ]
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: media
+spec:
+  schedule: "0 2 * * *"
+  template:
+    defaultVolumesToRestic: true
+    includedNamespaces: [ "media" ]
