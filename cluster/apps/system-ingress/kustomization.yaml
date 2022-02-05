@@ -3,5 +3,3 @@ kind: Kustomization
 namespace: system-ingress
 resources:
 - oauth2-proxy
-- gateway.yaml
-- wildcard-certificate.yaml

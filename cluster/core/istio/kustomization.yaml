@@ -3,5 +3,7 @@ kind: Kustomization
 namespace: istio-system
 resources:
 - authorizationpolicy.yaml
+- ingress-gateway.yaml
 - release.yaml
 - servicemonitor.yaml
+- wildcard-certificate.yaml
