@@ -5,8 +5,6 @@ metadata:
   name: istio
   namespace: istio-system
 spec:
-  hub: docker.io/istio
-  tag: 1.10.2
   profile: default
 
   meshConfig:
@@ -16,6 +14,9 @@ spec:
         service: oauth2-proxy.system-ingress.svc.cluster.local
         port: 80
         includeHeadersInCheck:
+        - authorization
+        - cookie
+        includeRequestHeadersInCheck:
         - authorization
         - cookie
         headersToUpstreamOnAllow:
