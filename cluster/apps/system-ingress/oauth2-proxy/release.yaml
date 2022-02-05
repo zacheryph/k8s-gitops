@@ -15,14 +15,16 @@ spec:
         namespace: flux-system
   values:
     image:
-      repository: quay.io/pusher/oauth2_proxy
-      tag: v6.1.1
+      repository: quay.io/oauth2-proxy/oauth2-proxy
+      tag: v7.2.1
     replicaCount: 2
     extraArgs:
       provider: "github"
       provider-display-name: "Gitea"
       email-domain: "*"
       cookie-domain: ".${CLUSTER_DOMAIN}"
+      cookie-name: _oauth2
+      reverse-proxy: "true"
       whitelist-domain: ".${CLUSTER_DOMAIN}"
       login-url: "https://git.${CLUSTER_DOMAIN}/login/oauth/authorize"
       redeem-url: "https://git.${CLUSTER_DOMAIN}/login/oauth/access_token"
