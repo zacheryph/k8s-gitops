@@ -14,7 +14,7 @@ spec:
   values:
     image:
       repository: blakeblackshear/frigate
-      tag: 0.9.4-amd64
+      tag: 0.10.0-amd64
     timezone: 'America/Chicago'
     rtspPassword: ${FRIGATE_RTSP_PASSWORD}
     extraVolumes:
