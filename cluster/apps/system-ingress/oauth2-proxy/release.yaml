@@ -21,28 +21,28 @@ spec:
     extraArgs:
       provider: "github"
       provider-display-name: "Gitea"
-      email-domain: "*"
-      cookie-domain: ".${CLUSTER_DOMAIN}"
-      cookie-name: _oauth2
-      reverse-proxy: "true"
-      whitelist-domain: ".${CLUSTER_DOMAIN}"
       login-url: "https://git.${CLUSTER_DOMAIN}/login/oauth/authorize"
       redeem-url: "https://git.${CLUSTER_DOMAIN}/login/oauth/access_token"
-      validate-url: "https://git.${CLUSTER_DOMAIN}/api/v1"
+      validate-url: "https://git.${CLUSTER_DOMAIN}/api/v1/user"
     config:
       cookieSecret: ${OAUTH_COOKIE_SECRET}
       clientID: ${OAUTH_CLIENT_ID}
       clientSecret: ${OAUTH_CLIENT_SECRET}
       configFile: |
         auth_logging = true
+        cookie_domains = ".${CLUSTER_DOMAIN}"
         cookie_httponly = true
+        cookie_name = "_inwin_oauth"
         cookie_refresh = "1h"
         cookie_samesite = "lax"
         cookie_secure = true
+        email_domains = [ "*" ]
+        pass_access_token = true
         pass_authorization_header = true
         pass_host_header = true
         redirect_url = "https://auth.${CLUSTER_DOMAIN}/oauth2/callback"
         request_logging = true
+        session_store_type = "cookie"
         set_authorization_header = true
         set_xauthrequest = true
         silence_ping_logging = true
@@ -51,3 +51,4 @@ spec:
         skip_provider_button = true
         standard_logging = true
         upstreams = [ "static://200" ]
+        whitelist_domains = ".${CLUSTER_DOMAIN}"
