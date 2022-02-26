@@ -1,9 +1,9 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta1
 kind: HelmRepository
 metadata:
-  name: authentik
+  name: authelia
   namespace: flux-system
 spec:
   interval: 30m0s
-  url: https://charts.goauthentik.io
+  url: https://charts.authelia.com
   timeout: 3m
