@@ -17,7 +17,7 @@ spec:
     image:
       repository: ghcr.io/goauthentik/server
       tag: 2022.2.1
-    replicas: 2
+    replicas: 1
     geoip:
       enabled: false
     postgresql:
