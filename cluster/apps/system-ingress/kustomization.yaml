@@ -3,5 +3,5 @@ kind: Kustomization
 namespace: system-ingress
 resources:
 - authentik
-- oauth2-proxy
+# - oauth2-proxy
 - gateway.yaml
