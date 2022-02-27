@@ -24,8 +24,6 @@ spec:
       enabled: false
     redis:
       enabled: false
-    service:
-      name: authentik
 
     authentik:
       secret_key: ${AUTHENTIK_SECRET_KEY}
