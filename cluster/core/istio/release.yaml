@@ -8,28 +8,28 @@ spec:
   profile: default
 
   meshConfig:
-    extensionProviders:
-    - name: authentik
-      envoyExtAuthzHttp:
-        service: authentik.system-ingress.svc.cluster.local
-        port: 80
-        includeHeadersInCheck:
-        - authorization
-        - cookie
-        includeRequestHeadersInCheck:
-        - authorization
-        - cookie
-        headersToUpstreamOnAllow:
-        - authorization
-        - path
-        - x-authentik-username
-        - x-authentik-group
-        - x-authentik-email
-        - x-authentik-name
-        - x-authentik-uid
-        headersToDownstreamOnDeny:
-        - content-type
-        - set-cookie
+    # extensionProviders:
+    # - name: authentik
+    #   envoyExtAuthzHttp:
+    #     service: authentik.system-ingress.svc.cluster.local
+    #     port: 80
+    #     includeHeadersInCheck:
+    #     - authorization
+    #     - cookie
+    #     includeRequestHeadersInCheck:
+    #     - authorization
+    #     - cookie
+    #     headersToUpstreamOnAllow:
+    #     - authorization
+    #     - path
+    #     - x-authentik-username
+    #     - x-authentik-group
+    #     - x-authentik-email
+    #     - x-authentik-name
+    #     - x-authentik-uid
+    #     headersToDownstreamOnDeny:
+    #     - content-type
+    #     - set-cookie
     accessLogFile: /dev/stdout
     enableTracing: false
     outboundTrafficPolicy:
