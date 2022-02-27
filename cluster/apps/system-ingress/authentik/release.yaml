@@ -36,6 +36,8 @@ spec:
         password: ${MAIL_SMTP_PASSWORD}
         from: "Authentik <no-reply@${CLUSTER_DOMAIN}>"
         use_tls: true
+      redis:
+        host: redis-master
       postgresql:
         host: postgresql
         name: postgres
