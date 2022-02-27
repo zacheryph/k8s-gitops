@@ -12,6 +12,6 @@ spec:
   http:
   - route:
     - destination:
-        host: nzbget.media.svc.cluster.local
+        host: authentik.system-ingress.svc.cluster.local
         port:
-          number: 6789
+          number: 80

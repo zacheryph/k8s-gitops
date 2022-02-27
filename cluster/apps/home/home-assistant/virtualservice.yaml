@@ -29,6 +29,6 @@ spec:
   http:
   - route:
     - destination:
-        host: home-assistant-codeserver.home-assistant.svc.cluster.local
+        host: authentik.system-ingress.svc.cluster.local
         port:
-          number: 12321
+          number: 80

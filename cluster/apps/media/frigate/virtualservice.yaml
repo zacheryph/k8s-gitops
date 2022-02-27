@@ -12,6 +12,6 @@ spec:
   http:
   - route:
     - destination:
-        host: frigate.media.svc.cluster.local
+        host: authentik.system-ingress.svc.cluster.local
         port:
-          number: 5000
+          number: 80

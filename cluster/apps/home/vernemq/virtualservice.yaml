@@ -12,6 +12,6 @@ spec:
   http:
   - route:
     - destination:
-        host: vernemq.home-assistant.svc.cluster.local
+        host: authentik.system-ingress.svc.cluster.local
         port:
-          number: 8080
+          number: 80
