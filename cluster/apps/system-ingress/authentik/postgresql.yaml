@@ -15,11 +15,12 @@ spec:
         namespace: flux-system
   values:
     fullnameOverride: postgresql
-    postgresqlPassword: ${AUTHENTIK_POSTGRESQL_PASSWORD}
     image:
       registry: docker.io
       repository: bitnami/postgresql
       tag: 14.2.0
       pullPolicy: IfNotPresent
+    auth:
+      postgresPassword: ${AUTHENTIK_POSTGRESQL_PASSWORD}
     persistence:
       enabled: true
