@@ -26,7 +26,7 @@ dependencies:
     repository: https://charts.bitnami.com/bitnami
     condition: mysql.enabled
   - name: mariadb
-    version: 9.4.4
+    version: 9.8.1
     repository: https://charts.bitnami.com/bitnami
     condition: mariadb.enabled
   - name: redis
