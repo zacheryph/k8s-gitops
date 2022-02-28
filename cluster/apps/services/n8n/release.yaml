@@ -18,7 +18,7 @@ spec:
 
     env:
       TZ: America/Chicago
-
+      N8N_PORT: "8080"
       QUEUE_BULL_REDIS_HOST: redis-master
 
     persistence:
