@@ -18,7 +18,7 @@ icon: https://avatars.githubusercontent.com/u/45487711?s=200&v=4
 
 dependencies:
   - name: postgresql
-    version: 10.9.4
+    version: 10.16.2
     repository: https://charts.bitnami.com/bitnami
     condition: postgresql.enabled
   - name: mysql
