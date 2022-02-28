@@ -1,0 +1,26 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: n8n
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: charts/linogics-n8n
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  values:
+    image:
+      repository: n8nio/n8n
+      tag: 0.164.1
+
+    env:
+      TZ: America/Chicago
+
+      QUEUE_BULL_REDIS_HOST: redis-master
+
+    persistence:
+      enabled: true
+      existingClaim: n8n-data

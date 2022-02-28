@@ -1,0 +1,203 @@
+# Default values for n8n.
+# This is a YAML-formatted file.
+# Declare variables to be passed into your templates.
+
+replicaCount: 1
+
+image:
+  repository: n8nio/n8n
+  pullPolicy: IfNotPresent
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: ""
+
+imagePullSecrets: []
+nameOverride: ""
+fullnameOverride: ""
+
+## Full list of ENV vars:
+## https://docs.n8n.io/reference/environment-variables.html
+##
+env: {}
+  # N8N_USER_FOLDER: /root
+  # N8N_ENCRYPTION_KEY: Change_Me_!
+  # N8N_LISTEN_ADDRESS: 0.0.0.0
+  # N8N_LOG_LEVEL: info
+  # N8N_LOG_OUTPUT: console
+  # GENERIC_TIMEZONE: Europe/Berlin
+  # DB_TYPE: postgresdb
+  # DB_POSTGRESDB_DATABASE: n8n
+  # DB_POSTGRESDB_HOST: n8n-postgres
+  # DB_POSTGRESDB_PASSWORD: Change_Me_!
+
+envFrom: []
+#  - configMapRef:
+#      name: n8n-config
+
+envValueFrom: {}
+#  N8N_ENCRYPTION_KEY:
+#    secretKeyRef:
+#      name: n8n-secret
+#      key: encryption-key
+
+## It is recommended to enable persistence otherwise config and sqlite
+## database are stored in a emptyDir. Your data will be lost after pod restart!
+##
+persistence:
+  enabled: false
+  annotations: {}
+  accessMode: ReadWriteOnce
+  size: 2Gi
+  # storageClass: "-"
+  # existingClaim: ""
+
+extraVolumes: []
+extraVolumeMounts: []
+
+serviceAccount:
+  # Specifies whether a service account should be created
+  create: false
+  # Annotations to add to the service account
+  annotations: {}
+  # The name of the service account to use.
+  # If not set and create is true, a name is generated using the fullname template
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext:
+  runAsUser: 1000
+  runAsGroup: 1000
+  fsGroup: 1000
+  fsGroupChangePolicy: "OnRootMismatch"
+
+securityContext:
+  capabilities:
+    drop:
+      - ALL
+  readOnlyRootFilesystem: true
+  allowPrivilegeEscalation: false
+  runAsNonRoot: true
+  runAsUser: 1000
+
+livenessProbe:
+  enabled: true
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 10
+
+readinessProbe:
+  enabled: true
+  httpGet:
+    path: /healthz
+    port: http
+  initialDelaySeconds: 15
+  periodSeconds: 10
+
+service:
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+    # kubernetes.io/ingress.class: nginx
+    # kubernetes.io/tls-acme: "true"
+  labels: {}
+  hosts:
+    - host: chart-example.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+  #  - secretName: chart-example-tls
+  #    hosts:
+  #      - chart-example.local
+
+resources: {}
+  # We usually recommend not to specify default resources and to leave this as a conscious
+  # choice for the user. This also increases chances charts run on environments with little
+  # resources, such as Minikube. If you do want to specify resources, uncomment the following
+  # lines, adjust them as necessary, and remove the curly braces after 'resources:'.
+  # limits:
+  #   cpu: 100m
+  #   memory: 128Mi
+  # requests:
+  #   cpu: 100m
+  #   memory: 128Mi
+
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 100
+  targetCPUUtilizationPercentage: 80
+  # targetMemoryUtilizationPercentage: 80
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+## Bitnami PostgreSQL
+## https://github.com/bitnami/charts/tree/master/bitnami/postgresql
+postgresql:
+  enabled: false
+  postgresqlUsername: n8n
+  postgresqlPassword: Change_Me_!
+  postgresqlPostgresPassword: Change_Me_!
+  existingSecret: ""
+  postgresqlDatabase: n8n
+  persistence:
+    enabled: true
+    existingClaim: ""
+    size: 2Gi
+
+## Bitnami MySQL
+## https://github.com/bitnami/charts/tree/master/bitnami/mysql
+mysql:
+  enabled: false
+  auth:
+    rootPassword: Change_Me_!
+    database: n8n
+    username: n8n
+    password: Change_Me_!
+    existingSecret: ""
+  persistence:
+    enabled: true
+    existingClaim: ""
+    size: 2Gi
+
+## Bitnami MariaDB
+## https://github.com/bitnami/charts/tree/master/bitnami/mariadb
+mariadb:
+  enabled: false
+  auth:
+    rootPassword: Change_Me_!
+    database: n8n
+    username: n8n
+    password: Change_Me_!
+    existingSecret: ""
+  persistence:
+      enabled: true
+      existingClaim: ""
+      size: 8Gi
+
+## Bitnami Redis
+## https://github.com/bitnami/charts/tree/master/bitnami/redis
+redis:
+  enabled: false
+
+  auth:
+    enabled: false
+    password: Change_Me_!
+    existingSecret: ""
+
+  architecture: standalone
+
+  persistence:
+    enabled: true
+    existingClaim: ""
+    size: 2Gi
