@@ -80,7 +80,7 @@ spec:
         - name: {{ include "n8n.fullname" . }}
           {{- if .Values.persistence.enabled }}
           persistentVolumeClaim:
-            claimName: {{ include "n8n.fullname" . }}
+            claimName: {{ .Values.persistence.existingClaim }}
           {{- else }}
           emptyDir: {}
           {{- end }}
