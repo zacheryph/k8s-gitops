@@ -3,7 +3,7 @@ kind: Kustomization
 
 namespace: n8n
 resources:
+- postgresql.yaml
 - redis.yaml
 - release.yaml
 - virtualservice.yaml
-- volume.yaml

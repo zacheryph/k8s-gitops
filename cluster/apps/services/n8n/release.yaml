@@ -18,8 +18,16 @@ spec:
 
     env:
       TZ: America/Chicago
-      N8N_PORT: "8080"
+      N8N_PORT: "5678"
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
       QUEUE_BULL_REDIS_HOST: redis-master
+
+      DB_TYPE: postgresdb
+      DB_POSTGRESDB_DATABASE: postgres
+      DB_POSTGRESDB_HOST: postgresql
+      DB_POSTGRESDB_USER: postgres
+      DB_POSTGRESDB_PASSWORD: ${N8N_POSTGRESQL_PASSWORD}
+      DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED: "false"
 
     persistence:
       enabled: true
