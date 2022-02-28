@@ -28,7 +28,3 @@ spec:
       DB_POSTGRESDB_USER: postgres
       DB_POSTGRESDB_PASSWORD: ${N8N_POSTGRESQL_PASSWORD}
       DB_POSTGRESDB_SSL_REJECT_UNAUTHORIZED: "false"
-
-    persistence:
-      enabled: true
-      existingClaim: n8n-data
