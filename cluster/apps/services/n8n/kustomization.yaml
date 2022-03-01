@@ -3,6 +3,7 @@ kind: Kustomization
 
 namespace: n8n
 resources:
+- bucket.yaml
 - postgresql.yaml
 - redis.yaml
 - release.yaml
