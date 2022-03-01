@@ -14,7 +14,7 @@ spec:
   values:
     image:
       repository: n8nio/n8n
-      tag: 0.164.1
+      tag: 0.165.0
 
     env:
       TZ: America/Chicago
