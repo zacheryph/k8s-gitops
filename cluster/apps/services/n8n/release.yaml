@@ -21,8 +21,9 @@ spec:
 
       N8N_PROTOCOL: https
       N8N_HOST: n8n.${CLUSTER_DOMAIN}
-      N8N_PORT: "443"
+      N8N_PORT: "5678"
       N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY}
+      WEBHOOK_URL: https://n8n.${CLUSTER_DOMAIN}/
 
       QUEUE_BULL_REDIS_HOST: redis-master
       DB_TYPE: postgresdb
