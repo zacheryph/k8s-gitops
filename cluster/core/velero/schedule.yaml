@@ -42,17 +42,17 @@ spec:
     defaultVolumesToRestic: true
     includedNamespaces: [ "home-assistant" ]
     ttl: 240h
-# ---
-# apiVersion: velero.io/v1
-# kind: Schedule
-# metadata:
-#   name: media
-# spec:
-#   schedule: "0 2 * * *"
-#   template:
-#     defaultVolumesToRestic: true
-#     includedNamespaces: [ "media" ]
-#     ttl: 240h
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: media
+spec:
+  schedule: "0 2 * * *"
+  template:
+    defaultVolumesToRestic: true
+    includedNamespaces: [ "media" ]
+    ttl: 240h
 ---
 apiVersion: velero.io/v1
 kind: Schedule
