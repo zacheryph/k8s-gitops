@@ -32,17 +32,49 @@ data:
           retain:
             default: 365
       cameras:
-        garage:
+        # garage:
+        #   detect:
+        #     height: 480
+        #     width: 708
+        #     fps: 6
+        #   ffmpeg:
+        #     inputs:
+        #     - path: rtsp://neolink.media.svc:8554/garage/subStream
+        #       roles:
+        #       - detect
+        #       - rtmp
+        #     - path: rtsp://neolink.media.svc:8554/garage/mainStream
+        #       roles:
+        #       - record
+        north_yard:
           detect:
-            height: 480
-            width: 708
-            fps: 6
+            height: 640
+            width: 480
+            fps: 7
           ffmpeg:
-            inputs:
-            - path: rtsp://neolink.media.svc:8554/garage/subStream
-              roles:
-              - detect
-              - rtmp
-            - path: rtsp://neolink.media.svc:8554/garage/mainStream
-              roles:
+            hwaccel_args:
+            input_args:
+              - -avoid_negative_ts
+              - make_zero
+              - -fflags
+              - nobuffer+genpts+discardcorrupt
+              - -flags
+              - low_delay
+              - -strict
+              - experimental
+              - -analyzeduration
+              - 1000M
+              - -probesize
+              - 1000M
+              - -rw_timeout
+              - "5000000"
+          inputs:
+          - path: http://${CAMERA_410_1_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=frigate&password=${CAMERA_410_1_PASSWORD}
+            roles:
               - record
+              - rtmp
+          - path: http://${CAMERA_410_1_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=frigate&password=${CAMERA_410_1_PASSWORD}
+            roles:
+              - detect
+          output_args:
+            record: -f segment -segment_time 60 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy
