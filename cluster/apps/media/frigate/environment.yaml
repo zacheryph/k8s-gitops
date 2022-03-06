@@ -2,7 +2,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: config
+  name: frigate-env
 data:
   FRIGATE_MQTT_USERNAME: "${FRIGATE_MQTT_USERNAME}"
   FRIGATE_MQTT_PASSWORD: "${FRIGATE_MQTT_PASSWORD}"
