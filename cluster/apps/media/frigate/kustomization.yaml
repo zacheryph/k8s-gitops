@@ -4,6 +4,7 @@ resources:
 - environment.yaml
 - release.yaml
 - virtualservice.yaml
+- volume.yaml
 
 configMapGenerator:
 - name: frigate-config
