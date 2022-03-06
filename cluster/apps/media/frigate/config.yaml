@@ -32,8 +32,8 @@ record:
 cameras:
   north_yard:
     detect:
-      height: 640
-      width: 480
+      width: 640
+      height: 480
       fps: 7
 
     ffmpeg:
