@@ -38,11 +38,11 @@ cameras:
 
     ffmpeg:
       inputs:
-      - path: "http://{CAMERA_410_1_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=frigate&password={CAMERA_410_1_PASSWORD}"
+      - path: "http://{FRIGATE_CAM_NORTH_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=frigate&password={FRIGATE_CAM_NORTH_PASSWORD}"
         roles:
         - record
         - rtmp
-      - path: "http://{CAMERA_410_1_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=frigate&password={CAMERA_410_1_PASSWORD}"
+      - path: "http://{FRIGATE_CAM_NORTH_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=frigate&password={FRIGATE_CAM_NORTH_PASSWORD}"
         roles:
         - detect
       input_args:
