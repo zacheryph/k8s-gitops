@@ -6,31 +6,49 @@ spec:
   interval: 1h
   chart:
     spec:
-      chart: charts/frigate
+      # registryUrl=https://k8s-at-home.com/charts/
+      chart: frigate
+      version: 0.10.0-amd64
       sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: HelmRepository
+        name: k8s-at-home
         namespace: flux-system
   values:
     image:
-      repository: blakeblackshear/frigate
+      repository: ghcr.io/k8s-at-home/frigate
       tag: 0.10.0-amd64
-    timezone: 'America/Chicago'
-    rtspPassword: ${FRIGATE_RTSP_PASSWORD}
-    extraVolumes:
-    - name: media
-      persistentVolumeClaim:
-        claimName: nvr-pool
-    - name: cache
-      emptyDir:
+
+    envFrom:
+    - configMapRef:
+        name: frigate-env
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: frigate-config
+        subPath: config.yaml
+        mountPath: /config/config.yaml
+        readOnly: true
+      data:
+        enabled: true
+        existingClaim: nvr-pool
+      cache:
+        enabled: true
+        type: emptyDir
         medium: Memory
-    extraVolumeMounts:
-    - name: media
-      mountPath: /media/frigate
-    - name: cache
-      mountPath: /tmp/cache
-    podAnnotations:
-      backup.velero.io/backup-volumes-excludes: media,cache
-  valuesFrom:
-  - kind: ConfigMap
-    name: frigate-config
+        sizeLimit: 512Mi
+        mountPath: /dev/shm
+
+    configmap:
+      config:
+        enabled: false
+
+    resources:
+      requests:
+        memory: 300Mi
+        cpu: 400m
+        # gpu.intel.com/i915: 1
+      limits:
+        memory: 1000Mi
+        # gpu.intel.com/i915: 1

@@ -1,80 +1,47 @@
-apiVersion: v1
-kind: ConfigMap
-metadata:
-  name: frigate-config
-data:
-  values.yaml: |
-    config: |
-      mqtt:
-        host: vernemq.home-assistant
-        user: ${FRIGATE_MQTT_USERNAME}
-        password: ${FRIGATE_MQTT_PASSWORD}
-      detectors:
-        cpu1:
-          type: cpu
-      database:
-        path: /media/frigate/frigate.db
-      objects:
-        track:
-        - person
-        - bicycle
-        - car
-        - motorcycle
-        - bus
-        - cat
-        - dog
-      timestamp_style:
-        format: "%Y-%m-%d %H:%M:%S"
-      record:
-        enabled: True
-        retain_days: 30
-        events:
-          retain:
-            default: 365
-      cameras:
-        # garage:
-        #   detect:
-        #     height: 480
-        #     width: 708
-        #     fps: 6
-        #   ffmpeg:
-        #     inputs:
-        #     - path: rtsp://neolink.media.svc:8554/garage/subStream
-        #       roles:
-        #       - detect
-        #       - rtmp
-        #     - path: rtsp://neolink.media.svc:8554/garage/mainStream
-        #       roles:
-        #       - record
-        north_yard:
-          detect:
-            height: 640
-            width: 480
-            fps: 7
-          ffmpeg:
-            hwaccel_args:
-            input_args:
-              - -avoid_negative_ts
-              - make_zero
-              - -fflags
-              - nobuffer+genpts+discardcorrupt
-              - -flags
-              - low_delay
-              - -strict
-              - experimental
-              - -analyzeduration
-              - 1000M
-              - -probesize
-              - 1000M
-              - -rw_timeout
-              - "5000000"
-          inputs:
-          - path: http://${CAMERA_410_1_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=frigate&password=${CAMERA_410_1_PASSWORD}
-            roles:
-              - record
-              - rtmp
-          - path: http://${CAMERA_410_1_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=frigate&password=${CAMERA_410_1_PASSWORD}
-            roles:
-              - detect
-          output_args:
-            record: -f segment -segment_time 60 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy
+mqtt:
+  host: vernemq.home-assistant
+  user: "{FRIGATE_MQTT_USERNAME}"
+  password: "{FRIGATE_MQTT_PASSWORD}"
+
+database:
+  path: /data/frigate.db
+
+detectors:
+  cpu1:
+    type: cpu
+    objects:
+      track:
+      - person
+      - bicycle
+      - car
+      - motorcycle
+      - bus
+      - cat
+      - dog
+
+timestamp_style:
+  format: "%Y-%m-%d %H:%M:%S"
+
+record:
+  enabled: True
+  retain_days: 30
+  events:
+    retain:
+      default: 365
+
+cameras:
+  north_yard:
+    detect:
+      height: 640
+      width: 480
+      fps: 7
+    inputs:
+    - path: "http://{CAMERA_410_1_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=frigate&password={CAMERA_410_1_PASSWORD}"
+      roles:
+      - record
+      - rtmp
+    - path: "http://{CAMERA_410_1_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=frigate&password={CAMERA_410_1_PASSWORD}"
+      roles:
+      - detect
+    output_args:
+      record: -f segment -segment_time 60 -segment_format mp4 -reset_timestamps 1 -strftime 1 -c copy
