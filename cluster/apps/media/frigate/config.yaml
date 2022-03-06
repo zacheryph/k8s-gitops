@@ -35,17 +35,16 @@ cameras:
       height: 640
       width: 480
       fps: 7
-    inputs:
-    - path: "http://{CAMERA_410_1_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=frigate&password={CAMERA_410_1_PASSWORD}"
-      roles:
-      - record
-      - rtmp
-    - path: "http://{CAMERA_410_1_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=frigate&password={CAMERA_410_1_PASSWORD}"
-      roles:
-      - detect
 
     ffmpeg:
-      hwaccel_args:
+      inputs:
+      - path: "http://{CAMERA_410_1_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=frigate&password={CAMERA_410_1_PASSWORD}"
+        roles:
+        - record
+        - rtmp
+      - path: "http://{CAMERA_410_1_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_ext.bcs&user=frigate&password={CAMERA_410_1_PASSWORD}"
+        roles:
+        - detect
       input_args:
       - -avoid_negative_ts
       - make_zero
