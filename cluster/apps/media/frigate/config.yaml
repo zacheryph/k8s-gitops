@@ -13,11 +13,12 @@ detectors:
 objects:
   track:
   - person
-  - bicycle
   - car
-  - motorcycle
-  - cat
-  - dog
+  filters:
+    person:
+      min_area: 500
+    car:
+      min_area: 1000
 
 timestamp_style:
   format: "%Y-%m-%d %H:%M:%S"
