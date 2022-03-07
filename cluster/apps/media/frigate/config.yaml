@@ -37,6 +37,14 @@ cameras:
       height: 480
       fps: 7
 
+    motion:
+      mask:
+      - 640,480,549,480,586,138,568,0,640,0
+      - 573,0,573,102,389,81,211,105,0,164,0,0
+    zones:
+      driveway:
+        coordinates: 0,480,520,480,565,315,86,220,0,258
+
     ffmpeg:
       inputs:
       - path: "http://{FRIGATE_CAM_NORTH_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=frigate&password={FRIGATE_CAM_NORTH_PASSWORD}"
