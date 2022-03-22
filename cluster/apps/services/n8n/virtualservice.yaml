@@ -11,6 +11,6 @@ spec:
   http:
   - route:
     - destination:
-        host: authentik.system-ingress.svc.cluster.local
+        host: n8n.n8n.svc.cluster.local
         port:
           number: 80
