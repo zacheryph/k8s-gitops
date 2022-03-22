@@ -16,6 +16,8 @@ spec:
   values:
     existingConfigMap: config
     prometheus:
+      serviceAccount: prometheus-operator
+      namespace: system-monitor
       podMonitor:
         enabled: true
     controller:
