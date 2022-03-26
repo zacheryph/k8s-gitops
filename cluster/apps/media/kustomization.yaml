@@ -5,6 +5,7 @@ namespace: media
 resources:
 - volumes
 - frigate
+- jellyfin
 # - neolink
 - nzbget
 - nzbhydra2
