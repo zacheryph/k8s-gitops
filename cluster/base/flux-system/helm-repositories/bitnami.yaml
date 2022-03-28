@@ -1,4 +1,4 @@
-apiVersion: source.toolkit.fluxcd.io/v1beta1
+apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
   name: bitnami
@@ -6,4 +6,3 @@ metadata:
 spec:
   interval: 30m0s
   url: https://charts.bitnami.com/bitnami
-  timeout: 3m

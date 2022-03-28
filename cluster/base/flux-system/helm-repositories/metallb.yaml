@@ -1,4 +1,4 @@
-apiVersion: source.toolkit.fluxcd.io/v1beta1
+apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: HelmRepository
 metadata:
   name: metallb
@@ -6,4 +6,3 @@ metadata:
 spec:
   interval: 30m0s
   url: https://metallb.github.io/metallb
-  timeout: 3m
