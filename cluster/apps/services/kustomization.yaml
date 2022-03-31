@@ -4,3 +4,4 @@ kind: Kustomization
 resources:
 - bitwarden
 - n8n
+- outline
