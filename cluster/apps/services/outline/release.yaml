@@ -17,10 +17,10 @@ spec:
       tag: 0.62.0
 
     service:
-      enabled: true
-      port:
-        port: 80
-        targetPort: 3000
+      main:
+        ports:
+          http:
+            port: 3000
 
     env:
       TZ: America/Chicago
