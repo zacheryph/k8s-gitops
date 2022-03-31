@@ -1,0 +1,12 @@
+---
+apiVersion: v2
+description: K8s-at-home common powered blank slate
+name: kah-common
+version: 1.0.0
+maintainers:
+- name: Zac
+  email: zacheryph@gmail.com
+dependencies:
+- name: common
+  repository: https://library-charts.k8s-at-home.com
+  version: 4.3.0
