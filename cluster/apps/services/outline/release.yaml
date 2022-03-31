@@ -12,6 +12,8 @@ spec:
         name: flux-system
         namespace: flux-system
   values:
+    nameOverride: outline
+
     image:
       repository: outlinewiki/outline
       tag: 0.62.0
@@ -39,6 +41,7 @@ spec:
       AWS_S3_UPLOAD_BUCKET_NAME: ${OUTLINE_AWS_S3_UPLOAD_BUCKET_NAME}
       AWS_S3_FORCE_PATH_STYLE: ${OUTLINE_AWS_S3_FORCE_PATH_STYLE}
       AWS_S3_ACL: ${OUTLINE_AWS_S3_ACL}
+      AWS_S3_UPLOAD_MAX_SIZE: 26214400
 
       OIDC_CLIENT_ID: ${OUTLINE_OIDC_CLIENT_ID}
       OIDC_CLIENT_SECRET: ${OUTLINE_OIDC_CLIENT_SECRET}
