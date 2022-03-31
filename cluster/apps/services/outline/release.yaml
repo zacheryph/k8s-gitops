@@ -6,12 +6,10 @@ spec:
   interval: 1h
   chart:
     spec:
-      # registryUrl=https://k8s-at-home.com/charts/
-      chart: common
-      version: 3.1.0
+      chart: charts/kah-common
       sourceRef:
-        kind: HelmRepository
-        name: k8s-at-home
+        kind: GitRepository
+        name: flux-system
         namespace: flux-system
   values:
     image:
