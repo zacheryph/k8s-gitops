@@ -6,4 +6,5 @@ resources:
 - bucket.yaml
 - postgresql.yaml
 - redis.yaml
+- release.yaml
 - virtualservice.yaml

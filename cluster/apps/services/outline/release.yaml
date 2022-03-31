@@ -1,0 +1,49 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: outline
+spec:
+  interval: 1h
+  chart:
+    spec:
+      # registryUrl=https://k8s-at-home.com/charts/
+      chart: common
+      version: 3.1.0
+      sourceRef:
+        kind: HelmRepository
+        name: k8s-at-home
+        namespace: flux-system
+  values:
+    image:
+      repository: outlinewiki/outline
+      tag: 0.62.0
+
+    service:
+      enabled: true
+      port:
+        port: 80
+        targetPort: 3000
+
+    env:
+      TZ: America/Chicago
+      URL: https://outline.${CLUSTER_DOMAIN}
+      PORT: 3000
+
+      SECRET_KEY: ${OUTLINE_SECRET_KEY}
+      UTILS_SECRET: ${OUTLINE_UTILS_SECRET}
+      DATABASE_URL: ${OUTLINE_DATABASE_URL}
+      REDIS_URL: redis://redis:6379
+
+      AWS_REGION: ${OUTLINE_AWS_REGION}
+      AWS_ACCESS_KEY_ID: ${OUTLINE_AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${OUTLINE_AWS_SECRET_ACCESS_KEY}
+      AWS_S3_UPLOAD_BUCKET_URL: ${OUTLINE_AWS_S3_UPLOAD_BUCKET_URL}
+      AWS_S3_UPLOAD_BUCKET_NAME: ${OUTLINE_AWS_S3_UPLOAD_BUCKET_NAME}
+      AWS_S3_FORCE_PATH_STYLE: ${OUTLINE_AWS_S3_FORCE_PATH_STYLE}
+      AWS_S3_ACL: ${OUTLINE_AWS_S3_ACL}
+
+      OIDC_CLIENT_ID: ${OUTLINE_OIDC_CLIENT_ID}
+      OIDC_CLIENT_SECRET: ${OUTLINE_OIDC_CLIENT_SECRET}
+      OIDC_AUTH_URI: ${OUTLINE_OIDC_AUTH_URI}
+      OIDC_TOKEN_URI: ${OUTLINE_OIDC_TOKEN_URI}
+      OIDC_USERINFO_URI: ${OUTLINE_OIDC_USERINFO_URI}
