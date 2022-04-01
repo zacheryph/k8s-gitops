@@ -13,6 +13,8 @@ spec:
         namespace: flux-system
   values:
     nameOverride: outline
+    env:
+      OIDC_SCOPES: "openid profile email"
     envFrom:
     - configMapRef:
         name: outline-env
