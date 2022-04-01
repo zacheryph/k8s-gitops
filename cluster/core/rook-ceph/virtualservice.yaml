@@ -32,3 +32,11 @@ spec:
         host: rook-ceph-rgw-object-store.system-rook-ceph.svc.cluster.local
         port:
           number: 80
+    corsPolicy:
+      allowOrigins:
+      - exact: https://outline.${CLUSTER_DOMAIN}
+      allowMethods:
+      - GET
+      - POST
+      allowCredentials: false
+      maxAge: "24h"
