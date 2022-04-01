@@ -8,3 +8,11 @@ resources:
 - redis.yaml
 - release.yaml
 - virtualservice.yaml
+
+configMapGenerator:
+- name: outline-env
+  envs:
+  - release.env
+
+generatorOptions:
+  disableNameSuffixHash: true
