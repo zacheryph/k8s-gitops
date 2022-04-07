@@ -6,4 +6,4 @@ resources:
 - https://github.com/tektoncd/pipeline/releases/download/v0.34.1/release.yaml
 - https://github.com/tektoncd/triggers/releases/download/v0.19.1/release.yaml
 - https://github.com/tektoncd/triggers/releases/download/v0.19.1/interceptors.yaml
-- https://github.com/tektoncd/dashboard/releases/download/v0.24.1/tekton-dashboard-release.yaml
+- https://github.com/tektoncd/dashboard/releases/download/v0.25.0/tekton-dashboard-release.yaml
