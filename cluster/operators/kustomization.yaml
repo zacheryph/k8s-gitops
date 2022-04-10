@@ -5,4 +5,5 @@ resources:
 - cert-manager
 - istio
 - knative
+- rook-ceph
 # - tekton
