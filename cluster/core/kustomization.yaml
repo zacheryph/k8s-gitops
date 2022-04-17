@@ -4,7 +4,7 @@ kind: Kustomization
 resources:
 # - cert-manager
 - hardware
-# - istio
+- istio
 # - metallb
 - rook-ceph
 - velero
