@@ -4,4 +4,4 @@ kind: Kustomization
 namespace: system-backup
 resources:
 - release.yaml
-- schedule.yaml
+# - schedule.yaml
