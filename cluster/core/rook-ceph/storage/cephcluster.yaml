@@ -60,15 +60,15 @@ spec:
       metadataDevice: ""
       osdsPerDevice: "1"
     nodes:
-    - name: k3os-11441
+    - name: talos-10-72-13-11
       devices:
       - name: sdb
       - name: sdc
-    - name: k3os-15317
+    - name: talos-10-72-13-12
       devices:
       - name: sdb
       - name: sdc
-    - name: k3os-28049
+    - name: talos-10-72-13-13
       devices:
       - name: sdb
       - name: sdc
