@@ -5,4 +5,4 @@ resources:
 # - authorizationpolicy.yaml
 - release.yaml
 - servicemonitor.yaml
-# - wildcard-certificate.yaml
+- wildcard-certificate.yaml
