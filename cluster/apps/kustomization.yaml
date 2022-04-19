@@ -4,8 +4,8 @@ kind: Kustomization
 resources:
 # - default
 # - dev
-# - home
-# - media
+- home
+- media
 # - network
 - services
 - system-ingress
