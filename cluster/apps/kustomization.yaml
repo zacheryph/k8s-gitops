@@ -9,4 +9,4 @@ resources:
 # - network
 - services
 - system-ingress
-# - system-monitor
+- system-monitor
