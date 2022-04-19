@@ -4,6 +4,6 @@ kind: Kustomization
 resources:
 - drone
 - gitea
-- harbor
+# - harbor
 # - knative
 # - tekton
