@@ -1,5 +1,25 @@
 ---
 apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nfs-media
+spec:
+  accessModes:
+  - ReadWriteMany
+  capacity:
+    storage: 8Ti
+  mountOptions:
+  - nfsvers=4.1
+  - proto=tcp
+  - noatime
+  - nodiratime
+  nfs:
+    path: /volume1/Media
+    server: ${NAS_ADDRESS}
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: media-pool
@@ -7,9 +27,7 @@ metadata:
 spec:
   accessModes:
   - ReadWriteMany
-
   resources:
     requests:
-      storage: 6Ti
-
-  storageClassName: rook-ceph-fs
+      storage: 8Ti
+  volumeName: nfs-media

@@ -2,8 +2,8 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-# - media-pool.yaml
-# - nvr-pool.yaml
+- media-pool.yaml
+- nvr-pool.yaml
 - nzbhydra-config.yaml
 - nzgbet-config.yaml
 - plex-config.yaml
