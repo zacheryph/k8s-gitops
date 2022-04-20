@@ -17,7 +17,6 @@ spec:
     allowMultiplePerNode: false
   monitoring:
     enabled: false
-    rulesNamespace: rook-ceph
   network:
   crashCollector:
     disable: false
