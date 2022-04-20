@@ -48,7 +48,7 @@ spec:
         memory: 1536Mi
     osd:
       requests:
-        cpu: "35m"
+        cpu: 35m
         memory: "1Gi"
       limits:
         memory: "3Gi"
