@@ -15,28 +15,28 @@ spec:
         host: rook-ceph-mgr-dashboard.system-rook-ceph.svc.cluster.local
         port:
           number: 7000
----
-apiVersion: networking.istio.io/v1beta1
-kind: VirtualService
-metadata:
-  name: ceph-s3-gateway
-  namespace: system-rook-ceph
-spec:
-  hosts:
-  - s3.${CLUSTER_DOMAIN}
-  gateways:
-  - system-ingress/gateway
-  http:
-  - route:
-    - destination:
-        host: rook-ceph-rgw-object-store.system-rook-ceph.svc.cluster.local
-        port:
-          number: 80
-    corsPolicy:
-      allowOrigins:
-      - exact: https://outline.${CLUSTER_DOMAIN}
-      allowMethods:
-      - GET
-      - POST
-      allowCredentials: false
-      maxAge: "24h"
+# ---
+# apiVersion: networking.istio.io/v1beta1
+# kind: VirtualService
+# metadata:
+#   name: ceph-s3-gateway
+#   namespace: system-rook-ceph
+# spec:
+#   hosts:
+#   - s3.${CLUSTER_DOMAIN}
+#   gateways:
+#   - system-ingress/gateway
+#   http:
+#   - route:
+#     - destination:
+#         host: rook-ceph-rgw-object-store.system-rook-ceph.svc.cluster.local
+#         port:
+#           number: 80
+#     corsPolicy:
+#       allowOrigins:
+#       - exact: https://outline.${CLUSTER_DOMAIN}
+#       allowMethods:
+#       - GET
+#       - POST
+#       allowCredentials: false
+#       maxAge: "24h"

@@ -1,0 +1,39 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: minio
+spec:
+  interval: 5m
+  chart:
+    spec:
+      # renovate: registryUrl=https://vmware-tanzu.github.io/helm-charts
+      chart: minio
+      version: 3.6.6
+      sourceRef:
+        kind: HelmRepository
+        name: minio
+        namespace: flux-system
+      interval: 5m
+  values:
+    image:
+      repository: quay.io/minio/minio
+      tag: RELEASE.2022-04-16T04-26-02Z
+    mcImage:
+      repository: quay.io/minio/mc
+      tag: RELEASE.2022-04-16T21-11-21Z
+    mode: standalone
+
+    rootUser: ${MINIO_ROOT_ACCESS_KEY}
+    rootPassword: ${MINIO_ROOT_SECRET_KEY}
+
+    persistence:
+      enabled: true
+      existingClaim: object-pool
+
+    resources:
+      requests:
+        memory: 350Mi
+        cpu: 25m
+      limits:
+        memory: 1000Mi
