@@ -21,11 +21,11 @@ spec:
 
     image:
       repository: outlinewiki/outline
-      tag: 0.62.0
+      tag: 0.63.0
 
     initContainers:
       migrations:
-        image: outlinewiki/outline:0.62.0
+        image: outlinewiki/outline:0.63.0
         command: ["yarn", "sequelize", "db:migrate"]
         envFrom:
         - configMapRef:
