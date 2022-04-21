@@ -5,4 +5,5 @@ namespace: system-knative
 resources:
 - eventing.yaml
 - serving.yaml
-- https://github.com/knative-sandbox/eventing-github/releases/download/v0.23.0/github.yaml
+- https://github.com/knative-sandbox/eventing-github/releases/download/knative-v1.4.0/github.yaml
+- https://github.com/knative-sandbox/eventing-ceph/releases/download/knative-v1.4.0/ceph.yaml

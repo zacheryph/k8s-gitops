@@ -4,6 +4,6 @@ kind: Kustomization
 resources:
 - cert-manager
 - istio
-# - knative
+- knative
 - rook-ceph
 # - tekton
