@@ -27,6 +27,10 @@ spec:
     rootUser: ${MINIO_ROOT_ACCESS_KEY}
     rootPassword: ${MINIO_ROOT_SECRET_KEY}
 
+    service:
+      port: "80"
+      targetPort: "9000"
+
     persistence:
       enabled: true
       existingClaim: object-pool

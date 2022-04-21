@@ -30,7 +30,7 @@ spec:
     - destination:
         host: minio.minio.svc.cluster.local
         port:
-          number: 9000
+          number: 80
     corsPolicy:
       allowOrigins:
       - exact: https://outline.${CLUSTER_DOMAIN}
