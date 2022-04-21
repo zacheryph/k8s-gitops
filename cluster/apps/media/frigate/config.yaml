@@ -31,6 +31,21 @@ record:
       default: 365
 
 cameras:
+  garage:
+    detect:
+      width: 704
+      height: 480
+      fps: 6
+    ffmpeg:
+      inputs:
+      - path: "rtsp://neolink:8554/garage"
+        roles:
+        - record
+        - rtmp
+      - path: "rtsp://neolink:8554/garage/subStream"
+        roles:
+        - detect
+
   north_yard:
     detect:
       width: 640
