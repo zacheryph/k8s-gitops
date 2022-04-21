@@ -5,7 +5,7 @@ namespace: media
 resources:
 - volumes
 - frigate
-# - neolink
+- neolink
 - nzbget
 - nzbhydra2
 - plex
