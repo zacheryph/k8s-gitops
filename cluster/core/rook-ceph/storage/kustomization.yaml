@@ -5,6 +5,5 @@ resources:
 - cephblockpool.yaml
 - cephcluster.yaml
 - cephfilesystem.yaml
-- cephobjectstore.yaml
 - storageclass.yaml
 - volumesnapshotclass.yaml
