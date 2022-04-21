@@ -4,6 +4,5 @@ kind: Kustomization
 resources:
 - cephblockpool.yaml
 - cephcluster.yaml
-- cephfilesystem.yaml
 - storageclass.yaml
 - volumesnapshotclass.yaml
