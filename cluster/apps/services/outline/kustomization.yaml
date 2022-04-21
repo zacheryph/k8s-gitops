@@ -3,7 +3,6 @@ kind: Kustomization
 
 namespace: outline
 resources:
-- bucket.yaml
 - postgresql.yaml
 - redis.yaml
 - release.yaml
