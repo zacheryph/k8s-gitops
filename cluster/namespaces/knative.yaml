@@ -3,3 +3,8 @@ apiVersion: v1
 kind: Namespace
 metadata:
   name: system-knative
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: knative-eventing

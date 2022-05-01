@@ -7,4 +7,5 @@ resources:
 # - harbor
 - kafka
 - knative
+- knative-eventing
 # - tekton
