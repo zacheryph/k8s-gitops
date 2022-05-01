@@ -67,10 +67,10 @@ spec:
               resources:
                 requests:
                   storage: 100Gi
-        additionalScrapeConfigs:
-        - job_name: "node"
-          static_config:
-          - targets: ["${OPNSENSE_ADDRESS}:9100"]
+        # additionalScrapeConfigs:
+        # - job_name: "node"
+        #   static_config:
+        #   - targets: ["${OPNSENSE_ADDRESS}:9100"]
 
     # scrapers
     kubelet:
