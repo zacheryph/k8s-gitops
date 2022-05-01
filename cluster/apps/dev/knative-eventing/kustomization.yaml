@@ -5,5 +5,6 @@ namespace: knative-eventing
 resources:
 - broker-config.yaml
 - eventing.yaml
+- triggermesh.yaml
 - https://github.com/knative-sandbox/eventing-kafka-broker/releases/download/knative-v1.4.0/eventing-kafka-controller.yaml
 - https://github.com/knative-sandbox/eventing-kafka-broker/releases/download/knative-v1.4.0/eventing-kafka-broker.yaml
