@@ -6,6 +6,6 @@ resources:
 - gitea
 # - harbor
 - kafka
-- knative
+- knative-serving
 - knative-eventing
 # - tekton
