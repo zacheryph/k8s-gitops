@@ -35,6 +35,10 @@ spec:
       enabled: true
       existingClaim: object-pool
 
+    metrics:
+      serviceMonitor:
+        enabled: true
+
     resources:
       requests:
         memory: 350Mi
