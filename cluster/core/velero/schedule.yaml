@@ -31,17 +31,17 @@ spec:
     defaultVolumesToRestic: true
     includedNamespaces: [ "gitea" ]
     ttl: 240h
----
-apiVersion: velero.io/v1
-kind: Schedule
-metadata:
-  name: harbor
-spec:
-  schedule: "0 2 * * *"
-  template:
-    defaultVolumesToRestic: true
-    includedNamespaces: [ "harbor" ]
-    ttl: 240h
+# ---
+# apiVersion: velero.io/v1
+# kind: Schedule
+# metadata:
+#   name: harbor
+# spec:
+#   schedule: "0 2 * * *"
+#   template:
+#     defaultVolumesToRestic: true
+#     includedNamespaces: [ "harbor" ]
+#     ttl: 240h
 ---
 apiVersion: velero.io/v1
 kind: Schedule
@@ -64,17 +64,17 @@ spec:
     defaultVolumesToRestic: true
     includedNamespaces: [ "media" ]
     ttl: 240h
----
-apiVersion: velero.io/v1
-kind: Schedule
-metadata:
-  name: n8n
-spec:
-  schedule: "0 2 * * *"
-  template:
-    defaultVolumesToRestic: true
-    includedNamespaces: [ "n8n" ]
-    ttl: 240h
+# ---
+# apiVersion: velero.io/v1
+# kind: Schedule
+# metadata:
+#   name: n8n
+# spec:
+#   schedule: "0 2 * * *"
+#   template:
+#     defaultVolumesToRestic: true
+#     includedNamespaces: [ "n8n" ]
+#     ttl: 240h
 ---
 apiVersion: velero.io/v1
 kind: Schedule
@@ -85,6 +85,17 @@ spec:
   template:
     defaultVolumesToRestic: true
     includedNamespaces: [ "outline" ]
+    ttl: 240h
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: photoprism
+spec:
+  schedule: "0 3 * * *"
+  template:
+    defaultVolumesToRestic: true
+    includedNamespaces: [ "photoprism" ]
     ttl: 240h
 ---
 apiVersion: velero.io/v1

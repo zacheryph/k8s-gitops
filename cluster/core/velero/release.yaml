@@ -39,7 +39,7 @@ spec:
         accessMode: ReadOnly
         bucket: ${VELERO_BACKUP_BUCKET}
         config:
-          region: us-west-000
+          region: ${VELERO_BACKUP_REGION}
           s3ForcePathStyle: true
           s3Url: ${VELERO_BACKUP_URL}
           publicUrl: ${VELERO_BACKUP_URL}
