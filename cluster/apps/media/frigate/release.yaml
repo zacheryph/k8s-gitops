@@ -48,6 +48,10 @@ spec:
       config:
         enabled: false
 
+    podAnnotations:
+      backup.velero.io/backup-volumes: config,data
+      backup.velero.io/backup-volumes-excludes: media
+
     resources:
       requests:
         memory: 300Mi
