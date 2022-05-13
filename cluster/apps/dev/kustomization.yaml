@@ -8,4 +8,5 @@ resources:
 - kafka
 - knative-serving
 - knative-eventing
+- triggermesh
 # - tekton
