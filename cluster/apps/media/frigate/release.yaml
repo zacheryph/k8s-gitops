@@ -50,7 +50,7 @@ spec:
 
     podAnnotations:
       backup.velero.io/backup-volumes: config,data
-
+      backup.velero.io/backup-volumes-excludes: cache
     resources:
       requests:
         memory: 300Mi
