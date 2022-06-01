@@ -10,3 +10,4 @@ resources:
 - knative-eventing
 - triggermesh
 # - tekton
+- waypoint

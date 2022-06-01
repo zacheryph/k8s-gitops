@@ -1,0 +1,32 @@
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: waypoint
+spec:
+  interval: 1h
+  chart:
+    spec:
+      # registryUrl=https://helm.releases.hashicorp.com
+      chart: waypoint
+      version: 0.1.9
+      sourceRef:
+        kind: HelmRepository
+        name: hashicorp
+        namespace: flux-system
+  values:
+    server:
+      image:
+        repository: hashicorp/waypoint
+        tag: 0.8.2
+    runner:
+      enabled: true
+      replicas: 1
+      image:
+        repository: hashicorp/waypoint
+        tag: 0.8.2
+    ui:
+      service:
+        enabled: true
+        type: ClusterIP
+      ingress:
+        enabled: false

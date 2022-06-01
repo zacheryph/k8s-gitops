@@ -1,0 +1,17 @@
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: waypoint
+  namespace: waypoint
+spec:
+  hosts:
+  - waypoint.${CLUSTER_DOMAIN}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        host: waypoint-ui.waypoint.svc.cluster.local
+        port:
+          number: 80
