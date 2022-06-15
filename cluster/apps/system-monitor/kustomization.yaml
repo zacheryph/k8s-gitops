@@ -6,4 +6,5 @@ resources:
 - grafana
 - loki-stack
 - prometheus-stack
+- tempo
 - volumes
