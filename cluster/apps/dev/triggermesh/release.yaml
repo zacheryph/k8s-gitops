@@ -14,6 +14,8 @@ spec:
         name: triggermesh
         namespace: flux-system
   values:
+    image:
+      tag: v1.19.1
     replicaCount: 1
     securityContext:
       allowPrivilegeEscalation: false
