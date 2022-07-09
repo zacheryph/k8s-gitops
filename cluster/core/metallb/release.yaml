@@ -8,7 +8,7 @@ spec:
     spec:
       # registryUrl=https://metallb.github.io/metallb
       chart: metallb
-      version: 0.13.3
+      version: 0.12.1
       sourceRef:
         kind: HelmRepository
         name: metallb
@@ -24,7 +24,7 @@ spec:
       enabled: true
       image:
         repository: quay.io/metallb/controller
-        tag: v0.13.3
+        tag: v0.12.1
       resources:
         limits:
           cpu: 100m
@@ -32,7 +32,7 @@ spec:
     speaker:
       image:
         repository: quay.io/metallb/speaker
-        tag: v0.13.3
+        tag: v0.12.1
       resources:
         limits:
           cpu: 100m
