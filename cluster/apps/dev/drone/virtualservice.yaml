@@ -14,4 +14,4 @@ spec:
     - destination:
         host: drone.drone.svc.cluster.local
         port:
-          number: 80
+          number: 8080
