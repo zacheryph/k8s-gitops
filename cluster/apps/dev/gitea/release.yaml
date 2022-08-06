@@ -46,8 +46,9 @@ spec:
           DEFAULT_BRANCH: main
         server:
           DISABLE_SSH: true
-          PROTOCOL: https
+          PROTOCOL: http
           DOMAIN: git.${CLUSTER_DOMAIN}
+          ROOT_URL: https://git.${CLUSTER_DOMAIN}
         database:
           DB_TYPE: postgres
           HOST: postgresql.gitea.svc:5432
