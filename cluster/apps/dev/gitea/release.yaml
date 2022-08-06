@@ -46,6 +46,7 @@ spec:
           DEFAULT_BRANCH: main
         server:
           DISABLE_SSH: true
+          PROTOCOL: https
           DOMAIN: git.${CLUSTER_DOMAIN}
         database:
           DB_TYPE: postgres
