@@ -18,10 +18,10 @@ spec:
   values:
     image:
       repository: quay.io/minio/minio
-      tag: RELEASE.2022-04-16T04-26-02Z
+      tag: RELEASE.2022-08-05T23-27-09Z
     mcImage:
       repository: quay.io/minio/mc
-      tag: RELEASE.2022-04-16T21-11-21Z
+      tag: RELEASE.2022-08-05T08-01-28Z
     mode: standalone
 
     rootUser: ${MINIO_ROOT_ACCESS_KEY}
