@@ -13,6 +13,7 @@ spec:
   - proto=tcp
   - noatime
   - nodiratime
+  - nolock
   nfs:
     path: /volume1/ObjectStorage
     server: ${NAS_ADDRESS}
