@@ -2,19 +2,6 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: config-br-defaults
-data:
-  default-br-config: |
-    clusterDefault:
-      apiVersion: v1
-      kind: ConfigMap
-      brokerClass: Kafka
-      namespace: knative-eventing
-      name: local-kafka-broker-config
----
-apiVersion: v1
-kind: ConfigMap
-metadata:
   name: local-kafka-broker-config
 data:
   default.topic.partitions: "1"
