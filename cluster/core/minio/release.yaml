@@ -33,7 +33,7 @@ spec:
 
     persistence:
       enabled: true
-      existingClaim: object-pool
+      existingClaim: minio-data
 
     metrics:
       serviceMonitor:
