@@ -8,4 +8,4 @@ resources:
 - metallb
 - minio
 - rook-ceph
-- velero
+# - velero
