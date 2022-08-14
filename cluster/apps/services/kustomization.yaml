@@ -4,4 +4,4 @@ kind: Kustomization
 resources:
 - bitwarden
 - outline
-# - photoprism #nfs
+- photoprism

@@ -9,20 +9,43 @@ spec:
 
   resources:
     requests:
-      storage: 256Gi
+      storage: 64Gi
 
   storageClassName: rook-ceph-block
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: PersistentVolume
 metadata:
-  name: photoprism-data
+  name: nfs-photos
+  labels:
+    velero.io/exclude-from-backup: "true"
 spec:
   accessModes:
-  - ReadWriteOnce
-
+  - ReadWriteMany
+  capacity:
+    storage: 8Ti
+  mountOptions:
+  - nfsvers=4.1
+  - proto=tcp
+  - noatime
+  - nodiratime
+  nfs:
+    path: /volume1/Photos
+    server: ${NAS_ADDRESS}
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: photos-pool
+  labels:
+    velero.io/exclude-from-backup: "true"
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: ""
   resources:
     requests:
-      storage: 1Ti
-
-  storageClassName: rook-ceph-block
+      storage: 8Ti
+  volumeName: nfs-photos

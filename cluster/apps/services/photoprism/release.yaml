@@ -44,4 +44,4 @@ spec:
       media:
         enabled: true
         mountPath: /photoprism/originals
-        existingClaim: photoprism-data
+        existingClaim: photos-pool
