@@ -37,6 +37,7 @@ cameras:
       width: 704
       height: 480
       fps: 6
+
     ffmpeg:
       inputs:
       - path: "rtsp://neolink:8554/garage"
@@ -61,6 +62,8 @@ cameras:
         coordinates: 0,480,570,480,619,270,175,216,0,313
       yard:
         coordinates: 427,246,534,145,606,136,599,101,493,87,423,95,166,214
+      door:
+        coordinates: 528,160,619,158,602,266,415,243
 
     ffmpeg:
       inputs:
@@ -94,6 +97,18 @@ cameras:
       width: 640
       height: 480
       fps: 7
+
+    motion:
+      mask:
+        - 640,0,640,293,209,0
+        - 129,0,98,258,0,253,0,0
+    zones:
+      driveway:
+        coordinates: 287,153,390,250,103,250,110,99
+      yard:
+        coordinates: 239,480,609,480,387,251,207,244
+      door:
+        coordinates: 211,248,230,365,49,444,21,248
 
     ffmpeg:
       inputs:
