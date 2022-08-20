@@ -44,6 +44,17 @@ spec:
         sizeLimit: 512Mi
         mountPath: /dev/shm
 
+    service:
+      main:
+        ports:
+          http:
+            port: 5000
+          rtmp:
+            enabled: true
+            port: 1935
+            protocol: TCP
+            targetPort: 1935
+
     configmap:
       config:
         enabled: false
