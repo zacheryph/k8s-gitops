@@ -143,6 +143,10 @@ cameras:
       height: 480
       fps: 7
 
+    zones:
+      driveway:
+        coordinates: 555,480,505,257,505,123,545,122,563,0,382,0,197,181,122,480
+
     ffmpeg:
       inputs:
       - path: "http://{FRIGATE_CAM_SHED_ADDRESS}/flv?port=1935&app=bcs&stream=channel0_main.bcs&user=frigate&password={FRIGATE_CAM_SHED_PASSWORD}"
