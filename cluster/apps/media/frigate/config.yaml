@@ -26,10 +26,10 @@ timestamp_style:
 record:
   enabled: True
   retain:
-    days: 30
+    days: 14
   events:
     retain:
-      default: 365
+      default: 30
 
 cameras:
   garage:
