@@ -23,6 +23,10 @@ spec:
     - secretRef:
         name: home-assistant-env
 
+    controller:
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     # hostNetwork: true
     # dnsPolicy: ClusterFirstWithHostNet
 

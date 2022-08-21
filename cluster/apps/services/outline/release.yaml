@@ -23,6 +23,11 @@ spec:
       repository: outlinewiki/outline
       tag: 0.65.2
 
+    controller:
+      type: deployment
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     initContainers:
       migrations:
         image: outlinewiki/outline:0.65.2

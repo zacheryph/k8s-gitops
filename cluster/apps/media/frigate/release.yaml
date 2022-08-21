@@ -18,6 +18,10 @@ spec:
       repository: ghcr.io/k8s-at-home/frigate
       tag: v0.10.1-amd64
 
+    controller:
+      annotations:
+        reloader.stakater.com/auto: "true"
+
     envFrom:
     - configMapRef:
         name: frigate-env
