@@ -4,7 +4,6 @@ kind: Kustomization
 resources:
 - drone
 - gitea
-# - harbor
 - kafka
 - knative-serving
 - knative-eventing
