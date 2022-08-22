@@ -26,7 +26,7 @@ timestamp_style:
 record:
   enabled: True
   retain:
-    days: 14
+    days: 30
   events:
     retain:
       default: 30
@@ -54,9 +54,14 @@ cameras:
       height: 480
       fps: 7
 
+    # mask without street
+    # motion:
+    #   mask:
+    #   - 414,51,247,73,0,164,0,0,640,0,640,71
+    # mask whole street
     motion:
       mask:
-      - 414,51,247,73,0,164,0,0,640,0,640,71
+      - 438,84,281,150,0,305,0,0,640,0,640,93
     zones:
       driveway:
         coordinates: 0,480,570,480,619,270,175,216,0,313
@@ -98,17 +103,25 @@ cameras:
       height: 480
       fps: 7
 
+    # mask without street
+    # motion:
+    #   mask:
+    #     - 640,0,640,293,209,0
+    #     - 129,0,98,258,0,253,0,0
+    # mask whole street
     motion:
       mask:
-        - 640,0,640,293,209,0
-        - 129,0,98,258,0,253,0,0
+        - 640,0,640,480,606,480,447,306,291,154,125,0
+        - 138,0,137,134,109,138,102,223,0,225,0,0
     zones:
+      door:
+        coordinates: 211,248,230,365,49,444,21,248
       driveway:
         coordinates: 287,153,390,250,103,250,110,99
       yard:
         coordinates: 239,480,609,480,387,251,207,244
-      door:
-        coordinates: 211,248,230,365,49,444,21,248
+      sideyard:
+        coordinates: 292,150,137,110,129,0
 
     ffmpeg:
       inputs:
@@ -146,6 +159,8 @@ cameras:
     zones:
       driveway:
         coordinates: 555,480,505,257,505,123,545,122,563,0,382,0,197,181,122,480
+      sideyard:
+        coordinates: 0,423,127,452,203,178,384,0,139,0,0,34
 
     ffmpeg:
       inputs:
