@@ -9,3 +9,4 @@ resources:
 - minio
 - reloader
 - rook-ceph
+- volsync
