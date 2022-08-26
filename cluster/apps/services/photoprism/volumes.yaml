@@ -17,8 +17,6 @@ apiVersion: v1
 kind: PersistentVolume
 metadata:
   name: nfs-photos
-  labels:
-    velero.io/exclude-from-backup: "true"
 spec:
   accessModes:
   - ReadWriteMany
@@ -40,8 +38,6 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: photos-pool
-  labels:
-    velero.io/exclude-from-backup: "true"
 spec:
   accessModes:
   - ReadWriteMany

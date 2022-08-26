@@ -9,4 +9,3 @@ resources:
 - minio
 - reloader
 - rook-ceph
-# - velero

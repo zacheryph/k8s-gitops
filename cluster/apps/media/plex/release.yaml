@@ -30,9 +30,6 @@ spec:
         existingClaim: media-pool
         mountPath: /data
         readOnly: true
-    podAnnotations:
-      backup.velero.io/backup-volumes: config
-      backup.velero.io/backup-volumes-excludes: data
     service:
       main:
         enabled: true
