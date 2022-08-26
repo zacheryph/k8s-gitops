@@ -3,4 +3,5 @@ kind: Kustomization
 
 namespace: volsync-system
 resources:
+- destination.yaml
 - release.yaml
