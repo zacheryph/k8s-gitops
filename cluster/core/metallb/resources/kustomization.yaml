@@ -3,4 +3,6 @@ kind: Kustomization
 
 namespace: metallb-system
 resources:
-- release.yaml
+- addresses.yaml
+- advertisement.yaml
+- peers.yaml

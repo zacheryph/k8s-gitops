@@ -1,0 +1,9 @@
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: services-block
+  namespace: metallb-system
+spec:
+  addresses:
+  - 10.72.48.0/20
+  autoAssign: true

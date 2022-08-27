@@ -6,8 +6,7 @@ metadata:
   name: cluster-settings
 data:
   # Load Balancers
-  LB_BLOCKY: 10.72.48.1
-  LB_INGRESS: 10.72.48.2
+  LB_ISTIO: 10.72.48.1
   LB_UNIFI: 10.72.48.3
   LB_PLEX: 10.72.48.4
   LB_TRAEFIK: 10.72.48.5
