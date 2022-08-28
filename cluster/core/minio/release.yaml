@@ -33,7 +33,19 @@ spec:
 
     persistence:
       enabled: true
-      existingClaim: minio-data
+      existingClaim: object-pool
+
+    # due to synology nfs "not supporting" file locks
+    # we hijack the multipart directory to allow these
+    # style uploads. this effects gitea primarily.
+    # https://github.com/minio/minio/issues/14522
+    extraVolumes:
+    - name: multipart
+      emptyDir:
+        sizeLimit: 1Gi
+    extraVolumeMounts:
+    - name: multipart
+      mountPath: /export/.minio.sys/multipart
 
     metrics:
       serviceMonitor:

@@ -1,49 +1,35 @@
 ---
 apiVersion: v1
-kind: PersistentVolumeClaim
+kind: PersistentVolume
 metadata:
-  name: minio-data
-  namespace: media
+  name: nfs-object-storage
 spec:
   accessModes:
-  - ReadWriteOnce
-
+  - ReadWriteMany
+  capacity:
+    storage: 4Ti
+  mountOptions:
+  - nfsvers=4.1
+  - nconnect=8
+  - proto=tcp
+  - noatime
+  - nodiratime
+  - nolock
+  nfs:
+    path: /volume1/ObjectStorage
+    server: ${NAS_ADDRESS}
+  persistentVolumeReclaimPolicy: Retain
+  volumeMode: Filesystem
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: object-pool
+spec:
+  accessModes:
+  - ReadWriteMany
+  storageClassName: ""
   resources:
     requests:
-      storage: 200Gi
-
-  storageClassName: rook-ceph-block
-# ---
-# apiVersion: v1
-# kind: PersistentVolume
-# metadata:
-#   name: nfs-object-storage
-# spec:
-#   accessModes:
-#   - ReadWriteMany
-#   capacity:
-#     storage: 4Ti
-#   mountOptions:
-#   - nfsvers=4.1
-#   - proto=tcp
-#   - noatime
-#   - nodiratime
-#   - nolock
-#   nfs:
-#     path: /volume1/ObjectStorage
-#     server: ${NAS_ADDRESS}
-#   persistentVolumeReclaimPolicy: Retain
-#   volumeMode: Filesystem
-# ---
-# apiVersion: v1
-# kind: PersistentVolumeClaim
-# metadata:
-#   name: object-pool
-# spec:
-#   accessModes:
-#   - ReadWriteMany
-#   storageClassName: ""
-#   resources:
-#     requests:
-#       storage: 4Ti
-#   volumeName: nfs-object-storage
+      storage: 4Ti
+  volumeName: nfs-object-storage
