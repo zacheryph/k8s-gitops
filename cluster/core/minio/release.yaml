@@ -7,53 +7,45 @@ spec:
   interval: 5m
   chart:
     spec:
-      # renovate: registryUrl=https://vmware-tanzu.github.io/helm-charts
-      chart: minio
-      version: 3.6.6
+      chart: charts/kah-common
       sourceRef:
-        kind: HelmRepository
-        name: minio
+        kind: GitRepository
+        name: flux-system
         namespace: flux-system
-      interval: 5m
   values:
+    global:
+      nameOverride: minio
     image:
       repository: quay.io/minio/minio
-      tag: RELEASE.2022-08-05T23-27-09Z
-    mcImage:
-      repository: quay.io/minio/mc
-      tag: RELEASE.2022-08-05T08-01-28Z
-    mode: standalone
-
-    rootUser: ${MINIO_ROOT_ACCESS_KEY}
-    rootPassword: ${MINIO_ROOT_SECRET_KEY}
-
-    service:
-      port: "80"
-      targetPort: "9000"
-
+      tag: RELEASE.2022-08-25T07-17-05Z
+    env:
+      TZ: America/Chicago
+      MINIO_UPDATE: "off"
+      MINIO_BROWSER_REDIRECT_URL: "https://minio.${CLUSTER_DOMAIN}"
+      MINIO_SERVER_URL: "https://s3.${CLUSTER_DOMAIN}"
+      MINIO_ROOT_USER: ${MINIO_ROOT_ACCESS_KEY}
+      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_SECRET_KEY}
+    args:
+    - server
+    - /data
+    - --console-address
+    - :9001
     persistence:
-      enabled: true
-      existingClaim: object-pool
-
-    # due to synology nfs "not supporting" file locks
-    # we hijack the multipart directory to allow these
-    # style uploads. this effects gitea primarily.
-    # https://github.com/minio/minio/issues/14522
-    extraVolumes:
-    - name: multipart
-      emptyDir:
-        sizeLimit: 1Gi
-    extraVolumeMounts:
-    - name: multipart
-      mountPath: /export/.minio.sys/multipart
-
-    metrics:
-      serviceMonitor:
+      config:
+        enabled: false
+      data:
         enabled: true
-
-    resources:
-      requests:
-        memory: 350Mi
-        cpu: 25m
-      limits:
-        memory: 1000Mi
+        type: pvc
+        mountPath: /data
+        existingClaim: object-pool
+    service:
+      main:
+        enabled: true
+        ports:
+          http:
+            enabled: true
+            port: 9001
+          api:
+            enabled: true
+            port: 80
+            targetPort: 9000
