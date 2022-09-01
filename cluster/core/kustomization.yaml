@@ -5,6 +5,7 @@ resources:
 - cert-manager
 - hardware
 - istio
+- kyverno
 - minio
 - reloader
 - rook-ceph
