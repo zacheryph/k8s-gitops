@@ -5,6 +5,7 @@ resources:
 - cert-manager
 - hardware
 - istio
+- kopia
 - kyverno
 - minio
 - reloader

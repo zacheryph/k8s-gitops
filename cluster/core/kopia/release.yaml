@@ -1,0 +1,59 @@
+---
+apiVersion: helm.toolkit.fluxcd.io/v2beta1
+kind: HelmRelease
+metadata:
+  name: kopia
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: charts/kah-common
+      sourceRef:
+        kind: GitRepository
+        name: flux-system
+        namespace: flux-system
+  values:
+    nameOverride: kopia
+    image:
+      repository: kopia/kopia
+      tag: 20220825.0.104458
+
+    command: kopia
+    args:
+    - server
+    - --insecure
+    - --address
+    - 0.0.0.0:80
+    - --metrics-listen-address
+    - 0.0.0.0:8080
+    - --without-password
+
+    service:
+      main:
+        ports:
+          http:
+            port: 80
+          metrics:
+            enabled: true
+            port: 8080
+
+    persistence:
+      config:
+        enabled: true
+        type: configMap
+        name: kopia-config
+        mountPath: /config/repository.config
+        subPath: config.json
+        readOnly: true
+      backup:
+        enabled: true
+        mountPath: /backups
+        existingClaim: backup-volume
+
+    resources:
+      requests:
+        cpu: 50m
+        memory:250Mi
+      limits:
+        cpu: 1000m
+        memory: 500Mi
