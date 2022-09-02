@@ -18,7 +18,6 @@ spec:
       repository: kopia/kopia
       tag: 20220825.0.104458
 
-    command: kopia
     args:
     - server
     - --insecure
@@ -53,7 +52,7 @@ spec:
     resources:
       requests:
         cpu: 50m
-        memory:250Mi
+        memory: 250Mi
       limits:
         cpu: 1000m
         memory: 500Mi
