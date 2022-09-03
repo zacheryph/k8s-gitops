@@ -23,9 +23,12 @@ spec:
     - --insecure
     - --address
     - 0.0.0.0:80
-    - --metrics-listen-address
+    - --metrics-listen-addr
     - 0.0.0.0:8080
     - --without-password
+
+    env:
+      KOPIA_PASSWORD: "none"
 
     service:
       main:
