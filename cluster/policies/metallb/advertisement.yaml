@@ -1,0 +1,10 @@
+apiVersion: metallb.io/v1beta1
+kind: BGPAdvertisement
+metadata:
+  name: router-bgp
+  namespace: metallb-system
+spec:
+  ipAddressPools:
+  - services-block
+  peers:
+  - router
