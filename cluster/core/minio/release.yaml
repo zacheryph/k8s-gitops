@@ -21,7 +21,7 @@ spec:
       tag: RELEASE.2022-09-01T23-53-36Z
     mcImage:
       repository: quay.io/minio/mc
-      tag: RELEASE.2022-09-01T23-53-36Z
+      tag: RELEASE.2022-08-28T20-08-11Z
 
     mode: standalone
     rootUser: ${MINIO_ROOT_ACCESS_KEY}
