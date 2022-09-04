@@ -7,44 +7,41 @@ spec:
   interval: 5m
   chart:
     spec:
-      chart: charts/kah-common
+      # renovate: registryUrl=https://charts.min.io/
+      chart: minio
+      version: 4.0.13
       sourceRef:
-        kind: GitRepository
-        name: flux-system
+        kind: HelmRepository
+        name: minio
         namespace: flux-system
+      interval: 5m
   values:
-    global:
-      nameOverride: minio
     image:
       repository: quay.io/minio/minio
-      tag: RELEASE.2022-08-25T07-17-05Z
-    env:
-      MINIO_UPDATE: "off"
-      MINIO_BROWSER_REDIRECT_URL: "https://minio.${CLUSTER_DOMAIN}"
-      MINIO_SERVER_URL: "https://s3.${CLUSTER_DOMAIN}"
-      MINIO_ROOT_USER: ${MINIO_ROOT_ACCESS_KEY}
-      MINIO_ROOT_PASSWORD: ${MINIO_ROOT_SECRET_KEY}
-    args:
-    - server
-    - /data
-    - --console-address
-    - :9001
-    persistence:
-      config:
-        enabled: false
-      data:
-        enabled: true
-        type: pvc
-        mountPath: /data
-        existingClaim: object-pool
+      tag: RELEASE.2022-09-01T23-53-36Z
+    mcImage:
+      repository: quay.io/minio/mc
+      tag: RELEASE.2022-09-01T23-53-36Z
+
+    mode: standalone
+    rootUser: ${MINIO_ROOT_ACCESS_KEY}
+    rootPassword: ${MINIO_ROOT_SECRET_KEY}
+
     service:
-      main:
+      port: "80"
+      targetPort: "9000"
+
+    persistence:
+      enabled: true
+      existingClaim: minio-data
+
+    metrics:
+      serviceMonitor:
         enabled: true
-        ports:
-          http:
-            enabled: true
-            port: 9001
-          api:
-            enabled: true
-            port: 80
-            targetPort: 9000
+
+    resources:
+      requests:
+        memory: 350Mi
+        cpu: 25m
+      limits:
+        memory: 1000Mi
