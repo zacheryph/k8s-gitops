@@ -17,3 +17,5 @@ spec:
       interval: 5m
   values:
     replicaCount: 1
+    serviceMonitor:
+      enabled: true
