@@ -26,7 +26,6 @@ spec:
             targetPort: 2342
 
     env:
-      TZ: America/Chicago
       PHOTOPRISM_STORAGE_PATH: /photoprism/storage
       PHOTOPRISM_ORIGINALS_PATH: /photoprism/originals
       PHOTOPRISM_ADMIN_PASSWORD: ${PHOTOPRISM_ADMIN_PASSWORD}

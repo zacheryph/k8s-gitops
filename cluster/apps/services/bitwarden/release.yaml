@@ -17,8 +17,6 @@ spec:
     image:
       repository: vaultwarden/server
       tag: 1.25.2
-    env:
-      TZ: "America/Chicago"
     persistence:
       config:
         enabled: true

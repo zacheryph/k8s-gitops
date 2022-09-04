@@ -17,8 +17,6 @@ spec:
     image:
       repository: ghcr.io/k8s-at-home/radarr
       tag: v4.1.0.6175
-    env:
-      TZ: "America/Chicago"
     podSecurityContext:
       runAsUser: 568
       runAsGroup: 568

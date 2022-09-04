@@ -19,7 +19,6 @@ spec:
       repository: quay.io/minio/minio
       tag: RELEASE.2022-08-25T07-17-05Z
     env:
-      TZ: America/Chicago
       MINIO_UPDATE: "off"
       MINIO_BROWSER_REDIRECT_URL: "https://minio.${CLUSTER_DOMAIN}"
       MINIO_SERVER_URL: "https://s3.${CLUSTER_DOMAIN}"

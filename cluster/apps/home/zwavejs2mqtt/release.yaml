@@ -18,7 +18,6 @@ spec:
       repository: zwavejs/zwavejs2mqtt
       tag: 7.0.0
     env:
-      TZ: "America/Chicago"
       NETWORK_KEY: ${ZWAVE_NETWORK_KEY}
     securityContext:
       privileged: true

@@ -18,8 +18,6 @@ spec:
       repository: ghcr.io/k8s-at-home/nzbget
       tag: v21.1
       pullPolicy: Always
-    env:
-      TZ: "America/Chicago"
     podSecurityContext:
       runAsUser: 568
       runAsGroup: 568
