@@ -39,25 +39,14 @@ spec:
       serviceMonitor:
         enabled: true
 
-    policies:
-    - name: volsync
-      statements:
-      - resources:
-        - "arn:aws:s3:::volsync/*"
-        actions:
-        - "s3:*"
+    users: []
+    # - accessKey: ${VOLSYNC_S3_ACCESS_KEY}
+    #   secretKey: ${VOLSYNC_S3_SECRET_KEY}
+    #   policy: readwrite
 
-    users:
-    - accessKey: ${VOLSYNC_S3_ACCESS_KEY}
-      secretKey: ${VOLSYNC_S3_SECRET_KEY}
-      policy: volsync
-
-    buckets:
-    - name: volsync
-      policy: none
-      purge: false
-      versioning: false
-      objectlocking: false
+    # buckets:
+    # - name: volsync
+    #   policy: none
 
     resources:
       requests:
