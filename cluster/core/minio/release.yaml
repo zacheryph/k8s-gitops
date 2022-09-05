@@ -27,6 +27,9 @@ spec:
     rootUser: ${MINIO_ROOT_ACCESS_KEY}
     rootPassword: ${MINIO_ROOT_SECRET_KEY}
 
+    DeploymentUpdate:
+      type: Recreate
+
     environment:
       MINIO_BROWSER_REDIRECT_URL: "https://minio.${CLUSTER_DOMAIN}"
       MINIO_SERVER_URL: "https://s3.${CLUSTER_DOMAIN}"
