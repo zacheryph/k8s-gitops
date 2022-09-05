@@ -54,6 +54,12 @@ spec:
         - "arn:aws:s3:::private/*"
         actions:
         - "s3:*"
+    - name: gitea
+      statements:
+      - resources:
+        - "arn:aws:s3:::gitea/*"
+        actions:
+        - "s3:*"
     - name: grafana-tempo
       statements:
       - resources:
@@ -73,6 +79,9 @@ spec:
         actions:
         - "s3:*"
     users:
+    - policy: gitea
+      accessKey: ${GITEA_S3_ACCESS_KEY}
+      secretKey: ${GITEA_S3_SECRET_KEY}
     - policy: grafana-tempo
       accessKey: ${TEMPO_S3_ACCESS_KEY}
       secretKey: ${TEMPO_S3_SECRET_KEY}
@@ -87,6 +96,8 @@ spec:
       policy: none
     - name: family
       policy: download
+    - name: gitea
+      policy: none
     - name: grafana-tempo
       policy: none
     - name: knative
