@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: homeassistant/home-assistant
-      tag: 2022.9.0
+      tag: 2022.9.2
     envFrom:
     - secretRef:
         name: home-assistant-env
