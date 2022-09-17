@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: unifi-data
   namespace: unifi
+  labels:
+    snapshot.home.arpa/enabled: "true"
 spec:
   accessModes:
   - ReadWriteOnce

@@ -4,6 +4,8 @@ kind: PersistentVolumeClaim
 metadata:
   name: bitwarden-data
   namespace: bitwarden
+  labels:
+    snapshot.home.arpa/enabled: "true"
 spec:
   accessModes:
   - ReadWriteOnce
