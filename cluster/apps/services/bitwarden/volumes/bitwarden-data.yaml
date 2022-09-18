@@ -6,6 +6,8 @@ metadata:
   namespace: bitwarden
   labels:
     snapshot.home.arpa/enabled: "true"
+    app.kubernetes.io/name: vaultwarden
+    app.kubernetes.io/instance: vaultwarden
 spec:
   accessModes:
   - ReadWriteOnce

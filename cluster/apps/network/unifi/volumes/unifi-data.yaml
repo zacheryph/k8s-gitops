@@ -6,6 +6,8 @@ metadata:
   namespace: unifi
   labels:
     snapshot.home.arpa/enabled: "true"
+    app.kubernetes.io/name: unifi
+    app.kubernetes.io/instance: unifi
 spec:
   accessModes:
   - ReadWriteOnce
