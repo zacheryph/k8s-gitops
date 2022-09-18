@@ -4,6 +4,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: nzbhydra-config
   namespace: media
+  labels:
+    app.kubernetes.io/name: nzbhydra2
+    app.kubernetes.io/instance: nzbhydra2
 spec:
   accessModes:
   - ReadWriteOnce

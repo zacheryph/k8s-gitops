@@ -4,6 +4,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: zwavejs2mqtt-config
   namespace: home-assistant
+  labels:
+    app.kubernetes.io/name: zwavejs2mqtt
+    app.kubernetes.io/instance: zwavejs2mqtt
 spec:
   accessModes:
   - ReadWriteOnce

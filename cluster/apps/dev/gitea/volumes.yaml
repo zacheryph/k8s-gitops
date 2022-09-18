@@ -4,6 +4,9 @@ kind: PersistentVolumeClaim
 metadata:
   name: gitea-data
   namespace: gitea
+  labels:
+    app.kubernetes.io/name: gitea
+    app.kubernetes.io/instance: gitea
 spec:
   accessModes:
   - ReadWriteOnce

@@ -3,8 +3,8 @@ kind: Kustomization
 
 namespace: gitea
 resources:
-- volumes
 - memcached.yaml
 - postgresql.yaml
 - release.yaml
 - virtualservice.yaml
+- volumes.yaml
