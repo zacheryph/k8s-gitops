@@ -22,7 +22,7 @@ spec:
     - server
     - --insecure
     - --address
-    - 0.0.0.0:80
+    - 0.0.0.0:8000
     - --metrics-listen-addr
     - 0.0.0.0:8080
     - --without-password
@@ -34,6 +34,8 @@ spec:
       main:
         ports:
           http:
+            enabled: true
+            targetPort: 8000
             port: 80
           metrics:
             enabled: true
