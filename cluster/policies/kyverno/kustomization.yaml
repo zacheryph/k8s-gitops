@@ -4,3 +4,4 @@ namespace: kyverno
 resources:
 - inject-timezone.yaml
 - kopia-snapshot-controller.yaml
+- rbac.yaml
