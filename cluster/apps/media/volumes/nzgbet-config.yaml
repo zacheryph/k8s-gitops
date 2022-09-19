@@ -5,6 +5,7 @@ metadata:
   name: nzbget-config
   namespace: media
   labels:
+    snapshot.home.arpa/enabled: "true"
     app.kubernetes.io/name: nzbget
     app.kubernetes.io/instance: nzbget
 spec:

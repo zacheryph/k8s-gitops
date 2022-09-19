@@ -5,6 +5,7 @@ metadata:
   name: gitea-data
   namespace: gitea
   labels:
+    snapshot.home.arpa/enabled: "true"
     app.kubernetes.io/name: gitea
     app.kubernetes.io/instance: gitea
 spec:

@@ -4,6 +4,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: photoprism-config
   labels:
+    snapshot.home.arpa/enabled: "true"
     app.kubernetes.io/name: photoprism
     app.kubernetes.io/instance: photoprism
 spec:

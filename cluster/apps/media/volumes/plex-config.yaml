@@ -5,6 +5,7 @@ metadata:
   name: plex-config
   namespace: media
   labels:
+    snapshot.home.arpa/enabled: "true"
     app.kubernetes.io/name: plex
     app.kubernetes.io/instance: plex
 spec:

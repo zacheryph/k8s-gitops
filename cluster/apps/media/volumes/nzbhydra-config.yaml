@@ -5,6 +5,7 @@ metadata:
   name: nzbhydra-config
   namespace: media
   labels:
+    snapshot.home.arpa/enabled: "true"
     app.kubernetes.io/name: nzbhydra2
     app.kubernetes.io/instance: nzbhydra2
 spec:
