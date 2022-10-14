@@ -24,7 +24,7 @@ spec:
       enabled: true
       image:
         repository: quay.io/metallb/controller
-        tag: v0.13.5
+        tag: v0.13.6
       resources:
         limits:
           cpu: 100m
