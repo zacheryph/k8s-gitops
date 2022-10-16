@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: vaultwarden/server
-      tag: 1.25.2
+      tag: 1.26.0
     persistence:
       config:
         enabled: true
