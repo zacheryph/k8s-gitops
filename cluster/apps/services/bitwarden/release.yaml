@@ -17,6 +17,8 @@ spec:
     image:
       repository: vaultwarden/server
       tag: 1.26.0
+    env:
+      ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
     persistence:
       config:
         enabled: true
