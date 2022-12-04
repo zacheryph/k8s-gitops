@@ -16,7 +16,7 @@ spec:
   values:
     image:
       registry: gcr.io/triggermesh
-      tag: v1.20.0
+      tag: v1.22.0
     replicaCount: 1
     securityContext:
       allowPrivilegeEscalation: false
