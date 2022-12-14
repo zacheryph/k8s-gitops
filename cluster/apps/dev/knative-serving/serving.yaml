@@ -4,7 +4,7 @@ kind: KnativeServing
 metadata:
   name: knative-serving
 spec:
-  version: 1.8.0
+  version: 1.8.3
   config:
     domain:
       ${KNATIVE_DOMAIN}: ""
