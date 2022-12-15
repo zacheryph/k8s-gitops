@@ -17,13 +17,13 @@ spec:
     server:
       image:
         repository: hashicorp/waypoint
-        tag: 0.10.4
+        tag: 0.10.5
     runner:
       enabled: true
       replicas: 1
       image:
         repository: hashicorp/waypoint
-        tag: 0.10.4
+        tag: 0.10.5
     ui:
       service:
         enabled: true
