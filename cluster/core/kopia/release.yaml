@@ -16,7 +16,7 @@ spec:
     nameOverride: kopia
     image:
       repository: kopia/kopia
-      tag: 0.12.1
+      tag: 20221229.0.195247
 
     args:
     - server
