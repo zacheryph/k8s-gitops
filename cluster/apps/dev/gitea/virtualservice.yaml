@@ -15,3 +15,20 @@ spec:
         host: gitea-http.gitea.svc.cluster.local
         port:
           number: 3000
+---
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: gitea-repo
+  namespace: gitea
+spec:
+  hosts:
+  - r.${CLUSTER_DOMAIN}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        host: gitea-http.gitea.svc.cluster.local
+        port:
+          number: 3000
