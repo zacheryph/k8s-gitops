@@ -32,7 +32,7 @@ spec:
     speaker:
       image:
         repository: quay.io/metallb/speaker
-        tag: v0.13.7
+        tag: v0.13.9
       resources:
         limits:
           cpu: 100m
