@@ -83,7 +83,7 @@ spec:
 
                   containers:
                   - name: backup
-                    image: ghcr.io/onedr0p/kopia:0.12.1@sha256:4e34d17120dca8436d8b9ee65123adbcb726790314f59dcd546b58e0a445d8f4
+                    image: ghcr.io/onedr0p/kopia:0.12.1@sha256:42b06533d804eab5fdfa7846599a87aca20eb51ff96ce4dabd8c1b1f1e858b0d
                     env:
                     - name: KOPIA_CACHE_DIRECTORY
                       value: /data/backups/cache/{{ namespace }}/{{ claimName }}
