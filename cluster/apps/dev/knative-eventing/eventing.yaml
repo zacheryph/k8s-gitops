@@ -4,7 +4,7 @@ kind: KnativeEventing
 metadata:
   name: knative-eventing
 spec:
-  version: 1.8.3
+  version: 1.9.6
   config:
     config-br-defaults:
       default-br-config: |
