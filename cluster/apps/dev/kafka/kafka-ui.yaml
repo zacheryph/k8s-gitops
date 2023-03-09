@@ -8,7 +8,7 @@ spec:
     spec:
       # registryUrl=https://provectus.github.io/kafka-ui
       chart: kafka-ui
-      version: 0.5.3
+      version: 0.5.4
       sourceRef:
         kind: HelmRepository
         name: provectus
