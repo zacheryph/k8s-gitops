@@ -6,6 +6,7 @@ resources:
 - gitea
 - kafka
 - knative-serving
+- knative-sources
 - knative-eventing
 - triggermesh
 # - tekton

@@ -12,4 +12,9 @@ metadata:
 apiVersion: v1
 kind: Namespace
 metadata:
+  name: knative-sources
+---
+apiVersion: v1
+kind: Namespace
+metadata:
   name: knative-eventing
