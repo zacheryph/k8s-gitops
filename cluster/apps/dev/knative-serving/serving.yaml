@@ -8,3 +8,6 @@ spec:
   config:
     domain:
       ${KNATIVE_DOMAIN}: ""
+  ingress:
+    istio:
+      enabled: true
