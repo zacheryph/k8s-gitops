@@ -16,7 +16,7 @@ spec:
   values:
     image:
       repository: ghcr.io/goauthentik/server
-      tag: 2023.2.3
+      tag: 2023.3.0
     replicas: 1
     geoip:
       enabled: false
