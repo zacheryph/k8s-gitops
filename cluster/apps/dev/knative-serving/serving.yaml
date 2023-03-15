@@ -8,6 +8,8 @@ spec:
   config:
     domain:
       ${KNATIVE_DOMAIN}: ""
+    istio:
+      gateway.system-ingress.gateway: "istio-ingressgateway.istio-system.svc.cluster.local"
   ingress:
     istio:
       enabled: true
