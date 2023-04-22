@@ -29,6 +29,8 @@ spec:
         enabled: true
         type: hostPath
         hostPath: /dev/ttyACM0
+    service:
+      additionalPorts: [3000]
     affinity:
       nodeAffinity:
         requiredDuringSchedulingIgnoredDuringExecution:
