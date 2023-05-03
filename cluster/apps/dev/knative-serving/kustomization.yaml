@@ -4,4 +4,3 @@ kind: Kustomization
 namespace: knative-serving
 resources:
 - serving.yaml
-- https://github.com/knative-sandbox/net-certmanager/releases/download/knative-v1.9.2/release.yaml

@@ -5,6 +5,8 @@ metadata:
   name: knative-serving
 spec:
   version: 1.9.5
+  additionalManifests:
+  - URL: https://github.com/knative-sandbox/net-certmanager/releases/download/knative-v1.10.0/net-certmanager.yaml
   config:
     certmanager:
       issuerRef: |
