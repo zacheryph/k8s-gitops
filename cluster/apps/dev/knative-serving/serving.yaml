@@ -17,6 +17,14 @@ spec:
     network:
       auto-tls: Enabled
       http-protocol: Redirected
+      namespace-wildcard-cert-selector: |
+        {"matchExpressions": [
+          {
+            "key":"networking.knative.dev/disableWildcardCert",
+            "operator": "NotIn",
+            "values":["true"]
+          }
+        ]}
   ingress:
     istio:
       enabled: true
