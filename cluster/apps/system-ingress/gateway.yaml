@@ -15,10 +15,6 @@ spec:
     hosts:
     - "${CLUSTER_DOMAIN}"
     - "*.${CLUSTER_DOMAIN}"
-    - "${KNATIVE_DOMAIN}"
-    - "*.${KNATIVE_DOMAIN}"
-    - "*.api.${KNATIVE_DOMAIN}"
-    - "*.tekton-pipelines.${KNATIVE_DOMAIN}"
     tls:
       httpsRedirect: true
   - port:
@@ -28,10 +24,6 @@ spec:
     hosts:
     - "${CLUSTER_DOMAIN}"
     - "*.${CLUSTER_DOMAIN}"
-    - "${KNATIVE_DOMAIN}"
-    - "*.${KNATIVE_DOMAIN}"
-    - "*.api.${KNATIVE_DOMAIN}"
-    - "*.tekton-pipelines.${KNATIVE_DOMAIN}"
     tls:
       credentialName: zro-wildcard-certificate
       mode: SIMPLE
