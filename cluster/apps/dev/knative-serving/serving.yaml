@@ -4,12 +4,14 @@ kind: KnativeServing
 metadata:
   name: knative-serving
 spec:
-  version: 1.9.1
+  version: 1.9.5
   config:
+    certmanager:
+      issuerRef: |
+        kind: ClusterIssuer
+        name: letsencrypt-cloudflare
     domain:
       ${KNATIVE_DOMAIN}: ""
-    istio:
-      gateway.system-ingress.gateway: "istio-ingressgateway.istio-system.svc.cluster.local"
   ingress:
     istio:
       enabled: true
