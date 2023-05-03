@@ -14,6 +14,9 @@ spec:
         name: letsencrypt-cloudflare
     domain:
       ${KNATIVE_DOMAIN}: ""
+    network:
+      auto-tls: Enabled
+      http-protocol: Redirected
   ingress:
     istio:
       enabled: true
