@@ -14,10 +14,6 @@ spec:
   dnsNames:
   - "${CLUSTER_DOMAIN}"
   - "*.${CLUSTER_DOMAIN}"
-  - "${KNATIVE_DOMAIN}"
-  - "*.${KNATIVE_DOMAIN}"
-  - "*.api.${KNATIVE_DOMAIN}"
-  - "*.tekton-pipelines.${KNATIVE_DOMAIN}"
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt-cloudflare
