@@ -1,0 +1,12 @@
+vault:
+  global:
+    enabled: true
+  injector:
+    enabled: false
+    dataStorage:
+      enabled: true
+      size: 10Gi
+  ui:
+    enabled: true
+  csi:
+    enabled: false

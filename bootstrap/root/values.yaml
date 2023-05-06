@@ -6,3 +6,4 @@ stacks:
   namespace: argocd
 - name: infra
   namespace: kube-system
+- name: platform
