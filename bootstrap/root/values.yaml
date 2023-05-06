@@ -4,3 +4,5 @@ gitops:
 stacks:
 - name: bootstrap
   namespace: argocd
+- name: infra
+  namespace: kube-system
