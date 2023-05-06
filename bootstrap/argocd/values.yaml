@@ -1,0 +1,19 @@
+argo-cd:
+  fullnameOverride: argocd
+
+  server:
+    extraArgs:
+    - --insecure
+    metrics: &metrics
+      enabled: true
+      serviceMonitor:
+        enabled: true
+
+  dex:
+    enabled: false
+  controller:
+    metrics: *metrics
+  repoServer:
+    metrics: *metrics
+  redis:
+    metrics: *metrics

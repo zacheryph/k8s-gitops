@@ -1,0 +1,6 @@
+gitops:
+  repo: https://github.com/zacheryph/k8s-gitops
+  revision: main
+stacks:
+- name: bootstrap
+  namespace: argocd
