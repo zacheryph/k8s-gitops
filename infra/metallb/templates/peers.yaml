@@ -1,0 +1,10 @@
+apiVersion: metallb.io/v1beta2
+kind: BGPPeer
+metadata:
+  name: router
+spec:
+  peerAddress: 10.72.13.1
+  peerASN: 64550
+  peerPort: 179
+  myASN: 64552
+  holdTime: 1m30s
