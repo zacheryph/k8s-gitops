@@ -9,6 +9,19 @@ argo-cd:
       serviceMonitor:
         enabled: true
 
+  configs:
+    cm:
+      # ignore external-secrets modifying spec
+      resource.customizations.ignoreDifferences.external-secrets.io_ExternalSecret: |
+        jqPathExpressions:
+        - ".spec.data[]?.remoteRef.conversionStrategy"
+        - ".spec.data[]?.remoteRef.decodingStrategy"
+      # ignore kind/version injection in stateful set volume claims
+      resource.customizations.ignoreDifferences.apps_StatefulSet: |
+        jqPathExpressions:
+        - ".spec.volumeClaimTemplates[]?.apiVersion"
+        - ".spec.volumeClaimTemplates[]?.kind"
+
   dex:
     enabled: false
   controller:
