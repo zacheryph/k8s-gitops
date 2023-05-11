@@ -11,14 +11,14 @@ spec:
       repoURL: {{ $.Values.gitops.repo }}
       revision: {{ $.Values.gitops.revision }}
       directories:
-      - path: {{ $stack.name }}/*
+      - path: {{ $stack.path | default $stack.name }}/*
   template:
     metadata:
       name: '{{ `{{path.basename}}` }}'
     spec:
       destination:
         name: in-cluster
-        namespace: '{{ default `{{path.basename}}` $stack.namespace }}'
+        namespace: "{{ $stack.namespace | default `{{path.basename}}` }}"
       project: default
       source:
         repoURL: {{ $.Values.gitops.repo }}
