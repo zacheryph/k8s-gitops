@@ -1,0 +1,36 @@
+app-template:
+  image:
+    repository: ghcr.io/onedr0p/radarr
+    tag: 4.4.4.7068
+  podSecurityContext:
+    runAsUser: 568
+    runAsGroup: 568
+    fsGroup: 568
+  env:
+    TZ: America/Chicago
+  persistence:
+    config:
+      enabled: true
+      existingClaim: radarr-config
+    media:
+      enabled: true
+      type: pvc
+      existingClaim: media-pool
+      mountPath: /media
+  resources:
+    requests:
+      memory: 250Mi
+      cpu: 50m
+    limits:
+      memory: 1500Mi
+  service:
+    main:
+      ports:
+        http:
+          port: 7878
+
+addons:
+  virtualService:
+    enabled: true
+    hostname: radarr.zro.io
+    service: authentik
