@@ -32,5 +32,6 @@ app-template:
 addons:
   virtualService:
     enabled: true
+    name: radarr
     hostname: radarr.zro.io
     service: authentik

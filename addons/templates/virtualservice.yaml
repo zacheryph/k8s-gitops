@@ -2,7 +2,7 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: sonarr
+  name: {{ .Values.virtualService.name }}
 spec:
   hosts:
   - {{ .Values.virtualService.hostname }}
