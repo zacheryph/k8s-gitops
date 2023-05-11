@@ -9,3 +9,4 @@ stacks:
 - name: platform
 - name: media
   path: home/media
+  namespace: media
