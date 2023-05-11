@@ -1,0 +1,23 @@
+{{- if .Values.virtualService.enabled -}}
+apiVersion: networking.istio.io/v1beta1
+kind: VirtualService
+metadata:
+  name: sonarr
+spec:
+  hosts:
+  - {{ .Values.virtualService.hostname }}
+  gateways:
+  - system-ingress/gateway
+  http:
+  - route:
+    - destination:
+        {{- if eq .Values.virtualService.service "authentik" }}
+        host: authentik.system-ingress.svc.cluster.local
+        port:
+          number: 80
+        {{- else }}
+        host: {{ .Values.virtualService.service }}
+        port:
+          number: {{ .Values.virtualService.port }}
+        {{- end }}
+{{- end -}}

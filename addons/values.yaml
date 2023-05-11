@@ -1,0 +1,7 @@
+virtualService:
+  enabled: false
+  name: ""
+  hostname: ""
+  # if this is "authentik" port is unnecessary
+  service: ""
+  port: 80
