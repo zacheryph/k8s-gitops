@@ -1,0 +1,37 @@
+app-template:
+  image:
+    repository: ghcr.io/onedr0p/nzbget
+    tag: 21.1
+  env:
+    TZ: America/Chicago
+  podSecurityContext:
+    runAsUser: 568
+    runAsGroup: 568
+    fsGroup: 568
+  persistence:
+    config:
+      enabled: true
+      existingClaim: nzbget-config
+    media:
+      enabled: true
+      type: pvc
+      existingClaim: media-pool
+      mountPath: /media
+  resources:
+    requests:
+      memory: 500Mi
+      cpu: 50m
+    limits:
+      memory: 4Gi
+  service:
+    main:
+      ports:
+        http:
+          port: 6789
+
+addons:
+  virtualService:
+    enabled: true
+    name: nzbget
+    hostname: nzbget.zro.io
+    service: authentik
