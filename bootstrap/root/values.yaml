@@ -7,3 +7,5 @@ stacks:
 - name: infra
   namespace: kube-system
 - name: platform
+- name: media
+  path: home/media
