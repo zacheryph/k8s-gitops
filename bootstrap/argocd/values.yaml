@@ -9,6 +9,32 @@ argo-cd:
       serviceMonitor:
         enabled: true
 
+  repoServer:
+    metrics: *metrics
+    volumes:
+    - name: custom-tools
+      emptyDir: {}
+    volumeMounts:
+    - name: custom-tools
+      mountPath: /usr/local/bin/argocd-vault-plugin
+      subPath: argocd-vault-plugin
+    initContainers:
+    - name: download-tools
+      image: alpine:3.17
+      command: [sh, -c]
+      env:
+      - name: AVP_VERSION
+        value: "1.14.0"
+      args:
+      - >-
+        wget -O argocd-vault-plugin
+        https://github.com/argoproj-labs/argocd-vault-plugin/releases/download/v${AVP_VERSION}/argocd-vault-plugin_${AVP_VERSION}_linux_amd64 &&
+        chmod +x argocd-vault-plugin &&
+        mv argocd-vault-plugin /custom-tools/
+      volumeMounts:
+      - mountPath: /custom-tools
+        name: custom-tools
+
   configs:
     cm:
       # lets not override CRD webhook caBundle
@@ -25,12 +51,33 @@ argo-cd:
         jqPathExpressions:
         - ".spec.volumeClaimTemplates[]?.apiVersion"
         - ".spec.volumeClaimTemplates[]?.kind"
+      configManagementPlugins: |
+        - name: argocd-vault-plugin
+          init:
+            command:
+            - 'sh'
+            - '-c'
+            - |
+              if test -e Chart.yaml; then
+                helm dependency build
+              fi
+          generate:
+            command:
+            - 'sh'
+            - '-c'
+            - |
+              BASENAME=`basename $PWD`
+              if test -e Chart.yaml; then
+                helm template --include-crds $BASENAME --namespace $BASENAME . | argocd-vault-plugin generate -
+              elif test -e kustomization.yaml; then
+                kustomize build . | argocd-vault-plugin generate -
+              else
+                argocd-vault-plugin generate ./
+              fi
 
   dex:
     enabled: false
   controller:
-    metrics: *metrics
-  repoServer:
     metrics: *metrics
   redis:
     metrics: *metrics
