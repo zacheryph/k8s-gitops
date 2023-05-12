@@ -1,23 +1,28 @@
-{{- if .Values.virtualService.enabled -}}
+{{- if .Values.virtualService.name -}}
+{{- $service :=.Values.virtualService -}}
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: {{ .Values.virtualService.name }}
+  name: {{ $service.name }}
 spec:
   hosts:
-  - {{ .Values.virtualService.hostname }}
+  {{- if $service.hostname }}
+  - {{ $service.hostname }}
+  {{- else }}
+  - <path:kv/ingress/hostname#{{ $service.name }}>
+  {{- end }}
   gateways:
   - system-ingress/gateway
   http:
   - route:
     - destination:
-        {{- if eq .Values.virtualService.service "authentik" }}
+        {{- if eq $service.service "authentik" }}
         host: authentik.system-ingress.svc.cluster.local
         port:
           number: 80
         {{- else }}
-        host: {{ .Values.virtualService.service }}
+        host: {{ $service.service }}
         port:
-          number: {{ .Values.virtualService.port }}
+          number: {{ $service.port }}
         {{- end }}
 {{- end -}}

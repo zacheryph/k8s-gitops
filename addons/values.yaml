@@ -1,7 +1,8 @@
 virtualService:
-  enabled: false
-  name: ""
-  hostname: ""
-  # if this is "authentik" port is unnecessary
-  service: ""
+  name: null
+  # if hostname is not set, the ingress hostname
+  # value is pulled from vault using the name.
+  hostname: null
+  service: null
+  # if service is "authentik" port is unnecessary
   port: 80
