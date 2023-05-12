@@ -31,7 +31,5 @@ app-template:
 
 addons:
   virtualService:
-    enabled: true
     name: sonarr
-    hostname: sonarr.zro.io
     service: authentik
