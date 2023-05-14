@@ -11,16 +11,14 @@ argo-cd:
 
   repoServer:
     metrics: *metrics
-    envFrom:
-    - secretRef:
-        name: vault-plugin-env
     volumes:
+    - name: cmp-plugin
+      configMap:
+        name: cmp-plugin
     - name: custom-tools
       emptyDir: {}
-    volumeMounts:
-    - name: custom-tools
-      mountPath: /usr/local/bin/argocd-vault-plugin
-      subPath: argocd-vault-plugin
+    - name: tmp-dir
+      emptyDir: {}
     initContainers:
     - name: download-tools
       image: alpine:3.17
@@ -37,6 +35,28 @@ argo-cd:
       volumeMounts:
       - mountPath: /custom-tools
         name: custom-tools
+    extraContainers:
+    - name: avp-helm
+      command: [/var/run/argocd/argocd-cmp-server]
+      image: quay.io/argoproj/argocd:v2.7.2
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 999
+      envFrom:
+      - secretRef:
+          name: vault-plugin-env
+      volumeMounts:
+      - mountPath: /var/run/argocd
+        name: var-files
+      - mountPath: /home/argocd/cmp-server/plugins
+        name: plugins
+      - mountPath: /tmp
+        name: tmp-dir
+      - mountPath: /home/argocd/cmp-server/config
+        name: cmp-plugin
+      - name: custom-tools
+        subPath: argocd-vault-plugin
+        mountPath: /usr/local/bin/argocd-vault-plugin
 
   configs:
     cm:
@@ -54,29 +74,6 @@ argo-cd:
         jqPathExpressions:
         - ".spec.volumeClaimTemplates[]?.apiVersion"
         - ".spec.volumeClaimTemplates[]?.kind"
-      configManagementPlugins: |
-        - name: argocd-vault-plugin
-          init:
-            command:
-            - 'sh'
-            - '-c'
-            - |
-              if test -e Chart.yaml; then
-                helm dependency build
-              fi
-          generate:
-            command:
-            - 'sh'
-            - '-c'
-            - |
-              BASENAME=`basename $PWD`
-              if test -e Chart.yaml; then
-                helm template --include-crds $BASENAME --namespace $BASENAME . | argocd-vault-plugin generate -
-              elif test -e kustomization.yaml; then
-                kustomize build . | argocd-vault-plugin generate -
-              else
-                argocd-vault-plugin generate ./
-              fi
 
   dex:
     enabled: false
