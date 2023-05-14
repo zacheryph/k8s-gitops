@@ -9,7 +9,7 @@ spec:
   {{- if $service.hostname }}
   - {{ $service.hostname }}
   {{- else }}
-  - <path:kv/ingress/hostname#{{ $service.name }}>
+  - <path:kv/data/ingress/hosts#{{ $service.name }}>
   {{- end }}
   gateways:
   - system-ingress/gateway
