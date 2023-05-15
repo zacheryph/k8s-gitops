@@ -17,15 +17,15 @@ data:
       discover:
         find:
           command:
-            - find
-            - "."
-            - -name
-            - kustomization.yaml
+          - find
+          - "."
+          - -name
+          - kustomization.yaml
       generate:
         command:
-          - sh
-          - "-c"
-          - "kustomize build . | argocd-vault-plugin generate -"
+        - sh
+        - "-c"
+        - "kustomize build . | argocd-vault-plugin generate -"
       lockRepo: false
   avp-helm.yaml: |
     ---
@@ -41,19 +41,25 @@ data:
       discover:
         find:
           command:
-            - sh
-            - "-c"
-            - "find . -name 'Chart.yaml' && find . -name 'values.yaml'"
+          - sh
+          - "-c"
+          - "find . -name 'Chart.yaml' && find . -name 'values.yaml'"
+      init:
+        command:
+        - bash
+        - "-c"
+        - |
+          helm dependency build
       generate:
         # **IMPORTANT**: passing `${ARGOCD_ENV_helm_args}` effectively allows users to run arbitrary code in the Argo CD
         # repo-server (or, if using a sidecar, in the plugin sidecar). Only use this when the users are completely trusted. If
         # possible, determine which Helm arguments are needed by your users and explicitly pass only those arguments.
         command:
-          - sh
-          - "-c"
-          - |
-            helm template $ARGOCD_APP_NAME -n $ARGOCD_APP_NAMESPACE ${ARGOCD_ENV_HELM_ARGS} . |
-            argocd-vault-plugin generate -
+        - sh
+        - "-c"
+        - |
+          helm template $ARGOCD_APP_NAME -n $ARGOCD_APP_NAMESPACE ${ARGOCD_ENV_HELM_ARGS} . |
+          argocd-vault-plugin generate -
       lockRepo: false
   avp.yaml: |
     apiVersion: argoproj.io/v1alpha1
@@ -65,12 +71,12 @@ data:
       discover:
         find:
           command:
-            - sh
-            - "-c"
-            - "find . -name '*.yaml' | xargs -I {} grep \"<path\\|avp\\.kubernetes\\.io\" {} | grep ."
+          - sh
+          - "-c"
+          - "find . -name '*.yaml' | xargs -I {} grep \"<path\\|avp\\.kubernetes\\.io\" {} | grep ."
       generate:
         command:
-          - argocd-vault-plugin
-          - generate
-          - "."
+        - argocd-vault-plugin
+        - generate
+        - "."
       lockRepo: false
