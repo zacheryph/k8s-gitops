@@ -9,9 +9,6 @@ gitea:
   persistence:
     enabled: true
     existingClaim: gitea-data
-  statefulset:
-    labels:
-      sidecar.istio.io/inject: "true"
 
   gitea:
     metrics:
@@ -43,7 +40,7 @@ gitea:
         THEMES: auto,gitea,arc-green,github,github-dark,github-auto,gitea-modern
 
   memcached:
-    enabled: false
+    enabled: true
   postgresql:
     enabled: false
   mysql:
