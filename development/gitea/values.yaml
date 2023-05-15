@@ -32,10 +32,6 @@ gitea:
         NAME: postgres
         USER: postgres
         PASSWD: <path:kv/data/postgresql#gitea>
-      cache:
-        ADAPTER: memcache
-        ENABLED: true
-        HOST: memcached:11211
       ui:
         THEMES: auto,gitea,arc-green,github,github-dark,github-auto,gitea-modern
 
