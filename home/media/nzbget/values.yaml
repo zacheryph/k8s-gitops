@@ -33,5 +33,4 @@ addons:
   virtualService:
     enabled: true
     name: nzbget
-    hostname: nzbget.zro.io
     service: authentik

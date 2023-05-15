@@ -36,6 +36,5 @@ addons:
   virtualService:
     enabled: true
     name: plex
-    hostname: plex.zro.io
     service: plex.media.svc.cluster.local
     port: 32400
