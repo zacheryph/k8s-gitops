@@ -34,3 +34,5 @@ addons:
     enabled: true
     name: nzbget
     service: authentik
+  volumes:
+  - name: nzbget-config

@@ -33,3 +33,5 @@ addons:
   virtualService:
     name: sonarr
     service: authentik
+  volumes:
+  - name: sonarr-config

@@ -38,3 +38,6 @@ addons:
     name: plex
     service: plex.media.svc.cluster.local
     port: 32400
+  volumes:
+  - name: plex-config
+    size: 8Gi
