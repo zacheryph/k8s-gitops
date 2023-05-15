@@ -34,7 +34,7 @@ gitea:
         HOST: postgresql.gitea.svc:5432
         NAME: postgres
         USER: postgres
-        PASSWD: <path:kv/data/dev/postgresql#gitea>
+        PASSWD: <path:kv/data/postgresql#gitea>
       cache:
         ADAPTER: memcache
         ENABLED: true
