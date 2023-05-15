@@ -16,7 +16,7 @@ spec:
   - nodiratime
   nfs:
     path: /volume1/Frigate
-    server: ${NAS_ADDRESS}
+    server: <path:kv/data/network#nasAddress>
   persistentVolumeReclaimPolicy: Retain
   volumeMode: Filesystem
 ---
