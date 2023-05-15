@@ -1,0 +1,61 @@
+postgresql:
+  fullnameOverride: postgresql
+  auth:
+    postgresPassword: <path:kv/data/postgresql#gitea>
+  persistence:
+    enabled: true
+
+gitea:
+  persistence:
+    enabled: true
+    existingClaim: gitea-data
+  statefulset:
+    labels:
+      sidecar.istio.io/inject: "true"
+
+  gitea:
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+
+    config:
+      APP_NAME: Zro
+
+      repository:
+        DEFAULT_BRANCH: main
+      server:
+        DISABLE_SSH: true
+        PROTOCOL: http
+        DOMAIN: <path:kv/data/ingress/hosts#gitea>
+        ROOT_URL: https://<path:kv/data/ingress/hosts#gitea>
+      database:
+        DB_TYPE: postgres
+        HOST: postgresql.gitea.svc:5432
+        NAME: postgres
+        USER: postgres
+        PASSWD: <path:kv/data/dev/postgresql#gitea>
+      cache:
+        ADAPTER: memcache
+        ENABLED: true
+        HOST: memcached:11211
+      ui:
+        THEMES: auto,gitea,arc-green,github,github-dark,github-auto,gitea-modern
+
+  memcached:
+    enabled: false
+  postgresql:
+    enabled: false
+  mysql:
+    enabled: false
+  mariadb:
+    enabled: false
+
+addons:
+  virtualService:
+    name: gitea
+    service: gitea-http.gitea.svc.cluster.local
+    port: 3000
+  volumes:
+  - name: gitea-data
+    size: 128Gi
