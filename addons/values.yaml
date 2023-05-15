@@ -6,3 +6,9 @@ virtualService:
   service: null
   # if service is "authentik" port is unnecessary
   port: 80
+
+# backups default to true
+volumes: []
+# - name: app-config
+#   backup: false
+#   size: 1Gi

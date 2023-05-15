@@ -1,0 +1,20 @@
+{{- range $index, $volume := .Values.volumes -}}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $volume.name }}
+  {{- if ne $volume.backup false }}
+  labels:
+    snapshot.home.arpa/enabled: "true"
+  {{- end }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+
+  resources:
+    requests:
+      storage: {{ $volume.size | default "2Gi" }}
+
+  storageClassName: rook-ceph-block
+{{ end }}
