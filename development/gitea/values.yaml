@@ -6,6 +6,10 @@ postgresql:
     enabled: true
 
 gitea:
+  memcached:
+    enabled: false
+  postgresql:
+    enabled: false
   persistence:
     enabled: true
     existingClaim: gitea-data
@@ -34,15 +38,6 @@ gitea:
         PASSWD: <path:kv/data/postgresql#gitea>
       ui:
         THEMES: auto,gitea,arc-green,github,github-dark,github-auto,gitea-modern
-
-  memcached:
-    enabled: true
-  postgresql:
-    enabled: false
-  mysql:
-    enabled: false
-  mariadb:
-    enabled: false
 
 addons:
   virtualService:
