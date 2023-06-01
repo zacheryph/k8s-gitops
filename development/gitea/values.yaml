@@ -9,7 +9,8 @@ postgresql:
   persistence:
     enabled: true
 
-memcached: {}
+memcached:
+  fullnameOverride: memcached
 
 gitea:
   memcached:
