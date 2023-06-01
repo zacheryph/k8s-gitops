@@ -1,9 +1,15 @@
 postgresql:
   fullnameOverride: postgresql
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: 14.8.0-debian-11-r7
   auth:
     postgresPassword: <path:kv/data/postgresql#gitea>
   persistence:
     enabled: true
+
+memcached: {}
 
 gitea:
   memcached:
