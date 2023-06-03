@@ -66,20 +66,20 @@ argo-cd:
       # lets not override CRD webhook caBundle
       resource.customizations.ignoreDifferences.apiextensions.k8s.io_CustomResourceDefinition: |
         jqPathExpressions:
-        - ".spec.conversion.webhook.clientConfig.caBundle"
+        - '.spec.conversion.webhook.clientConfig.caBundle'
       # ignore external-secrets modifying spec
       resource.customizations.ignoreDifferences.external-secrets.io_ExternalSecret: |
         jqPathExpressions:
-        - ".spec.data[]?.remoteRef.conversionStrategy"
-        - ".spec.data[]?.remoteRef.decodingStrategy"
-        - ".spec.dataFrom[]?.extract.conversionStrategy"
-        - ".spec.dataFrom[]?.extract.decodingStrategy"
+        - '.spec.data[]?.remoteRef.conversionStrategy'
+        - '.spec.data[]?.remoteRef.decodingStrategy'
+        - '.spec.dataFrom[]?.extract.conversionStrategy'
+        - '.spec.dataFrom[]?.extract.decodingStrategy'
       # ignore kind/version injection in stateful set volume claims
       resource.customizations.ignoreDifferences.apps_StatefulSet: |
         jqPathExpressions:
-        - ".spec.volumeClaimTemplates[]?.apiVersion"
-        - ".spec.volumeClaimTemplates[]?.kind"
-        - .metadata.annotations | to_entries | map(select(.key | startswith("policies.kyverno.io"))) | from_entries
+        - '.spec.volumeClaimTemplates[]?.apiVersion'
+        - '.spec.volumeClaimTemplates[]?.kind'
+        - '.metadata.annotations["policies.kyverno.io/last-applied-patches"]'
 
   dex:
     enabled: false
