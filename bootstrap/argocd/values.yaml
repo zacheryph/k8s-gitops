@@ -79,7 +79,7 @@ argo-cd:
         jqPathExpressions:
         - ".spec.volumeClaimTemplates[]?.apiVersion"
         - ".spec.volumeClaimTemplates[]?.kind"
-        - ".metadata.annotations | to_entries | map(select(.key | startswith('policies.kyverno.io'))) | from_entries"
+        - .metadata.annotations | to_entries | map(select(.key | startswith("policies.kyverno.io"))) | from_entries
 
   dex:
     enabled: false
