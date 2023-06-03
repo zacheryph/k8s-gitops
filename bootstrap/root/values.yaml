@@ -16,3 +16,5 @@ stacks:
 - name: media
   path: home/media
   namespace: media
+- name: services
+  path: home/services

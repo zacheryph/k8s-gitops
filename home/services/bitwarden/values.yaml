@@ -1,0 +1,26 @@
+app-template:
+  image:
+    repository: vaultwarden/server
+    tag: 1.28.1
+  env:
+    ADMIN_TOKEN: <path:kv/data/services/vaultwarden#adminToken>
+  persistence:
+    config:
+      enabled: true
+      existingClaim: bitwarden-data
+  service:
+    main:
+      ports:
+        http:
+          port: 80
+        websocket:
+          port: 3012
+
+addons:
+  virtualService:
+    name: vaultwarden
+    service: vaultwarden
+    port: 80
+  volumes:
+  - name: bitwarden-data
+    size: 4Gi
