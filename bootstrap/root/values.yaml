@@ -6,7 +6,9 @@ stacks:
   namespace: argocd
 - name: infra
   namespace: kube-system
+  path: core/infra
 - name: platform
+  path: core/platform
 - name: development
 - name: media
   path: home/media

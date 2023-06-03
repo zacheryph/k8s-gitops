@@ -1,0 +1,9 @@
+reloader:
+  ignoreNamespaces: "api,system-rook-ceph"
+  deployment:
+    resources:
+      limits:
+        cpu: 100m
+        memory: 256Mi
+    podMonitor:
+      enabled: true
