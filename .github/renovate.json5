@@ -7,49 +7,33 @@
   "commitMessageSuffix": "[ci-skip]",
   "rebaseWhen": "conflicted,",
   "assignees": ["@zacheryph"],
-  "helm-values": {"fileMatch": ["cluster/.+\\.yaml$"]},
-  "regexManagers": [
-    // helm release files
-    {
-      "fileMatch": ["cluster/.+\\.yaml$"],
-      "matchStrings": [
-        "registryUrl=(?<registryUrl>.*?)\n *chart: (?<depName>.*?)\n *version: (?<currentValue>.*)\n"
-      ],
-      "datasourceTemplate": "helm"
-    },
+  "ignorePaths": ["cluster/**"],
+  "labels": ["renovate"],
+  "commitBodyTable": true,
 
-    // kustomization github release resources
-    {
-      "fileMatch": [
-        "cluster/crds/.+/.+\\.yaml",
-        "cluster/operators/.+/.+\\.yaml"
-      ],
-      "matchStrings": [
-        "https://github.com/(?<depName>.*?)/releases/download/(?<currentValue>[^/]*)/",
-        "https://raw.githubusercontent.com/(?<depName>.*?)/(?<currentValue>[^/]*)/manifests/grafana-dashboardDefinitions.yaml"
-      ],
-      "datasourceTemplate": "github-releases"
-    },
-
-    // crds: kube-prometheus-stack
-    {
-      "fileMatch": ["cluster/crds/kube-prometheus-stack/.+\\.yaml$"],
-      "matchStrings": [
-        "registryUrl=(?<registryUrl>.*?)\n *tag: (?<depName>[a-zA-Z-]+)-(?<currentValue>.*)\n",
-      ],
-      "datasourceTemplate": "helm"
-    },
-
-    // crds: rook-ceph
-    {
-      "fileMatch": ["cluster/crds/rook-ceph/.+\\.yaml$"],
-      "matchStrings": [
-        "registryUrl=(?<registryUrl>.*?) chart=(?<depName>.*?)\n *tag: (?<currentValue>.*)\n",
-      ],
-      "datasourceTemplate": "helm"
-    }
-  ],
   "packageRules": [
+    // packages safe to auto-merge
+    {
+      "matchDatasources": ["docker"],
+      "matchPackagePatterns": [
+        "ghcr.io/onedr0p/nzbget",
+        "ghcr.io/onedr0p/radarr",
+        "ghcr.io/onedr0p/sonarr",
+        "plexinc/pms-docker"
+      ],
+      "addLabels": ["renovate/automerge"],
+      "automerge": true,
+      "versioning": "loose"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "commitMessageTopic": "Docker image {{depName}}",
+      "commitMessageExtra": "to {{#if isSingleVersion}}v{{{newVersion}}}{{else}}{{{newValue}}}{{/if}}",
+      "matchUpdateTypes": ["major", "minor", "patch"],
+      "enabled": true,
+    },
+
+    // add labels for fun...
     {
       "addLabels": ["renovate/image-release"],
       "matchUpdateTypes": ["docker"]
@@ -73,11 +57,6 @@
     {
       "addLabels": ["dependency/patch"],
       "matchUpdateTypes": ["patch"]
-    },
-    {
-      "versioning": "loose",
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["plexinc/pms-docker"]
     }
   ]
 }
