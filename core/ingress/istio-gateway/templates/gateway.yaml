@@ -1,4 +1,3 @@
-# this is our istio-ingressgateway Gateway
 ---
 apiVersion: networking.istio.io/v1beta1
 kind: Gateway
@@ -13,8 +12,8 @@ spec:
       name: http
       protocol: HTTP
     hosts:
-    - "${CLUSTER_DOMAIN}"
-    - "*.${CLUSTER_DOMAIN}"
+    - "<path:kv/data/network#clusterDomain>"
+    - "*.<path:kv/data/network#clusterDomain>"
     tls:
       httpsRedirect: true
   - port:
@@ -22,8 +21,8 @@ spec:
       name: https
       protocol: HTTPS
     hosts:
-    - "${CLUSTER_DOMAIN}"
-    - "*.${CLUSTER_DOMAIN}"
+    - "<path:kv/data/network#clusterDomain>"
+    - "*.<path:kv/data/network#clusterDomain>"
     tls:
       credentialName: zro-wildcard-certificate
       mode: SIMPLE

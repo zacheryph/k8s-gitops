@@ -7,6 +7,9 @@ stacks:
 - name: infra
   namespace: kube-system
   path: core/infra
+- name: ingress
+  namespace: system-ingress
+  path: core/ingress
 - name: platform
   path: core/platform
 - name: development
