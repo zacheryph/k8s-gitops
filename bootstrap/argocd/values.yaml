@@ -72,11 +72,14 @@ argo-cd:
         jqPathExpressions:
         - ".spec.data[]?.remoteRef.conversionStrategy"
         - ".spec.data[]?.remoteRef.decodingStrategy"
+        - ".spec.dataFrom[]?.extract.conversionStrategy"
+        - ".spec.dataFrom[]?.extract.decodingStrategy"
       # ignore kind/version injection in stateful set volume claims
       resource.customizations.ignoreDifferences.apps_StatefulSet: |
         jqPathExpressions:
         - ".spec.volumeClaimTemplates[]?.apiVersion"
         - ".spec.volumeClaimTemplates[]?.kind"
+        - ".metadata.annotations | to_entries | map(select(.key | startswith('policies.kyverno.io'))) | from_entries"
 
   dex:
     enabled: false
