@@ -1,0 +1,7 @@
+triggermesh:
+  replicaCount: 1
+  securityContext:
+    allowPrivilegeEscalation: false
+  webhook:
+    podAnnotations:
+      sidecar.istio.io/inject: 'false'
