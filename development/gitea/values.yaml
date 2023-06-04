@@ -22,7 +22,8 @@ gitea:
     existingClaim: gitea-data
   statefulset:
     env:
-      TZ: America/Chicago
+    - name: TZ
+      value: America/Chicago
 
   gitea:
     metrics:
