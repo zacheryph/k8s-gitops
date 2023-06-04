@@ -2,26 +2,10 @@
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
-  name: minio-console
-spec:
-  hosts:
-  - minio.${CLUSTER_DOMAIN}
-  gateways:
-  - system-ingress/gateway
-  http:
-  - route:
-    - destination:
-        host: minio-console.minio.svc.cluster.local
-        port:
-          number: 9001
----
-apiVersion: networking.istio.io/v1beta1
-kind: VirtualService
-metadata:
   name: minio-gateway
 spec:
   hosts:
-  - s3.${CLUSTER_DOMAIN}
+  - <path:kv/data/ingress/hosts#minio-gateway>
   gateways:
   - system-ingress/gateway
   http:
@@ -32,7 +16,7 @@ spec:
           number: 80
     corsPolicy:
       allowOrigins:
-      - exact: https://outline.${CLUSTER_DOMAIN}
+      - exact: <path:kv/data/ingress/hosts#outline>
       allowMethods:
       - GET
       - POST
