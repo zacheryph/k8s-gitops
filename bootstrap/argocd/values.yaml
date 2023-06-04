@@ -80,6 +80,11 @@ argo-cd:
         - '.spec.volumeClaimTemplates[]?.apiVersion'
         - '.spec.volumeClaimTemplates[]?.kind'
         - '.metadata.annotations["policies.kyverno.io/last-applied-patches"]'
+      # a lot of things produce cluster roles and dynamically set rules
+      # knitive, triggermesh, ?
+      resource.customizations.ignoreDifferences.rbac.authorization.k8s.io_ClusterRole: |
+        jqPathExpressions:
+        - '.rules'
 
   dex:
     enabled: false
