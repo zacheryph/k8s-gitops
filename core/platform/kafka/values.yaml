@@ -1,0 +1,38 @@
+kafka:
+  image:
+    registry: docker.io
+    repository: bitnami/kafka
+    tag: 3.1.0-debian-10-r89
+  persistence:
+    enabled: true
+  metrics:
+    kafka:
+      enabled: true
+    serviceMonitor:
+      enabled: true
+      namespace: system-monitor
+  zookeeper:
+    enabled: true
+    persistence:
+      enabled: true
+
+kafka-ui:
+  image:
+    registry: docker.io
+    repository: provectuslabs/kafka-ui
+    tag: master
+    pullPolicy: Always
+  yamlApplicationConfig:
+    auth:
+      type: disabled
+    kafka:
+      clusters:
+      - name: general
+        bootstrapServers: kafka:9092
+        metrics:
+          port: 9308
+
+addons:
+  virtualService:
+    name: kafka-ui
+    service: authentik
