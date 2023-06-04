@@ -9,11 +9,11 @@ spec:
   renewBefore: 360h
   subject:
     organizations:
-    - ${ORGANIZATION_NAME}
-  commonName: ${CLUSTER_DOMAIN}
+    - <path:kv/data/organization#name>
+  commonName: <path:kv/data/network#clusterDomain>
   dnsNames:
-  - "${CLUSTER_DOMAIN}"
-  - "*.${CLUSTER_DOMAIN}"
+  - "<path:kv/data/network#clusterDomain>"
+  - "*.<path:kv/data/network#clusterDomain>"
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt-cloudflare
