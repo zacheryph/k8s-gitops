@@ -1,5 +1,7 @@
-{{- if .Values.virtualService.name -}}
-{{- $service :=.Values.virtualService -}}
+{{- define "addon.virtualService" -}}
+{{- if .name -}}
+{{- $service := . -}}
+---
 apiVersion: networking.istio.io/v1beta1
 kind: VirtualService
 metadata:
@@ -25,4 +27,10 @@ spec:
         port:
           number: {{ $service.port }}
         {{- end }}
+{{ end }}
+{{- end -}}
+
+{{ include "addon.virtualService" .Values.virtualService }}
+{{ range .Values.virtualServices -}}
+  {{ include "addon.virtualService" . }}
 {{- end -}}

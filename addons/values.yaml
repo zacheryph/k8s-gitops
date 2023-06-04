@@ -7,6 +7,10 @@ virtualService:
   # if service is "authentik" port is unnecessary
   port: 80
 
+# you can set an array of services to create.
+# each indicy should be a service above.
+virtualServices: []
+
 # backups default to true
 volumes: []
 # - name: app-config
