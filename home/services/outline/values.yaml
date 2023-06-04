@@ -18,6 +18,7 @@ app-template:
     OIDC_SCOPES: "openid profile email"
     URL: https://<path:kv/data/ingress/hosts#outline>
     PORT: 3000
+    PGSSLMODE: disable
     REDIS_URL: redis://redis-master:6379
     AWS_REGION: local
     AWS_S3_ACL: private
