@@ -1,0 +1,21 @@
+apiVersion: v2
+name: home-assistant
+version: 0.0.0
+dependencies:
+- name: app-template
+  version: 1.5.1
+  repository: https://bjw-s.github.io/helm-charts
+  alias: home-assistant
+- name: app-template
+  version: 1.5.1
+  repository: https://bjw-s.github.io/helm-charts
+  alias: zwavejs2mqtt
+- name: vernemq
+  version: 1.8.1
+  repository: https://vernemq.github.io/docker-vernemq
+- name: postgresql
+  version: 12.5.1
+  repository: https://charts.bitnami.com/bitnami
+- name: addons
+  version: 1.0.0
+  repository: file://../../../addons

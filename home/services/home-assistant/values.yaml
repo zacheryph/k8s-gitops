@@ -1,0 +1,103 @@
+home-assistant:
+  image:
+    repository: homeassistant/home-assistant
+    tag: 2023.4.6
+  controller:
+    annotations:
+      reloader.stakater.com/auto: "true"
+  env:
+    HASS_DATABASE_URL: postgresql://postgres:<path:kv/data/postgresql#home-assistant>@postgresql/postgres?sslmode=disable
+  persistence:
+    config:
+      enabled: true
+      existingClaim: home-assistant-config
+  addons:
+    codeserver:
+      enabled: true
+      git:
+        deploySecretKey: github-credentials
+      workingDir: /config
+      volumeMounts:
+      - name: config
+        mountPath: /config
+      resources:
+        requests:
+          cpu: 35m
+          memory: 128Mi
+        limits:
+          memory: 512Mi
+
+vernemq:
+  image:
+    repository: vernemq/vernemq
+    tag: 1.12.6.2-alpine
+  replicaCount: 1
+  serviceMonitor:
+    create: true
+  service:
+    ws:
+      enabled: true
+  persistentVolume:
+    enabled: true
+  additionalEnv:
+  - name: DOCKER_VERNEMQ_ACCEPT_EULA
+    value: "yes"
+  - name: DOCKER_VERNEMQ_ALLOW_ANONYMOUS
+    value: "on"
+  envFrom: []
+
+zwavejs2mqtt:
+  image:
+    repository: zwavejs/zwavejs2mqtt
+    tag: 8.18.0
+  env:
+    NETWORK_KEY: <path:kv/data/services/home-assistant#zwaveNetworkKey>
+  securityContext:
+    privileged: true
+  persistence:
+    config:
+      enabled: true
+      existingClaim: zwavejs2mqtt-config
+    zwave:
+      enabled: true
+      type: hostPath
+      hostPath: /dev/ttyACM0
+  service:
+    additionalPorts: [3000]
+  affinity:
+    nodeAffinity:
+      requiredDuringSchedulingIgnoredDuringExecution:
+        nodeSelectorTerms:
+        - matchExpressions:
+          - key: "feature.node.kubernetes.io/custom-zwave"
+            operator: In
+            values: ["true"]
+
+postgresql:
+  fullnameOverride: postgresql
+  image:
+    registry: docker.io
+    repository: bitnami/postgresql
+    tag: 14.8.0-debian-11-r7
+    pullPolicy: IfNotPresent
+  auth:
+    postgresPassword: <path:kv/data/postgresql#home-assistant>
+  persistence:
+    enabled: true
+
+addons:
+  virtualServices:
+  - name: home-assistant
+    service: home-assistant
+    port: 8123
+  - name: home-assistant-codeserver
+    service: authentik
+  - name: vernemq
+    service: authentik
+  - name: zwavejs2mqtt
+    service: authentik
+  volumes:
+  - name: home-assistant-config
+    size: 4Gi
+  - name: zwavejs2mqtt-config
+    size: 8Gi
