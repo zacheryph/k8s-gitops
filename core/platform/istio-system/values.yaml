@@ -1,0 +1,9 @@
+istiod:
+  meshConfig:
+    outboundTrafficPolicy:
+      mode: ALLOW_ANY
+
+gateway:
+  service:
+    type: LoadBalancer
+    loadBalancerIP: <path:kv/data/network#ingressAddress>
