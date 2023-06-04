@@ -1,14 +1,14 @@
 app-template:
   image:
     repository: outlinewiki/outline
-    tag: 0.69.1
+    tag: 0.69.2
   controller:
     type: deployment
     annotations:
       reloader.stakater.com/auto: "true"
   initContainers:
     migrations:
-      image: outlinewiki/outline:0.69.1
+      image: outlinewiki/outline:0.69.2
       command: ["yarn", "sequelize", "db:migrate"]
       envFrom:
       - configMapRef:
