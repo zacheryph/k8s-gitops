@@ -4,8 +4,8 @@ metadata:
   name: unifi-tls
 spec:
   secretName: unifi-tls
-  duration: 2160h
-  renewBefore: 360h
+  duration: 2160h0m0s
+  renewBefore: 360h0m0s
   subject:
     organizations:
     - <path:kv/data/organization#name>
