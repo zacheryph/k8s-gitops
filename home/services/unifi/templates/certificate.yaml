@@ -8,10 +8,10 @@ spec:
   renewBefore: 360h
   subject:
     organizations:
-    - ${ORGANIZATION_NAME}
-  commonName: unifi.${CLUSTER_DOMAIN}
+    - <path:kv/data/organization#name>
+  commonName: <path:kv/data/ingress/hosts#unifi>
   dnsNames:
-  - "unifi.${CLUSTER_DOMAIN}"
+  - <path:kv/data/ingress/hosts#unifi>
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt-cloudflare
