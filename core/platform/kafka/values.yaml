@@ -11,6 +11,10 @@ kafka:
     serviceMonitor:
       enabled: true
       namespace: system-monitor
+  kraft:
+    enabled: false
+  zookeeper:
+    enabled: true
 
 kafka-ui:
   image:
