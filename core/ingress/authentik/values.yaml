@@ -8,6 +8,8 @@ authentik:
     enabled: false
 
   authentik:
+    env:
+      TZ: America/Chicago
     secret_key: <path:kv/data/infra/authentik#secretKey>
     email:
       host: <path:kv/data/infra/authentik#smtpHost>

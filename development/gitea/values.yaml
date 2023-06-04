@@ -20,6 +20,9 @@ gitea:
   persistence:
     enabled: true
     existingClaim: gitea-data
+  statefulset:
+    env:
+      TZ: America/Chicago
 
   gitea:
     metrics:
