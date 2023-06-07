@@ -42,11 +42,6 @@ spec:
       # better way to manage these on a per-application basis.
       ignoreDifferences:
       - group: apps
-        kind: Deployment
-        namespace: istio-system
-        jqPathExpressions:
-        - '.spec.template.spec.containers[]?.image'
-      - group: apps
         kind: Pod
         namespace: istio-system
         jqPathExpressions:
