@@ -43,7 +43,7 @@ data:
           command:
           - sh
           - "-c"
-          - "find . -name 'Chart.yaml' && find . -name 'values.yaml'"
+          - "find . -name 'Chart.yaml' || find . -name 'kustomization.yaml'"
       init:
         command:
         - bash
