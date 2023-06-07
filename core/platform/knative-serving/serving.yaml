@@ -13,7 +13,7 @@ spec:
         kind: ClusterIssuer
         name: letsencrypt-cloudflare
     domain:
-      <path:kv/data/network#knativeDomain>: ""
+      zro.net: ""
     network:
       auto-tls: Enabled
       http-protocol: Redirected
