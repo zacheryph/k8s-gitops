@@ -35,7 +35,20 @@ spec:
             factor: 2
             maxDuration: 16m
         syncOptions:
-          - CreateNamespace=true
-          - ApplyOutOfSyncOnly=true
-          - ServerSideApply=true
+        - CreateNamespace=true
+        - ApplyOutOfSyncOnly=true
+        - ServerSideApply=true
+      # this is the worst place for this until i figure out a
+      # better way to manage these on a per-application basis.
+      ignoreDifferences:
+      - group: apps
+        kind: Deployment
+        namespace: istio-system
+        jqPathExpressions:
+        - '.spec.template.spec.containers[]?.image'
+      - group: apps
+        kind: Pod
+        namespace: istio-system
+        jqPathExpressions:
+        - '.spec.containers[]?.image'
 {{- end }}
