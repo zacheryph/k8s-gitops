@@ -85,6 +85,9 @@ argo-cd:
       resource.customizations.ignoreDifferences.rbac.authorization.k8s.io_ClusterRole: |
         jqPathExpressions:
         - '.rules'
+      resource.customizations.ignoreDifferences.admissionregistration.k8s.io_ValidatingWebhookConfiguration: |
+        jqPathExpressions:
+        - '.webhooks[]?.failurePolicy'
 
   dex:
     enabled: false
