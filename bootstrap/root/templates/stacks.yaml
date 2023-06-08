@@ -46,4 +46,9 @@ spec:
         namespace: istio-system
         jqPathExpressions:
         - '.spec.containers[]?.image'
+      - group: apps
+        kind: Deployment
+        namespace: istio-system
+        jqPathExpressions:
+        - '.spec.template.spec.containers[]?.env[]?.valueFrom.resourceFieldRef'
 {{- end }}
