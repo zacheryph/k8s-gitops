@@ -28,13 +28,12 @@ app-template:
       externalTrafficPolicy: Local
       ports:
         http:
-          port: 443
-          protocol: HTTPS
-          targetPort: 8443
-        controller:
           enabled: true
           port: 8080
           protocol: TCP
+        https:
+          port: 8443
+          protocol: HTTPS
         portal-http:
           enabled: false
           port: 8880
@@ -61,6 +60,10 @@ app-template:
           protocol: UDP
 
 addons:
+  virtualService:
+    name: unifi
+    service: unifi
+    port: 8080
   volumes:
   - name: unifi-data
     size: 8Gi
