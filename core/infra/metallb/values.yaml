@@ -12,6 +12,10 @@ metallb:
         cpu: 100m
         memory: 100Mi
   speaker:
+    frr:
+      image:
+        repository: quay.io/frrouting/frr
+        tag: 8.5.1
     resources:
       limits:
         cpu: 100m
