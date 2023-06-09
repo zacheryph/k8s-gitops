@@ -12,9 +12,10 @@ kafka:
       enabled: true
       namespace: system-monitor
   kraft:
-    enabled: false
-  zookeeper:
     enabled: true
+    clusterId: inwin-development-cluster
+  zookeeper:
+    enabled: false
 
 kafka-ui:
   image:
