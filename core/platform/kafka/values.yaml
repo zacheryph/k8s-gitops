@@ -18,6 +18,7 @@ kafka:
     enabled: false
 
 kafka-ui:
+  fullnameOverride: kafka-ui
   image:
     registry: docker.io
     repository: provectuslabs/kafka-ui
