@@ -20,3 +20,5 @@ spec:
   ingress:
     istio:
       enabled: true
+      hosts:
+      - '*.<path:kv/data/network#knativeDomain>'
