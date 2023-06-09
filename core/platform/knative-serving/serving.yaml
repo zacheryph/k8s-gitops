@@ -21,4 +21,4 @@ spec:
     istio:
       enabled: true
       hosts:
-      - '*.<path:kv/data/network#knativeDomain>'
+      - '*.zro.net'
