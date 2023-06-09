@@ -1,8 +1,4 @@
 kafka:
-  image:
-    registry: docker.io
-    repository: bitnami/kafka
-    tag: 3.1.0-debian-10-r89
   persistence:
     enabled: true
   replicaCount: 3
