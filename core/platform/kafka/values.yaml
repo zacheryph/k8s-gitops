@@ -5,6 +5,7 @@ kafka:
     tag: 3.1.0-debian-10-r89
   persistence:
     enabled: true
+  replicaCount: 3
   metrics:
     kafka:
       enabled: true
@@ -12,10 +13,7 @@ kafka:
       enabled: true
       namespace: system-monitor
   kraft:
-    enabled: true
     clusterId: inwin-development-cluster
-  zookeeper:
-    enabled: false
 
 kafka-ui:
   fullnameOverride: kafka-ui
