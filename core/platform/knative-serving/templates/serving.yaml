@@ -20,5 +20,11 @@ spec:
   ingress:
     istio:
       enabled: true
-      hosts:
-      - '*.zro.net'
+      knative-ingress-gateway:
+        servers:
+        - hosts:
+          - '*.zro.net'
+          port:
+            name: http
+            number: 80
+            protocol: HTTP
