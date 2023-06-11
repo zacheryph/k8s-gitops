@@ -94,3 +94,9 @@ argo-cd:
     metrics: *metrics
   redis:
     metrics: *metrics
+
+addons:
+  virtualService:
+    name: argocd
+    service: argocd-server
+    port: 80
