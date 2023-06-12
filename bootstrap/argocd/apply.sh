@@ -5,6 +5,7 @@ VALUES="values.yaml"
 helm template \
     --dependency-update \
     --include-crds \
+    --set addons.virtualService.name=null \
     --namespace argocd \
     --values "${VALUES}" \
     argocd . \
