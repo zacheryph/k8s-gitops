@@ -43,12 +43,17 @@ data:
           - sh
           - "-c"
           - "find . -name 'Chart.yaml' && find . -name 'values.yaml'"
+      init:
+        command:
+        - bash
+        - "-c"
+        - "[[ -f Chart.yaml ]] && helm dependency build"
       generate:
         # **IMPORTANT**: passing `${ARGOCD_ENV_helm_args}` effectively allows users to run arbitrary code in the Argo CD
         # repo-server (or, if using a sidecar, in the plugin sidecar). Only use this when the users are completely trusted. If
         # possible, determine which Helm arguments are needed by your users and explicitly pass only those arguments.
         command:
-        - sh
+        - bash
         - "-c"
         - |
           helm template $ARGOCD_APP_NAME --include-crds -n $ARGOCD_APP_NAMESPACE ${ARGOCD_ENV_HELM_ARGS} . |
