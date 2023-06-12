@@ -6,8 +6,8 @@ metadata:
 spec:
   version: 1.10.0
   additionalManifests:
-  - URL: https://github.com/knative-sandbox/eventing-kafka-broker/releases/download/knative-v1.10.1/eventing-kafka-controller.yaml
-  - URL: https://github.com/knative-sandbox/eventing-kafka-broker/releases/download/knative-v1.10.1/eventing-kafka-broker.yaml
+  - URL: https://github.com/knative-sandbox/eventing-kafka-broker/releases/download/knative-v1.10.0/eventing-kafka-controller.yaml
+  - URL: https://github.com/knative-sandbox/eventing-kafka-broker/releases/download/knative-v1.10.0/eventing-kafka-broker.yaml
   - URL: https://github.com/knative-sandbox/eventing-github/releases/download/knative-v1.10.0/github.yaml
   config:
     config-br-defaults:
