@@ -6,7 +6,7 @@ dependencies:
   version: 2023.5.3
   repository: https://charts.goauthentik.io
 - name: postgresql
-  version: 12.5.6
+  version: 12.5.8
   repository: https://charts.bitnami.com/bitnami
 - name: redis
   version: 17.11.3
