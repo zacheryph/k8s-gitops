@@ -1,0 +1,8 @@
+# sources are separated because kustomize falls over when
+# kafka-broker & sources exist in the same kustomization.
+---
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+namespace: knative-sources
+resources:
+- https://github.com/knative-sandbox/eventing-github/releases/download/knative-v1.10.0/github.yaml
