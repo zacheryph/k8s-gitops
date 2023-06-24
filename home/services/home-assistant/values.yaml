@@ -49,7 +49,7 @@ vernemq:
 zwavejs2mqtt:
   image:
     repository: zwavejs/zwavejs2mqtt
-    tag: 8.18.0
+    tag: 8.19.0
   env:
     NETWORK_KEY: <path:kv/data/services/home-assistant#zwaveNetworkKey>
   securityContext:
