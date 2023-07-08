@@ -9,7 +9,7 @@ dependencies:
   version: 6.5.4
   repository: https://charts.bitnami.com/bitnami
 - name: postgresql
-  version: 12.6.2
+  version: 12.6.4
   repository: https://charts.bitnami.com/bitnami
 - name: addons
   version: 1.0.0
