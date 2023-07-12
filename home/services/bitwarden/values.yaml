@@ -6,7 +6,7 @@ app-template:
   env:
     ADMIN_TOKEN: <path:kv/data/services/vaultwarden#adminToken>
   persistence:
-    config:
+    data:
       enabled: true
       existingClaim: bitwarden-data
   service:
