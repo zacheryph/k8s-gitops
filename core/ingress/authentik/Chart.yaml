@@ -9,7 +9,7 @@ dependencies:
   version: 12.8.0
   repository: https://charts.bitnami.com/bitnami
 - name: redis
-  version: 17.11.7
+  version: 17.14.5
   repository: https://charts.bitnami.com/bitnami
 - name: addons
   version: 1.0.0
