@@ -6,7 +6,7 @@ dependencies:
   version: 1.18.0
   repository: https://istio-release.storage.googleapis.com/charts
 - name: istiod
-  version: 1.18.0
+  version: 1.18.2
   repository: https://istio-release.storage.googleapis.com/charts
 - name: gateway
   version: 1.18.0
