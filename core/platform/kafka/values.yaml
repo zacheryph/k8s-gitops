@@ -10,11 +10,15 @@ kafka:
       enabled: true
       namespace: system-monitor
   kraft:
-    enabled: false
-  zookeeper:
     enabled: true
-    persistence:
-      size: 2Gi
+    clusterId: <path:kv/data/platform/kafka#clusterId>
+  controller:
+    replicaCount: 1
+    controllerOnly: true
+    zookeeperMigrationMode: true
+  broker:
+    replicaCount: 3
+    zookeeperMigrationMode: true
 
 kafka-ui:
   fullnameOverride: kafka-ui
