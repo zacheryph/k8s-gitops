@@ -42,7 +42,7 @@ redis:
   image:
     registry: docker.io
     repository: bitnami/redis
-    tag: 7.0.12
+    tag: 7.2.0
   architecture: standalone
   auth:
     enabled: false
