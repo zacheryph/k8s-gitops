@@ -1,8 +1,4 @@
 kafka:
-  persistence:
-    enabled: true
-    size: 20Gi
-  replicaCount: 3
   metrics:
     kafka:
       enabled: true
@@ -13,12 +9,10 @@ kafka:
     enabled: true
     clusterId: <path:kv/data/platform/kafka#clusterId>
   controller:
-    replicaCount: 1
-    controllerOnly: true
-    zookeeperMigrationMode: true
-  broker:
     replicaCount: 3
-    zookeeperMigrationMode: true
+    persistence:
+      enabled: true
+      size: 50Gi
 
 kafka-ui:
   fullnameOverride: kafka-ui
