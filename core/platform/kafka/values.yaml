@@ -13,6 +13,16 @@ kafka:
     persistence:
       enabled: true
       size: 50Gi
+  sasl:
+    client:
+      users:
+      - <path:kv/data/platform/kafka#personalUsername>
+      - <path:kv/data/platform/kafka#uiUsername>
+      - <path:kv/data/platform/kafka#knativeUsername>
+      passwords:
+      - <path:kv/data/platform/kafka#personalPassword>
+      - <path:kv/data/platform/kafka#uiPassword>
+      - <path:kv/data/platform/kafka#knativePassword>
 
 kafka-ui:
   fullnameOverride: kafka-ui
@@ -31,7 +41,7 @@ kafka-ui:
         properties:
           security.protocol: SASL_PLAINTEXT
           sasl.mechanism: PLAIN
-          sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="<path:kv/data/platform/kafka#clientUsername>" password="<path:kv/data/platform/kafka#clientPassword>";
+          sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="<path:kv/data/platform/kafka#uiUsername>" password="<path:kv/data/platform/kafka#uiPassword>";
 
         metrics:
           port: 9308
