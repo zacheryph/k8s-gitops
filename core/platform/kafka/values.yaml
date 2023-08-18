@@ -28,6 +28,11 @@ kafka-ui:
       clusters:
       - name: general
         bootstrapServers: kafka:9092
+        properties:
+          security.protocol: SASL_PLAINTEXT
+          sasl.mechanism: PLAIN
+          sasl.jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="<path:kv/data/platform/kafka#clientUsername>" password="<path:kv/data/platform/kafka#clientPassword>";
+
         metrics:
           port: 9308
 
