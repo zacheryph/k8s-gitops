@@ -3,7 +3,7 @@ name: kafka
 version: 0.0.0
 dependencies:
 - name: kafka
-  version: 24.0.9
+  version: 24.0.14
   repository: https://charts.bitnami.com/bitnami
 - name: kafka-ui
   version: 0.7.2
