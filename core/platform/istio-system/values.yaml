@@ -1,5 +1,7 @@
 istiod:
   meshConfig:
+    accessLogFile: /dev/stdout
+    accessLogEncoding: JSON
     outboundTrafficPolicy:
       mode: ALLOW_ANY
 
