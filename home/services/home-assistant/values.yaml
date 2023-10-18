@@ -5,6 +5,11 @@ home-assistant:
   controller:
     annotations:
       reloader.stakater.com/auto: "true"
+  service:
+    main:
+      ports:
+        http:
+          port: 8123
   env:
     HASS_DATABASE_URL: postgresql://postgres:<path:kv/data/postgresql#home-assistant>@postgresql/postgres?sslmode=disable
   persistence:
