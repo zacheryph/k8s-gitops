@@ -48,7 +48,13 @@ zwavejs2mqtt:
       type: hostPath
       hostPath: /dev/ttyACM0
   service:
-    additionalPorts: [3000]
+    main:
+      ports:
+        http:
+          port: 8091
+        websocket:
+          enabled: true
+          port: 3000
   affinity:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
