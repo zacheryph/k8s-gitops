@@ -88,8 +88,6 @@ addons:
   - name: home-assistant
     service: home-assistant
     port: 8123
-  - name: home-assistant-codeserver
-    service: authentik
   - name: vernemq
     service: authentik
   - name: zwavejs2mqtt
