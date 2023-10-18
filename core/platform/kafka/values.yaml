@@ -1,7 +1,7 @@
 kafka:
   metrics:
     kafka:
-      enabled: true
+      enabled: false
     serviceMonitor:
       enabled: true
       namespace: system-monitor
