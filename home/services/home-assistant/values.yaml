@@ -11,22 +11,6 @@ home-assistant:
     config:
       enabled: true
       existingClaim: home-assistant-config
-  addons:
-    codeserver:
-      enabled: true
-      git:
-        deploySecretKey: github-credentials
-      workingDir: /config
-      volumeMounts:
-      - name: config
-        mountPath: /config
-      resources:
-        requests:
-          cpu: 35m
-          memory: 128Mi
-        limits:
-          memory: 512Mi
-
 vernemq:
   image:
     repository: vernemq/vernemq
@@ -40,12 +24,11 @@ vernemq:
   persistentVolume:
     enabled: true
   additionalEnv:
-  - name: DOCKER_VERNEMQ_ACCEPT_EULA
-    value: "yes"
-  - name: DOCKER_VERNEMQ_ALLOW_ANONYMOUS
-    value: "on"
+    - name: DOCKER_VERNEMQ_ACCEPT_EULA
+      value: "yes"
+    - name: DOCKER_VERNEMQ_ALLOW_ANONYMOUS
+      value: "on"
   envFrom: []
-
 zwavejs2mqtt:
   image:
     repository: zwavejs/zwavejs2mqtt
@@ -68,11 +51,10 @@ zwavejs2mqtt:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
-        - matchExpressions:
-          - key: "feature.node.kubernetes.io/custom-zwave"
-            operator: In
-            values: ["true"]
-
+          - matchExpressions:
+              - key: "feature.node.kubernetes.io/custom-zwave"
+                operator: In
+                values: ["true"]
 postgresql:
   fullnameOverride: postgresql
   image:
@@ -84,20 +66,19 @@ postgresql:
     postgresPassword: <path:kv/data/postgresql#home-assistant>
   persistence:
     enabled: true
-
 addons:
   virtualServices:
-  - name: home-assistant
-    service: home-assistant
-    port: 8123
-  - name: home-assistant-codeserver
-    service: authentik
-  - name: vernemq
-    service: authentik
-  - name: zwavejs2mqtt
-    service: authentik
+    - name: home-assistant
+      service: home-assistant
+      port: 8123
+    - name: home-assistant-codeserver
+      service: authentik
+    - name: vernemq
+      service: authentik
+    - name: zwavejs2mqtt
+      service: authentik
   volumes:
-  - name: home-assistant-config
-    size: 4Gi
-  - name: zwavejs2mqtt-config
-    size: 8Gi
+    - name: home-assistant-config
+      size: 4Gi
+    - name: zwavejs2mqtt-config
+      size: 8Gi
