@@ -2,11 +2,15 @@ home-assistant:
   image:
     repository: homeassistant/home-assistant
     tag: 2023.10.3
+  podLabels:
+    component: home-assistant
   controller:
     annotations:
       reloader.stakater.com/auto: "true"
   service:
     main:
+      extraSelectorLabels:
+        component: home-assistant
       ports:
         http:
           port: 8123
@@ -40,9 +44,12 @@ vernemq:
 
 zwavejs2mqtt:
   fullnameOverride: zwavejs2mqtt
+  nameOverride: zwavejs2mqtt
   image:
     repository: zwavejs/zwave-js-ui
     tag: 9.1.2
+  podLabels:
+    component: zwavejs2mqtt
   env:
     NETWORK_KEY: <path:kv/data/services/home-assistant#zwaveNetworkKey>
   securityContext:
@@ -57,6 +64,8 @@ zwavejs2mqtt:
       hostPath: /dev/ttyACM0
   service:
     main:
+      extraSelectorLabels:
+        component: zwavejs2mqtt
       ports:
         http:
           port: 8091
