@@ -33,6 +33,7 @@ vernemq:
   envFrom: []
 
 zwavejs2mqtt:
+  fullnameOverride: zwavejs2mqtt
   image:
     repository: zwavejs/zwave-js-ui
     tag: 9.1.2
