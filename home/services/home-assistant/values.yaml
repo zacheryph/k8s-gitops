@@ -13,6 +13,7 @@ home-assistant:
       existingClaim: home-assistant-config
 
 vernemq:
+  fullnameOverride: vernemq
   image:
     repository: vernemq/vernemq
     tag: 1.12.6.2-alpine
