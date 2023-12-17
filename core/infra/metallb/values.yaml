@@ -15,7 +15,7 @@ metallb:
     frr:
       image:
         repository: quay.io/frrouting/frr
-        tag: 8.5.4
+        tag: 9.1.0
     resources:
       limits:
         cpu: 100m
