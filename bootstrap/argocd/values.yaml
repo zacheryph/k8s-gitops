@@ -96,8 +96,10 @@ argo-cd:
         jqPathExpressions:
         - '.spec.data[]?.remoteRef.conversionStrategy'
         - '.spec.data[]?.remoteRef.decodingStrategy'
+        - '.spec.data[]?.remoteRef.metadataPolicy'
         - '.spec.dataFrom[]?.extract.conversionStrategy'
         - '.spec.dataFrom[]?.extract.decodingStrategy'
+        - '.spec.dataFrom[]?.extract.metadataPolicy'
       # ignore kind/version injection in stateful set volume claims
       resource.customizations.ignoreDifferences.apps_StatefulSet: |
         jqPathExpressions:
