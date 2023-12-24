@@ -1,7 +1,7 @@
 app-template:
   image:
     repository: ghcr.io/onedr0p/radarr
-    tag: 5.1.3.8246
+    tag: 5.2.6.8376
   podSecurityContext:
     runAsUser: 568
     runAsGroup: 568
