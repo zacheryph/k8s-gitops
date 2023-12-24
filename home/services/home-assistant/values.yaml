@@ -20,13 +20,12 @@ home-assistant:
     config:
       enabled: true
       existingClaim: home-assistant-config
-
 vernemq:
   fullnameOverride: vernemq
   nameOverride: vernemq
   image:
     repository: vernemq/vernemq
-    tag: 1.12.6.2-alpine
+    tag: 1.13.0-alpine
   replicaCount: 1
   serviceMonitor:
     create: true
@@ -36,18 +35,17 @@ vernemq:
   persistentVolume:
     enabled: true
   additionalEnv:
-  - name: DOCKER_VERNEMQ_ACCEPT_EULA
-    value: "yes"
-  - name: DOCKER_VERNEMQ_ALLOW_ANONYMOUS
-    value: "on"
+    - name: DOCKER_VERNEMQ_ACCEPT_EULA
+      value: "yes"
+    - name: DOCKER_VERNEMQ_ALLOW_ANONYMOUS
+      value: "on"
   envFrom: []
-
 zwavejs2mqtt:
   fullnameOverride: zwavejs2mqtt
   nameOverride: zwavejs2mqtt
   image:
     repository: zwavejs/zwave-js-ui
-    tag: 9.1.2
+    tag: 9.6.2
   podLabels:
     component: zwavejs2mqtt
   env:
@@ -76,11 +74,10 @@ zwavejs2mqtt:
     nodeAffinity:
       requiredDuringSchedulingIgnoredDuringExecution:
         nodeSelectorTerms:
-        - matchExpressions:
-          - key: "feature.node.kubernetes.io/custom-zwave"
-            operator: In
-            values: ["true"]
-
+          - matchExpressions:
+              - key: "feature.node.kubernetes.io/custom-zwave"
+                operator: In
+                values: ["true"]
 postgresql:
   fullnameOverride: postgresql
   image:
@@ -92,18 +89,17 @@ postgresql:
     postgresPassword: <path:kv/data/postgresql#home-assistant>
   persistence:
     enabled: true
-
 addons:
   virtualServices:
-  - name: home-assistant
-    service: home-assistant
-    port: 8123
-  - name: vernemq
-    service: authentik
-  - name: zwavejs2mqtt
-    service: authentik
+    - name: home-assistant
+      service: home-assistant
+      port: 8123
+    - name: vernemq
+      service: authentik
+    - name: zwavejs2mqtt
+      service: authentik
   volumes:
-  - name: home-assistant-config
-    size: 4Gi
-  - name: zwavejs2mqtt-config
-    size: 8Gi
+    - name: home-assistant-config
+      size: 4Gi
+    - name: zwavejs2mqtt-config
+      size: 8Gi
