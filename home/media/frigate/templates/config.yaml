@@ -43,21 +43,21 @@ data:
         default: 30
 
     cameras:
-      garage:
-        detect:
-          width: 704
-          height: 480
-          fps: 6
+      # garage:
+      #   detect:
+      #     width: 704
+      #     height: 480
+      #     fps: 6
 
-        ffmpeg:
-          inputs:
-          - path: "rtsp://neolink:8554/garage"
-            roles:
-            - record
-            - rtmp
-          - path: "rtsp://neolink:8554/garage/subStream"
-            roles:
-            - detect
+      #   ffmpeg:
+      #     inputs:
+      #     - path: "rtsp://neolink:8554/garage"
+      #       roles:
+      #       - record
+      #       - rtmp
+      #     - path: "rtsp://neolink:8554/garage/subStream"
+      #       roles:
+      #       - detect
 
       north_yard:
         detect:
@@ -65,21 +65,16 @@ data:
           height: 480
           fps: 7
 
-        # mask without street
-        # motion:
-        #   mask:
-        #   - 414,51,247,73,0,164,0,0,640,0,640,71
-        # mask whole street
         motion:
           mask:
-          - 438,84,281,150,0,305,0,0,640,0,640,93
+          - 450,153,315,183,0,284,0,0,640,0,551,172
         zones:
-          driveway:
-            coordinates: 0,480,570,480,619,270,175,216,0,313
-          yard:
-            coordinates: 427,246,534,145,606,136,599,101,493,87,423,95,166,214
           door:
-            coordinates: 528,160,619,158,602,266,415,243
+            coordinates: 557,224,640,239,599,363,411,298
+          driveway:
+            coordinates: 0,480,570,480,600,358,172,226,0,283
+          yard:
+            coordinates: 397,300,541,245,610,189,551,172,492,158,435,156,177,226
 
         ffmpeg:
           inputs:
@@ -114,25 +109,18 @@ data:
           height: 480
           fps: 7
 
-        # mask without street
-        # motion:
-        #   mask:
-        #     - 640,0,640,293,209,0
-        #     - 129,0,98,258,0,253,0,0
-        # mask whole street
         motion:
           mask:
-            - 640,0,640,480,606,480,447,306,291,154,125,0
-            - 138,0,137,134,109,138,102,223,0,225,0,0
+          - 0,64,52,117,159,100,281,94,407,109,640,130,640,0,0,0
         zones:
           door:
-            coordinates: 211,248,230,365,49,444,21,248
+            coordinates: 277,223,351,284,358,366,264,480,126,348
           driveway:
-            coordinates: 287,153,390,250,103,250,110,99
-          yard:
-            coordinates: 239,480,609,480,387,251,207,244
+            coordinates: 265,101,398,112,195,292,108,187
           sideyard:
-            coordinates: 292,150,137,110,129,0
+            coordinates: 251,113,127,181,49,124,128,109
+          yard:
+            coordinates: 351,292,360,366,272,480,640,480,640,134,394,102,278,227
 
         ffmpeg:
           inputs:
@@ -169,9 +157,9 @@ data:
 
         zones:
           driveway:
-            coordinates: 555,480,505,257,505,123,545,122,563,0,382,0,197,181,122,480
+            coordinates: 585,480,583,249,597,226,603,120,609,95,285,85,176,250,122,480
           sideyard:
-            coordinates: 0,423,127,452,203,178,384,0,139,0,0,34
+            coordinates: 0,480,79,480,210,185,276,91,0,112,0,34
 
         ffmpeg:
           inputs:
