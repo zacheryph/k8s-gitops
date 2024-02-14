@@ -3,7 +3,7 @@ name: frigate
 version: 0.0.0
 dependencies:
 - name: app-template
-  version: 1.5.1
+  version: 2.6.0
   repository: https://bjw-s.github.io/helm-charts
 - name: addons
   version: 1.0.0
