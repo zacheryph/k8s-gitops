@@ -1,7 +1,7 @@
 app-template:
   image:
     repository: plexinc/pms-docker
-    tag: 1.32.8.7639-fb6452ebf
+    tag: 1.40.1.8227-c0dd5a73e
   env:
     TZ: America/Chicago
   persistence:
