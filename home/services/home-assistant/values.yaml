@@ -45,7 +45,7 @@ zwavejs2mqtt:
   nameOverride: zwavejs2mqtt
   image:
     repository: zwavejs/zwave-js-ui
-    tag: 9.6.2
+    tag: 9.14.4
   podLabels:
     component: zwavejs2mqtt
   env:
