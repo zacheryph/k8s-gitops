@@ -1,7 +1,7 @@
 app-template:
   image:
     repository: ghcr.io/onedr0p/sonarr
-    tag: 4.0.5.1710
+    tag: 4.0.8.1874
   podSecurityContext:
     runAsUser: 568
     runAsGroup: 568
