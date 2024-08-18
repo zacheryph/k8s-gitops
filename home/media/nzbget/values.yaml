@@ -1,13 +1,15 @@
 app-template:
   image:
-    repository: ghcr.io/onedr0p/nzbget
-    tag: 21.1
+    repository: linuxserver/nzbget
+    tag: version-v24.2
   env:
     TZ: America/Chicago
+    PUID: 568
+    PGID: 568
   podSecurityContext:
-    runAsUser: 568
-    runAsGroup: 568
-    fsGroup: 568
+    runAsUser: 0
+  #   runAsGroup: 568
+  #   fsGroup: 568
   persistence:
     config:
       enabled: true
