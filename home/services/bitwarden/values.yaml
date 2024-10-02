@@ -2,7 +2,7 @@ app-template:
   fullnameOverride: vaultwarden
   image:
     repository: vaultwarden/server
-    tag: 1.30.5
+    tag: 1.32.0
   env:
     ADMIN_TOKEN: <path:kv/data/services/vaultwarden#adminToken>
   persistence:
