@@ -3,7 +3,7 @@ postgresql:
   image:
     registry: docker.io
     repository: bitnami/postgresql
-    tag: 15.3.0
+    tag: 15.8.0
   auth:
     postgresPassword: <path:kv/data/postgresql#photoview>
   persistence:
