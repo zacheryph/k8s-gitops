@@ -1,8 +1,7 @@
 app-template:
   image:
     repository: ghcr.io/blakeblackshear/frigate
-    tag: stable
-    pullPolicy: always
+    tag: 0.14.1
   controller:
     annotations:
       reloader.stakater.com/auto: "true"
