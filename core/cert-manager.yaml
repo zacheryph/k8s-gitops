@@ -1,0 +1,65 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: cert-manager
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: jetstack
+  namespace: cert-manager
+spec:
+  interval: 12h
+  url: https://charts.jetstack.io
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cert-manager
+  namespace: cert-manager
+spec:
+  chart:
+    spec:
+      chart: cert-manager
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: jetstack
+      version: v1.16.1
+  interval: 1h
+  values:
+    crds:
+      enabled: true
+      keep: true
+    dns01RecursiveNameservers: "1.1.1.1:853,9.9.9.9:853"
+    dns01RecursiveNameserversOnly: true
+    prometheus:
+      enabled: false
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+    namespace: cert-manager
+    name: cloudflare-token
+stringData:
+    token: ${CLOUDFLARE_TOKEN}
+---
+apiVersion: cert-manager.io/v1
+kind: ClusterIssuer
+metadata:
+  name: letsencrypt-cloudflare
+spec:
+  acme:
+    email: ${USER_EMAIL}
+    server: https://acme-v02.api.letsencrypt.org/directory
+    privateKeySecretRef:
+      name: acme-account-key
+    solvers:
+    - dns01:
+        cloudflare:
+          email: ${USER_EMAIL}
+          apiTokenSecretRef:
+            name: cloudflare-token
+            key: token
