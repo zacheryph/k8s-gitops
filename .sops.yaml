@@ -1,0 +1,6 @@
+creation_rules:
+- path_regex: config/secrets.yaml
+  encrypted_regex: '^(data|stringData)$'
+  pgp: >-
+    0x98C3A69E6747EA68,
+    0x4B9C178B49228EFD

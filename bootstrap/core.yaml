@@ -11,3 +11,11 @@ spec:
   path: ./core
   interval: 10m0s
   prune: false
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-gpg
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-secrets
