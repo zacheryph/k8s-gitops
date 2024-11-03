@@ -1,0 +1,80 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: minio
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: minio
+  namespace: minio
+spec:
+  interval: 12h
+  url: https://charts.min.io/
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: minio-data
+  namespace: minio
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 128Gi
+  storageClassName: longhorn
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: minio
+  namespace: minio
+spec:
+  chart:
+    spec:
+      chart: minio
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: minio
+      version: 5.3.0
+  interval: 1h
+  values:
+    image:
+      repository: quay.io/minio/minio
+      tag: RELEASE.2024-10-29T16-01-48Z
+    mcImage:
+      repository: quay.io/minio/mc
+      tag: RELEASE.2024-10-29T15-34-59Z
+    mode: standalone
+    persistence:
+      enabled: true
+      existingClaim: minio-data
+    # rootUser: ${MINIO_ROOT_USERNAME}
+    # rootPassword: ${MINIO_ROOT_PASSWORD}
+    resources:
+      requests:
+        memory: 350Mi
+        cpu: 25m
+      limits:
+        memory: 1Gi
+    environment:
+      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL}
+      MINIO_SERVER_URL: ${MINIO_SERVER_URL}
+
+    # buckets, policies, and users
+    buckets:
+    - name: private
+      policy: none
+    - name: family
+      policy: download
+    - name: gitea
+      policy: none
+    policies:
+    - name: gitea
+      statements:
+      - resources:
+        - "arn:aws:s3:::gitea/*"
+        actions:
+        - "s3:*"
