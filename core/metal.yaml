@@ -1,0 +1,30 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: metal-system
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: node-feature-discovery
+  namespace: metal-system
+spec:
+  interval: 12h
+  url: https://kubernetes-sigs.github.io/node-feature-discovery/charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: node-feature-discovery
+  namespace: metal-system
+spec:
+  chart:
+    spec:
+      chart: node-feature-discovery
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: node-feature-discovery
+      version: 0.16.6
+  interval: 1h

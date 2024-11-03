@@ -6,3 +6,4 @@ resources:
 - capacitor.yaml
 - cert-manager.yaml
 - longhorn.yaml
+- metal.yaml
