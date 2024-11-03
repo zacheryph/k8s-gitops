@@ -13,6 +13,15 @@ spec:
   interval: 12h
   url: https://kubernetes-sigs.github.io/node-feature-discovery/charts
 ---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: intel
+  namespace: metal-system
+spec:
+  interval: 12h
+  url: https://intel.github.io/helm-charts/
+---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -27,4 +36,20 @@ spec:
         kind: HelmRepository
         name: node-feature-discovery
       version: 0.16.6
+  interval: 1h
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: intel-plugin-gpu
+  namespace: metal-system
+spec:
+  chart:
+    spec:
+      chart: intel-device-plugins-gpu
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: intel
+      version: 0.31.1
   interval: 1h
