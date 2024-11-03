@@ -31,3 +31,15 @@ spec:
           - feature: kernel.enabledmodule
             matchExpressions:
               xe: {op: Exists}
+---
+apiVersion: deviceplugin.intel.com/v1
+kind: GpuDevicePlugin
+metadata:
+  name: gpu-device-plugin-gpu
+spec:
+  image: intel/intel-gpu-plugin:0.31.1
+  sharedDevNum: 10
+  logLevel: 4
+  enableMonitoring: true
+  nodeSelector:
+    intel.feature.node.kubernetes.io/gpu: "true"
