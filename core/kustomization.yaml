@@ -6,5 +6,6 @@ resources:
 - capacitor.yaml
 - cert-manager.yaml
 - hardware.yaml
+- ingress.yaml
 - longhorn.yaml
 - metallb.yaml

@@ -15,3 +15,7 @@ spec:
     provider: sops
     secretRef:
       name: sops-gpg
+  postBuild:
+    substituteFrom:
+    - kind: Secret
+      name: cluster-secrets
