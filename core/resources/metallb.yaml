@@ -1,0 +1,34 @@
+---
+apiVersion: metallb.io/v1beta1
+kind: IPAddressPool
+metadata:
+  name: services-block
+  namespace: metallb-system
+spec:
+  addresses:
+  - 10.72.48.0/20
+  autoAssign: true
+  avoidBuggyIPs: true
+# ---
+# apiVersion: metallb.io/v1beta2
+# kind: BGPPeer
+# metadata:
+#   name: router
+#   namespace: metallb-system
+# spec:
+#   peerAddress: ${ROUTER_IP}
+#   peerASN: ${ROUTER_ASN}
+#   peerPort: 179
+#   myASN: ${CLUSTER_ASN}
+#   holdTime: 1m30s
+# ---
+# apiVersion: metallb.io/v1beta1
+# kind: BGPAdvertisement
+# metadata:
+#   name: router-bgp
+#   namespace: metallb-system
+# spec:
+#   ipAddressPools:
+#   - services-block
+#   peers:
+#   - router

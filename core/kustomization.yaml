@@ -7,3 +7,4 @@ resources:
 - cert-manager.yaml
 - hardware.yaml
 - longhorn.yaml
+- metallb.yaml
