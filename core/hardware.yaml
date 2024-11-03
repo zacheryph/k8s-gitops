@@ -2,13 +2,13 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: metal-system
+  name: hardware-system
 ---
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
   name: node-feature-discovery
-  namespace: metal-system
+  namespace: hardware-system
 spec:
   interval: 12h
   url: https://kubernetes-sigs.github.io/node-feature-discovery/charts
@@ -17,7 +17,7 @@ apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
   name: intel
-  namespace: metal-system
+  namespace: hardware-system
 spec:
   interval: 12h
   url: https://intel.github.io/helm-charts/
@@ -26,7 +26,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: node-feature-discovery
-  namespace: metal-system
+  namespace: hardware-system
 spec:
   chart:
     spec:
@@ -42,7 +42,7 @@ apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
   name: intel-plugin-gpu
-  namespace: metal-system
+  namespace: hardware-system
 spec:
   chart:
     spec:
