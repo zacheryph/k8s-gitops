@@ -32,3 +32,10 @@ spec:
         name: metallb
       version: 0.14.8
   interval: 1h
+  values:
+    speaker:
+      frr:
+        enabled: true
+        image:
+          repository: quay.io/frrouting/frr
+          tag: 8.5.6
