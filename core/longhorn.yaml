@@ -28,3 +28,12 @@ spec:
         name: longhorn
       version: v1.7.2
   interval: 1h
+  values:
+    persistence:
+      defaultClassReplicaCount: 2
+      defaultDataLocality: best-effort
+      reclaimPolicy: Retain
+      migratable: true
+    defaultDiskSelector:
+      enable: true
+      selector: does-not-exist
