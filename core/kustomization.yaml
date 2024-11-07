@@ -5,6 +5,7 @@ resources:
 - ../config/secrets.yaml
 - capacitor.yaml
 - cert-manager.yaml
+- external-snapshotter.yaml
 - hardware.yaml
 - ingress.yaml
 - longhorn.yaml
