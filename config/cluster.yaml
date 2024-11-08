@@ -1,0 +1,18 @@
+apiVersion: k0sctl.k0sproject.io/v1beta1
+kind: Cluster
+metadata:
+  name: k0s-cluster
+spec:
+  k0s:
+    config:
+      network:
+        kuberouter:
+          ipMasq: true
+  hosts:
+  - hostname: k0s-inwin-03
+    role: controller+worker
+    noTaints: true
+    ssh:
+      address: 10.72.13.13
+      user: root
+      port: 22
