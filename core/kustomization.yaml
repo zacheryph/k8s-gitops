@@ -8,5 +8,6 @@ resources:
 - external-snapshotter.yaml
 - hardware.yaml
 - ingress.yaml
+- k8tz.yaml
 - longhorn.yaml
 - metallb.yaml

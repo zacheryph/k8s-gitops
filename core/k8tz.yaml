@@ -1,0 +1,30 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: k8tz
+  namespace: kube-system
+spec:
+  interval: 12h
+  url: https://k8tz.github.io/k8tz/
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: k8tz
+  namespace: kube-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: k8tz
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: k8tz
+      version: 0.17.1
+
+  values:
+    replicaCount: 2
+    namespace: kube-system
+    timezone: ${CLUSTER_TIMEZONE}
