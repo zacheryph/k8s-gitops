@@ -1,0 +1,104 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: authelia
+  namespace: authelia
+spec:
+  interval: 12h
+  url: https://charts.authelia.com
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: authelia-config
+spec:
+  accessModes: [ReadWriteMany]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 128Mi
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authelia
+  namespace: authelia
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: authelia
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: authelia
+      version: 0.9.9
+
+  values:
+    image:
+      repository: authelia/authelia
+      tag: 4.38.17
+    ingress:
+      enabled: true
+      className: ingress-nginx
+    pod:
+      kind: Deployment
+      replicas: 2
+      extraVolumes:
+      - name: config-volume
+        persistentVolumeClaim:
+          claimName: authelia-config
+      extraVolumeMounts:
+      - name: config-volume
+        mountPath: /config
+    configMap:
+      theme: grey
+      authentication_backend:
+        refresh_interval: '1m'
+        password_reset:
+          disable: false
+        file:
+          enabled: true
+          path: '/config/users.yaml'
+      notifier:
+        disable_startup_check: false
+        smtp:
+          enabled: true
+          address: ${SMTP_ADDRESS}
+          timeout: '5s'
+          username: ${SMTP_USERNAME}
+          password:
+            value: ${SMTP_PASSWORD}
+          sender: "Authelia <authelia@${CLUSTER_EXTERNAL_DOMAIN}>"
+          identifier: 'k0s-cluster.cluster.${CLUSTER_EXTERNAL_DOMAIN}'
+          subject: "[Authelia] {title}"
+          startup_check_address: ${USER_EMAIL}
+          disable_require_tls: false
+          disable_starttls: false
+          disable_html_emails: false
+      session:
+        cookies:
+        - domain: ${CLUSTER_EXTERNAL_DOMAIN}
+          authelia_url: https://${AUTHELIA_INGRESS_HOST}
+        redis:
+          enabled: true
+          host: dragonfly
+          port: 6379
+          timeout: '5s'
+          max_retries: 0
+          database_index: 0
+          maximum_active_connections: 16
+          minimum_idle_connections: 4
+      storage:
+        encryption_key:
+          value: ${AUTHELIA_STORAGE_ENCRYPTION_KEY}
+        postgres:
+          enabled: true
+          address: tcp://postgresql-17-rw.database:5432
+          database: authelia
+          schema: public
+          username: authelia
+          password:
+            value: ${DATABASE_AUTHELIA_PASSWORD}
+          timeout: '5s'
