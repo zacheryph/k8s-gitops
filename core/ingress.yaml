@@ -30,5 +30,7 @@ spec:
   interval: 1h
   values:
     controller:
+      extraArgs:
+        default-ssl-certificate: "ingress-system/default-wildcard-tls"
       service:
         loadBalancerIP: ${LOAD_BALANCER_INGRESS}

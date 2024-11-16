@@ -65,27 +65,15 @@ spec:
     ingress:
       enabled: true
       ingressClassName: nginx
-      annotations:
-        cert-manager.io/cluster-issuer: "letsencrypt-staging"
       path: "/"
       hosts:
       - ${MINIO_INGRESS_HOST}
-      tls:
-      - secretName: minio-ingress-tls
-        hosts:
-        - ${MINIO_INGRESS_HOST}
     consoleIngress:
       enabled: true
       ingressClassName: nginx
-      annotations:
-        cert-manager.io/cluster-issuer: "letsencrypt-staging"
       path: "/"
       hosts:
       - ${MINIO_INGRESS_ADMIN}
-      tls:
-      - secretName: minio-admin-tls
-        hosts:
-        - ${MINIO_INGRESS_ADMIN}
 
     # buckets, policies, and users
     buckets:

@@ -39,18 +39,12 @@ spec:
       ingress:
         enabled: true
         className: nginx
-        annotations:
-          cert-manager.io/cluster-issuer: "letsencrypt-staging"
         hosts:
         - host: ${SIGNOZ_INGRESS_HOST}
           paths:
           - path: /
             pathType: ImplementationSpecific
             port: 3301
-        tls:
-        - secretName: signoz-ingress-tls
-          hosts:
-          - ${SIGNOZ_INGRESS_HOST}
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
