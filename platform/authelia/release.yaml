@@ -80,6 +80,7 @@ spec:
       session:
         cookies:
         - domain: ${CLUSTER_EXTERNAL_DOMAIN}
+          subdomain: auth
           authelia_url: https://${AUTHELIA_INGRESS_HOST}
         redis:
           enabled: true
