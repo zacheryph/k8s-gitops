@@ -54,6 +54,8 @@ spec:
         mountPath: /config
     configMap:
       theme: grey
+      access_control:
+        default_policy: one_factor
       authentication_backend:
         refresh_interval: '1m'
         password_reset:
