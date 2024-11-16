@@ -1,0 +1,29 @@
+---
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: ingress-authelia-authorization
+  annotations:
+    policies.kyverno.io/title: Inject Annotations for Ingress Authelia Authentication
+    policies.kyverno.io/category: Ingress
+    policies.kyverno.io/description: >-
+      This policy injects annotations into Ingress resources
+      to use Authelia for Authentication.
+spec:
+  rules:
+  - name: inject-ingress-nginx-annotations
+    match:
+      any:
+      - resources:
+          kinds: [Ingress]
+          selector:
+            matchLabels:
+              cluster.routine.sh/ingress-auth: "authelia"
+    mutate:
+      patchStrategicMerge:
+        metadata:
+          annotations:
+            +(nginx.ingress.kubernetes.io/auth-method): "GET"
+            +(nginx.ingress.kubernetes.io/auth-url): "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
+            +(nginx.ingress.kubernetes.io/auth-signin): "https://${AUTHELIA_INGRESS_HOST}?rm=$request_method"
+            +(nginx.ingress.kubernetes.io/auth-response-headers): "Remote-User,Remote-Name,Remote-Groups,Remote-Email"

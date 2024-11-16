@@ -5,4 +5,5 @@ namespace: authelia
 resources:
 - dragonfly.yaml
 - namespace.yaml
+- policy.yaml
 - release.yaml
