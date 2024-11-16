@@ -41,7 +41,7 @@ spec:
       tag: 4.38.17
     ingress:
       enabled: true
-      className: ingress-nginx
+      className: nginx
     pod:
       kind: Deployment
       replicas: 2

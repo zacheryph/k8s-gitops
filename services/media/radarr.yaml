@@ -84,7 +84,7 @@ spec:
 
     ingress:
       app:
-        className: ingress-nginx
+        className: nginx
         labels:
           cluster.routine.sh/ingress-auth: authelia
         hosts:
