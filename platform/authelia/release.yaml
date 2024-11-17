@@ -98,7 +98,7 @@ spec:
           value: ${AUTHELIA_STORAGE_ENCRYPTION_KEY}
         postgres:
           enabled: true
-          address: tcp://postgresql-17-rw.database:5432
+          address: tcp://${DATABASE_ADDRESS}
           database: authelia
           schema: public
           username: authelia
