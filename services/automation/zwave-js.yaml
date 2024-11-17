@@ -1,0 +1,85 @@
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &app zwave-js-ui
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.5.1
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    # defaultPodOptions:
+    #   nodeSelector:
+    #     feature.node.kubernetes.io/zwave: "true"
+    controllers:
+      app:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/zwave-js/zwave-js-ui
+              tag: 9.27.2@sha256:ac7e66f98c39fe56b6ddb5d2e9cfced8246f74658278b82f6f60bee15206ae73
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: &port 8091
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            securityContext:
+              privileged: true
+            resources:
+              requests:
+                cpu: 50m
+                memory: 64Mi
+              limits:
+                memory: 256Mi
+    persistence:
+      config:
+        enabled: true
+        accessMode: ReadWriteOnce
+        size: 256Mi
+        storageClass: longhorn
+        globalMounts:
+        - path: /usr/src/app/store
+      # usb:
+      #   type: hostPath
+      #   hostPath: /dev/serial/by-id/usb-0658_0200-if00
+      #   hostPathType: CharDevice
+      #   globalMounts:
+      #     - path: /dev/serial/by-id/usb-0658_0200-if00
+
+    service:
+      app:
+        controller: app
+        ports:
+          http:
+            port: *port
+          websocket:
+            port: 3000
+    ingress:
+      app:
+        className: nginx
+        labels:
+          cluster.routine.sh/ingress-auth: authelia
+        hosts:
+          - host: ${ZWAVE_INGRESS_HOST}
+            paths:
+              - path: /
+                pathType: Prefix
+                service:
+                  identifier: app
+                  port: http
