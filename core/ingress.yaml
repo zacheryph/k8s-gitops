@@ -30,6 +30,7 @@ spec:
   interval: 1h
   values:
     controller:
+      allowSnippetAnnotations: true
       extraArgs:
         default-ssl-certificate: "ingress-system/default-wildcard-tls"
       service:

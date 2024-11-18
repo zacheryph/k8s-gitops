@@ -1,0 +1,114 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/helmrepository_v1.json
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: forgejo
+spec:
+  type: oci
+  interval: 1h
+  url: oci://code.forgejo.org/forgejo-helm
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: forgejo-data
+spec:
+  accessModes: ["ReadWriteOnce"]
+  storageClassName: longhorn
+  resources:
+    requests:
+      storage: 16Gi
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &name forgejo
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: forgejo
+      version: 10.1.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: forgejo
+
+  values:
+    redis-cluster:
+      enabled: false
+    postgresql-ha:
+      enabled: false
+    postgresql:
+      enabled: false
+
+    persistence:
+      enabled: true
+      create: false
+      claimName: forgejo-data
+
+    replicaCount: 1
+    strategy:
+      type: Recreate
+    resources:
+      requests:
+        cpu: 100m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+    gitea:
+      admin:
+        email: ${USER_EMAIL}
+        username: ${USER_USERNAME}
+        password: ${SERVICES_INIT_PASSWORD}
+        passwordMode: initialOnlyNoReset
+      config:
+        database:
+          DB_TYPE: postgres
+          HOST: ${DATABASE_HOSTNAME}
+          NAME: forgejo
+          USER: forgejo
+          PASSWD: ${DATABASE_FORGEJO_PASSWORD}
+          SCHEMA: public
+        cache:
+          ADAPTER: memory
+        session:
+          PROVIDER: memory
+          COOKIE_SECURE: true
+          SAME_SITE: strict
+        server:
+          DOMAIN: ${FORGEJO_INGRESS_HOST}
+          ROOT_URL: https://${FORGEJO_INGRESS_HOST}
+        mailer:
+          ENABLED: true
+          FROM: "Forgejo <forgejo@${CLUSTER_EXTERNAL_DOMAIN}>"
+          PROTOCOL: smtp+starttls
+          SMTP_ADDR: ${SMTP_HOSTNAME}
+          SMTP_PORT: ${SMTP_PORT}
+          USER: ${SMTP_USERNAME}
+          PASSWD: ${SMTP_PASSWORD}
+        migrations:
+          ALLOWED_DOMAINS: 'github.com,*.github.com,gitlab.com,*.gitlab.com'
+        repository:
+          DEFAULT_PRIVATE: private
+        storage:
+          STORAGE_TYPE: local
+    ingress:
+      enabled: true
+      className: nginx
+      annotations:
+        nginx.ingress.kubernetes.io/custom-http-errors: "502,503"
+        nginx.ingress.kubernetes.io/proxy-body-size: "1000m"
+        # nginx.ingress.kubernetes.io/server-snippet: |
+        #   # Do not expose metrics to the outside.
+        #   location = /metrics {
+        #     return 404;
+        #   }
+      hosts:
+        - host: ${FORGEJO_INGRESS_HOST}
+          paths:
+            - path: /
+              pathType: Prefix

@@ -81,12 +81,16 @@ spec:
       policy: none
     - name: family
       policy: download
-    - name: gitea
+    - name: forgejo
       policy: none
     policies:
-    - name: gitea
+    - name: forgejo
       statements:
       - resources:
-        - "arn:aws:s3:::gitea/*"
+        - "arn:aws:s3:::forgejo/*"
         actions:
         - "s3:*"
+    users:
+    - accessKey: ${MINIO_FORGEJO_ACCESS_KEY}
+      secretKey: ${MINIO_FORGEJO_SECRET_KEY}
+      policy: forgejo
