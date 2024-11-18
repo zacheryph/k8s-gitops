@@ -4,6 +4,7 @@ kind: Kustomization
 namespace: media
 resources:
 - namespace.yaml
+- plex.yaml
 - sonarr.yaml
 - radarr.yaml
-- volumes/media-pool.yaml
+- volumes-shared.yaml
