@@ -98,5 +98,5 @@ spec:
     persistence:
       config:
         existingClaim: radarr-config
-      # media:
-      #   existingClaim: media-pool
+      media:
+        existingClaim: media-pool

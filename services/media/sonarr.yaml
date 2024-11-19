@@ -98,5 +98,5 @@ spec:
     persistence:
       config:
         existingClaim: sonarr-config
-      # media:
-      #   existingClaim: media-pool
+      media:
+        existingClaim: media-pool
