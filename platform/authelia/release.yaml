@@ -44,7 +44,7 @@ spec:
       className: nginx
     pod:
       kind: Deployment
-      replicas: 2
+      replicas: 1
       extraVolumes:
       - name: config-volume
         persistentVolumeClaim:
