@@ -7,4 +7,5 @@ resources:
 - plex.yaml
 - sonarr.yaml
 - radarr.yaml
+- sabnzbd.yaml
 - volumes-shared.yaml
