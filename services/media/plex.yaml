@@ -33,7 +33,6 @@ spec:
         runAsUser: 568
         runAsGroup: 568
         fsGroup: 568
-        fsGroupChangePolicy: OnRootMismatch
       nodeSelector:
         intel.feature.node.kubernetes.io/gpu: "true"
     controllers:
@@ -41,18 +40,15 @@ spec:
         containers:
           app:
             image:
-              repository: plexinc/pms-docker
-              tag: 1.41.2.9200-c6bbc1b53
+              repository: ghcr.io/onedr0p/plex
+              tag: 1.41.2.9200-c6bbc1b53@sha256:47c6f3d85f4e739210860934a0bb24126170fa2f6a602fb909467f17a035c311
     persistence:
       config:
         enabled: true
         existingClaim: plex-config
-      data:
+      media:
         enabled: true
         existingClaim: media-pool
-        globalMounts:
-        - path: /data
-          readOnly: true
     service:
       app:
         controller: plex
