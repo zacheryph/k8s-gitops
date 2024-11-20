@@ -16,9 +16,9 @@ spec:
         namespace: flux-system
 
   values:
-    # defaultPodOptions:
-    #   nodeSelector:
-    #     feature.node.kubernetes.io/zwave: "true"
+    defaultPodOptions:
+      nodeSelector:
+        feature.node.kubernetes.io/zwave: "true"
     controllers:
       app:
         containers:
@@ -55,12 +55,12 @@ spec:
         storageClass: longhorn
         globalMounts:
         - path: /usr/src/app/store
-      # usb:
-      #   type: hostPath
-      #   hostPath: /dev/serial/by-id/usb-0658_0200-if00
-      #   hostPathType: CharDevice
-      #   globalMounts:
-      #     - path: /dev/serial/by-id/usb-0658_0200-if00
+      usb:
+        type: hostPath
+        hostPath: /dev/serial/by-id/usb-0658_0200-if00
+        hostPathType: CharDevice
+        globalMounts:
+        - path: /dev/serial/by-id/usb-0658_0200-if00
 
     service:
       app:
