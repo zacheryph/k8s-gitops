@@ -50,15 +50,15 @@ spec:
           http:
             port: 8123
     ingress:
-    app:
-      className: "nginx"
-      hosts:
-      - host: ${HOME_ASSISTANT_INGRESS_HOST}
-        paths:
-          - path: /
-            service:
-              identifier: app
-              port: http
+      app:
+        className: "nginx"
+        hosts:
+        - host: ${HOME_ASSISTANT_INGRESS_HOST}
+          paths:
+            - path: /
+              service:
+                identifier: app
+                port: http
     persistence:
       config:
         existingClaim: home-assistant-config
