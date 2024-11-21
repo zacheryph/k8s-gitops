@@ -63,7 +63,7 @@ spec:
           subjects:
             - kind: ServiceAccount
               name: dragonfly-operator
-              namespace: database
+              namespace: operators-system
     controllers:
       dragonfly-operator:
         replicas: 1
