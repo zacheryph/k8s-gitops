@@ -49,6 +49,9 @@ spec:
       media:
         enabled: true
         existingClaim: media-pool
+      transcode:
+        enabled: true
+        type: emptyDir
     service:
       app:
         controller: plex
