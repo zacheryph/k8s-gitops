@@ -1,0 +1,117 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: unifi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: unifi-data
+  namespace: unifi
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 4Gi
+  storageClassName: longhorn
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &name unifi-controller
+  namespace: unifi
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: app-template
+      version: 3.5.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    controllers:
+      app:
+        containers:
+          app:
+            image:
+              repository: jacobalberty/unifi
+              tag: v8.6.9@sha256:b8eb551cc0aa61666357aab0078bba15fec557c81ba83284c2c9bfc217d6a529
+              pullPolicy: IfNotPresent
+            env:
+              RUNAS_UID0: "false"
+              UNIFI_UID: "999"
+              UNIFI_GID: "999"
+              UNIFI_STDOUT: "true"
+              JVM_INIT_HEAP_SIZE:
+              JVM_MAX_HEAP_SIZE: 1024M
+            resources:
+              requests:
+                cpu: 50m
+                memory: 2Gi
+              limits:
+                cpu: 1
+                memory: 4Gi
+
+    service:
+      app:
+        controller: app
+        type: LoadBalancer
+        externalTrafficPolicy: Local
+        loadBalancerIP: ${LOAD_BALANCER_UNIFI}
+        ports:
+          http:
+            port: 8443
+            protocol: HTTPS
+          controller:
+            enabled: true
+            port: 8080
+            protocol: TCP
+          portal-http:
+            enabled: false
+            port: 8880
+            protocol: HTTP
+          portal-https:
+            enabled: false
+            port: 8843
+            protocol: HTTPS
+          speedtest:
+            enabled: true
+            port: 6789
+            protocol: TCP
+          stun:
+            enabled: true
+            port: 3478
+            protocol: UDP
+          syslog:
+            enabled: true
+            port: 5514
+            protocol: UDP
+          discovery:
+            enabled: true
+            port: 10001
+            protocol: UDP
+    ingress:
+      app:
+        className: nginx
+        hosts:
+        - host: &host "${UNIFI_INGRESS_HOST}"
+          paths:
+          - path: /
+            service:
+              identifier: app
+              port: http
+        tls:
+        - hosts: [*host]
+
+    persistence:
+      config:
+        enabled: true
+        existingClaim: unifi-data
+        globalMounts:
+        - path: /unifi
