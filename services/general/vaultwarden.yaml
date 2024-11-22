@@ -29,7 +29,7 @@ spec:
           app:
             image:
               repository: ghcr.io/dani-garcia/vaultwarden
-              tag: 1.32.4-alpine
+              tag: 1.32.5-alpine@sha256:76d46d32ba4120b022e0a69487f9fd79fc52e2765b1650c5c51a5dd912a3c288
             env:
               ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
               DOMAIN: https://${VAULTWARDEN_INGRESS_HOST}
