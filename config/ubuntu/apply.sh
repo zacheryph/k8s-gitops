@@ -23,6 +23,10 @@ apt update
 apt upgrade --yes
 apt install --yes nfs-common
 
+# Disable Multipathd
+echo "** Disabling Multipathd"
+systemctl stop multipathd.service
+systemctl disable multipathd.service
 
 # Reboot =)
 echo "** Rebooting"
