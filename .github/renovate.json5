@@ -55,19 +55,19 @@
     {
       description: ["Loose versioning for non-semver packages"],
       matchDatasources: ["docker"],
-      matchPackagePatterns: ["plex"],
+      matchPackageNames: ["/plex/"],
       versioning: "loose",
     },
     {
       "description": ["Custom versioning for minio"],
       "matchDatasources": ["docker"],
-      "matchPackagePatterns": ["minio"],
+      "matchPackageNames": ["/minio/"],
       "versioning": "regex:^RELEASE\\.(?<major>\\d+)-(?<minor>\\d+)-(?<patch>\\d+)T.*Z$"
     },
     {
       "description": ["Custom schedule for frequently updated packages"],
       "matchDatasources": ["docker", "helm"],
-      "matchPackagePatterns": ["minio", "postgresql", "reloader"],
+      "matchPackageNames": ["/minio/", "/postgresql/", "/reloader/"],
       "schedule": ["on the first day of the month"]
     },
   ],
