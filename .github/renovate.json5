@@ -17,6 +17,14 @@
   ignorePaths: ["config/**"],
   rebaseWhen: "conflicted",
 
+  // Don't [try to] pin these digests, You'll fail
+  pinDigest: {
+    ignorePaths: [
+      "bootstrap/flux-system/**",
+      "services/development/forgejo.yaml",
+    ]
+  },
+
   flux: {
     fileMatch: ["(bootstrap|core|platform|services)/.+\\.yaml$"],
   },
