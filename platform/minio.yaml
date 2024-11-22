@@ -46,7 +46,7 @@ spec:
       tag: RELEASE.2024-10-29T16-01-48Z
     mcImage:
       repository: quay.io/minio/mc
-      tag: RELEASE.2024-10-29T15-34-59Z
+      tag: RELEASE.2024-11-17T19-35-25Z@sha256:8f94d208188dcd04bbaa51b54578bb43ea2a663626ca59889c07d4fb8ae9546d
     mode: standalone
     persistence:
       enabled: true
