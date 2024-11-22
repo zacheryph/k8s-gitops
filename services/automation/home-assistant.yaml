@@ -33,7 +33,7 @@ spec:
           app:
             image:
               repository: homeassistant/home-assistant
-              tag: 2024.11.2
+              tag: 2024.11.3@sha256:988ae0f8bab0620d7e9abdcf07f8a8f6d88f5ae301749e61e6cf00aaed13a19b
             env:
               DATABASE_URL: postgresql://home_assistant:${DATABASE_HOME_ASSISTANT_PASSWORD}@${DATABASE_ADDRESS}/home_assistant
             resources:
