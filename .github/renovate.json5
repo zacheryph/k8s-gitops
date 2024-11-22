@@ -1,74 +1,107 @@
 {
-  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: [
-    "config:recommended",
-    ":dependencyDashboard",
-    ":enableRenovate",
-    ":renovatePrefix",
-    ":semanticCommits",
-    ":separateMajorReleases",
-    ":separateMultipleMajorReleases",
-    ":timezone(America/Chicago)",
-    "docker:pinDigests",
-    "helpers:pinGitHubActionDigests",
-    "replacements:k8s-registry-move",
+    'config:recommended',
+    ':dependencyDashboard',
+    ':enableRenovate',
+    ':renovatePrefix',
+    ':semanticCommits',
+    ':separateMajorReleases',
+    ':separateMultipleMajorReleases',
+    ':timezone(America/Chicago)',
+    'docker:pinDigests',
+    'helpers:pinGitHubActionDigests',
+    'replacements:k8s-registry-move',
   ],
-  dependencyDashboardTitle: "🤖 Renovate Dashboard",
-  ignorePaths: ["config/**"],
-  rebaseWhen: "conflicted",
-
+  dependencyDashboardTitle: '🤖 Renovate Dashboard',
+  ignorePaths: [
+    'config/**',
+  ],
+  rebaseWhen: 'conflicted',
   flux: {
-    fileMatch: ["(bootstrap|core|platform|services)/.+\\.yaml$"],
+    fileMatch: [
+      '(bootstrap|core|platform|services)/.+\\.yaml$',
+    ],
   },
-  "helm-values": {
-    fileMatch: ["(bootstrap|core|platform|services)/.+\\.yaml$"],
+  'helm-values': {
+    fileMatch: [
+      '(bootstrap|core|platform|services)/.+\\.yaml$',
+    ],
   },
   kubernetes: {
-    fileMatch: ["(bootstrap|core|platform|services)/.+\\.yaml$"],
+    fileMatch: [
+      '(bootstrap|core|platform|services)/.+\\.yaml$',
+    ],
   },
-
   customManagers: [
     {
-      customType: "regex",
-      description: "Process GitHub download dependencies in YAML files",
-      fileMatch: ["\\.yaml$"],
-      matchStrings: [
-        // https://github.com/rancher/system-upgrade-controller/releases/download/v0.13.2/crd.yaml
-        "https:\\/\\/github.com\\/(?<depName>\\S+?\\/\\S+?)\\/releases\\/download\\/(?<currentValue>(v|\\d)\\S+?)\\/\\S+",
-        // https://raw.githubusercontent.com/external-secrets/external-secrets/v0.9.11/docs/snippets/dashboard.json
-        "https:\\/\\/raw.githubusercontent.com\\/(?<depName>\\S+?\\/\\S+?)\\/(?<currentValue>(v|\\d)\\S+?)\\/\\S+",
+      customType: 'regex',
+      description: 'Process GitHub download dependencies in YAML files',
+      fileMatch: [
+        '\\.yaml$',
       ],
-      datasourceTemplate: "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
-      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
-      // extractVersionTemplate: "{{#if extractVersion}}{{{extractVersion}}}{{else}}^v?(?<version>.*)${{/if}}",
+      matchStrings: [
+        'https:\\/\\/github.com\\/(?<depName>\\S+?\\/\\S+?)\\/releases\\/download\\/(?<currentValue>(v|\\d)\\S+?)\\/\\S+',
+        'https:\\/\\/raw.githubusercontent.com\\/(?<depName>\\S+?\\/\\S+?)\\/(?<currentValue>(v|\\d)\\S+?)\\/\\S+',
+      ],
+      datasourceTemplate: '{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}',
+      versioningTemplate: '{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}',
     },
   ],
-
   packageRules: [
     {
-      matchManagers: ["github-actions"],
+      matchManagers: [
+        'github-actions',
+      ],
       automerge: true,
-      automergeType: "branch",
-      matchUpdateTypes: ["minor", "patch", "digest"],
+      automergeType: 'branch',
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+        'digest',
+      ],
       ignoreTests: true,
     },
     {
-      description: ["Loose versioning for non-semver packages"],
-      matchDatasources: ["docker"],
-      matchPackagePatterns: ["plex"],
-      versioning: "loose",
+      description: [
+        'Loose versioning for non-semver packages',
+      ],
+      matchDatasources: [
+        'docker',
+      ],
+      versioning: 'loose',
+      matchPackageNames: [
+        '/plex/',
+      ],
     },
     {
-      "description": ["Custom versioning for minio"],
-      "matchDatasources": ["docker"],
-      "matchPackagePatterns": ["minio"],
-      "versioning": "regex:^RELEASE\\.(?<major>\\d+)-(?<minor>\\d+)-(?<patch>\\d+)T.*Z$"
+      description: [
+        'Custom versioning for minio',
+      ],
+      matchDatasources: [
+        'docker',
+      ],
+      versioning: 'regex:^RELEASE\\.(?<major>\\d+)-(?<minor>\\d+)-(?<patch>\\d+)T.*Z$',
+      matchPackageNames: [
+        '/minio/',
+      ],
     },
     {
-      "description": ["Custom schedule for frequently updated packages"],
-      "matchDatasources": ["docker", "helm"],
-      "matchPackagePatterns": ["minio", "postgresql", "reloader"],
-      "schedule": ["on the first day of the month"]
+      description: [
+        'Custom schedule for frequently updated packages',
+      ],
+      matchDatasources: [
+        'docker',
+        'helm',
+      ],
+      schedule: [
+        'on the first day of the month',
+      ],
+      matchPackageNames: [
+        '/minio/',
+        '/postgresql/',
+        '/reloader/',
+      ],
     },
   ],
 }
