@@ -79,12 +79,14 @@ spec:
 
     # buckets, policies, and users
     buckets:
-    - name: private
-      policy: none
     - name: family
       policy: download
     - name: forgejo
       policy: none
+    - name: private
+      policy: none
+    - name: public
+      policy: download
     policies:
     - name: forgejo
       statements:
