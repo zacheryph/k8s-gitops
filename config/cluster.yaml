@@ -1,7 +1,7 @@
 apiVersion: k0sctl.k0sproject.io/v1beta1
 kind: Cluster
 metadata:
-  name: k0s-cluster
+  name: k0s-inwin
 spec:
   k0s:
     config:
@@ -9,6 +9,20 @@ spec:
         kuberouter:
           ipMasq: true
   hosts:
+  - hostname: k0s-inwin-01
+    role: controller+worker
+    noTaints: true
+    ssh:
+      address: 10.72.13.11
+      user: root
+      port: 22
+  - hostname: k0s-inwin-02
+    role: controller+worker
+    noTaints: true
+    ssh:
+      address: 10.72.13.12
+      user: root
+      port: 22
   - hostname: k0s-inwin-03
     role: controller+worker
     noTaints: true
