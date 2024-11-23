@@ -5,3 +5,4 @@ namespace: database
 resources:
 - namespace.yaml
 - postgresql-17.yaml
+- redpanda.yaml
