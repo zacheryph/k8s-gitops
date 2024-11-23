@@ -1,0 +1,118 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: redpanda
+spec:
+  interval: 12h
+  url: https://charts.redpanda.com
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redpanda-superusers
+stringData:
+  superusers.txt: |
+    context:${REDPANDA_SUPERUSER_PASSWORD}
+    console:${REDPANDA_CONSOLE_PASSWORD}
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: redpanda-console-config
+stringData:
+  KAFKA_BROKERS: redpanda:9093
+  KAFKA_SASL_ENABLED: "true"
+  KAFKA_SASL_MECHANISM: SCRAM-SHA-512
+  KAFKA_SASL_USERNAME: console
+  KAFKA_SASL_PASSWORD: ${REDPANDA_CONSOLE_PASSWORD}
+  KAFKA_TLS_ENABLED: "false"
+  REDPANDA_ADMINAPI_ENABLED: "true"
+  REDPANDA_ADMINAPI_URLS: http://redpanda:9644
+  REDPANDA_ADMINAPI_USERNAME: console
+  REDPANDA_ADMINAPI_PASSWORD: ${REDPANDA_CONSOLE_PASSWORD}
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: redpanda
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: redpanda
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: redpanda
+      version: 5.9.12
+
+  values:
+    console:
+      enabled: false
+    auth:
+      sasl:
+        enabled: true
+        mechanism: SCRAM-SHA-512
+        secretRef: redpanda-superusers
+    tls:
+      enabled: false
+    image:
+      registry: docker.redpanda.com
+      repository: redpandadata/redpanda
+      tag: v24.2.11@sha256:e51aa0f712861f8d4fc8e37ec5685ef96167434bb687e5ff6907e0b4994c2ce4
+    storage:
+      enabled: true
+      persistentVolume:
+        storageClass: longhorn
+        size: 8Gi
+    statefulset:
+      replicas: 3
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: redpanda-console
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: console
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: redpanda
+      version: 0.7.30
+
+  values:
+    image:
+      registry: docker.redpanda.com
+      repository: redpandadata/console
+      tag: v2.7.2
+    extraEnvFrom:
+    - secretRef:
+        name: redpanda-console-config
+    resources:
+      limits:
+        cpu: 100m
+        memory: 128Mi
+    # extraVolumes:
+    # - name: redpanda-certs
+    #   secret:
+    #     secretName: redpanda-external-cert
+    # extraVolumeMounts:
+    # - name: redpanda-certs
+    #   mountPath: /etc/kafka/certs
+    #   readOnly: true
+    ingress:
+      enabled: true
+      className: nginx
+      hosts:
+      - host: ${REDPANDA_CONSOLE_INGRESS_HOST}
+        paths:
+        - path: /
+          pathType: ImplementationSpecific
+    # this is for the ingress but gets set on everything.
+    # luckily our kyverno policy only looks at Ingresses.
+    commonLabels:
+      cluster.routine.sh/ingress-auth: authelia
