@@ -44,5 +44,5 @@ spec:
     ingress:
       dashboard:
         enabled: true
-        hosts:
-        - ${EMQX_INGRESS_HOST}
+        ingressClassName: nginx
+        hosts: ["${EMQX_INGRESS_HOST}"]
