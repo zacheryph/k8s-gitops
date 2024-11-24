@@ -1,0 +1,48 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: emqx
+spec:
+  interval: 12h
+  url: https://repos.emqx.io/charts
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: emqx
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: emqx
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: emqx
+      version: 5.8.2
+
+  values:
+    replicaCount: 3
+    recreatePods: true
+    persistence:
+      enabled: true
+      storageClass: longhorn
+      size: 1Gi
+    resources:
+      requests:
+        cpu: 20m
+      limits:
+        cpu: 1
+        memory: 1Gi
+    emqxConfig:
+      EMQX_ALLOW_ANONYMOUS: "true"
+      EMQX_LOADED_MODULES: "emqx_mod_presence,emqx_mod_acl_internal,emqx_mod_topic_metrics"
+      EMQX_LOADED_PLUGINS: "emqx_management,emqx_recon,emqx_retainer,emqx_dashboard,emqx_rule_engine,emqx_auth_mnesia,emqx_prometheus"
+      EMQX_CLUSTER__DISCOVERY_STRATEGY: k8s
+      EMQX_DASHBOARD__DEFAULT_PASSWORD: ${SERVICES_INIT_PASSWORD}
+    ingress:
+      dashboard:
+        enabled: true
+        hosts:
+        - ${EMQX_INGRESS_HOST}
