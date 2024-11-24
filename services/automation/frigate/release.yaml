@@ -1,0 +1,105 @@
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: frigate-data
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 4Gi
+  storageClassName: longhorn
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &name frigate
+spec:
+  interval: 30m
+  chart:
+    spec:
+      chart: app-template
+      version: 3.5.1
+      interval: 30m
+      sourceRef:
+        kind: HelmRepository
+        name: bjw-s
+        namespace: flux-system
+
+  values:
+    defaultPodOptions:
+      nodeSelector:
+        intel.feature.node.kubernetes.io/gpu: "true"
+    controllers:
+      app:
+        type: statefulset
+        containers:
+          main:
+            image:
+              repository: ghcr.io/blakeblackshear/frigate
+              tag: 0.14.1@sha256:22e3d0b486df52c3d669682254c2b1bf4205fa6ad8bd8f8c9f7fe76b1517005d
+            env:
+              LIBVA_DRIVER_NAME: i965
+            securityContext:
+              privileged: true
+            resources:
+              requests:
+                cpu: 100m
+                memory: 250Mi
+              limits:
+                gpu.intel.com/i915: 1
+                memory: 4Gi
+            probes:
+              liveness:
+                enabled: false
+              readiness:
+                enabled: false
+              startup:
+                enabled: false
+    persistence:
+      config-file:
+        type: secret
+        name: frigate-config
+        globalMounts:
+          - path: /config/config.yaml
+            subPath: config.yaml
+            readOnly: true
+      cache:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 6Gi
+        globalMounts:
+          - path: /dev/shm
+      data:
+        existingClaim: frigate-data
+      media:
+        type: nfs
+        server: ${NAS_ADDRESS}
+        path: /volume1/Frigate
+        globalMounts:
+        - path: /media/frigate
+    service:
+      app:
+        controller: app
+        ports:
+          http:
+            port: &port 5000
+          go2rtc:
+            enabled: true
+            port: &api-port 1984
+          rtsp:
+            enabled: true
+            port: &restream-port 8554
+    ingress:
+      app:
+        className: nginx
+        labels:
+          cluster.routine.sh/ingress-auth: authelia
+        hosts:
+          - host: ${FRIGATE_INGRESS_HOST}
+            paths:
+              - path: /
+                service:
+                  identifier: app
+                  port: http
