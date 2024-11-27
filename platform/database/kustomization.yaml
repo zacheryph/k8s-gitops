@@ -6,4 +6,3 @@ resources:
 - emqx.yaml
 - namespace.yaml
 - postgresql-17.yaml
-- redpanda.yaml
