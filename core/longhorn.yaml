@@ -37,3 +37,9 @@ spec:
     defaultDiskSelector:
       enable: true
       selector: does-not-exist
+    ingress:
+      enabled: true
+      ingressClassName: nginx
+      host: ${LONGHORN_INGRESS_HOST}
+      annotations:
+        cluster.routine.sh/ingress-auth: "authelia"
