@@ -60,7 +60,7 @@ spec:
     image:
       registry: docker.redpanda.com
       repository: redpandadata/redpanda
-      tag: v24.2.11@sha256:e51aa0f712861f8d4fc8e37ec5685ef96167434bb687e5ff6907e0b4994c2ce4
+      tag: v24.2.12@sha256:81aff65722c9da3245ef6e147af7478eee23b124b308d4e4c9e6033e33dc5ae3
     storage:
       enabled: true
       persistentVolume:
