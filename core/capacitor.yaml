@@ -8,7 +8,7 @@ spec:
   interval: 12h
   url: oci://ghcr.io/gimlet-io/capacitor-manifests
   ref:
-    tag: "v0.4.8"
+    tag: "v0.4.8@sha256:1efcb443eb84e5551804d5693a0085bf60f271afbbb026e0042dc9ef5237a855"
 ---
 apiVersion: kustomize.toolkit.fluxcd.io/v1
 kind: Kustomization
