@@ -3,11 +3,6 @@ kind: Cluster
 metadata:
   name: k0s-inwin
 spec:
-  k0s:
-    config:
-      network:
-        kuberouter:
-          ipMasq: true
   hosts:
   - hostname: k0s-inwin-01
     role: controller+worker
@@ -30,3 +25,14 @@ spec:
       address: 10.72.13.13
       user: root
       port: 22
+  k0s:
+    config:
+      apiVersion: k0s.k0sproject.io/v1beta1
+      kind: ClusterConfig
+      metadata:
+        name: k0s-inwin
+      spec:
+        network:
+          nodeLocalLoadBalancing:
+            enabled: true
+            type: EnvoyProxy
