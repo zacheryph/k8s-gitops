@@ -80,6 +80,9 @@ spec:
           disable_starttls: false
           disable_html_emails: false
       session:
+        inactivity: "1h"
+        expiration: "6h"
+        remember_me: "3M"
         cookies:
         - domain: ${CLUSTER_EXTERNAL_DOMAIN}
           subdomain: auth
