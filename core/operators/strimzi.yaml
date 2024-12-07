@@ -27,6 +27,7 @@ spec:
     replicas: 1
     watchNamespaces: [database]
     tmpDirSizeLimit: 128Mi
+    generateNetworkPolicy: false
     resources:
       requests:
         cpu: 50m
