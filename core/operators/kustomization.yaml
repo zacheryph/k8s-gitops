@@ -7,3 +7,4 @@ resources:
 - cloudnative-pg.yaml
 - dragonfly.yaml
 - namespace.yaml
+- strimzi.yaml
