@@ -21,6 +21,7 @@
   pinDigest: {
     ignorePaths: [
       "bootstrap/flux-system/**",
+      "core/resources/hardware.yaml",
       "services/development/forgejo.yaml",
     ]
   },
