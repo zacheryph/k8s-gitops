@@ -5,7 +5,6 @@ resources:
 - ../config/secrets.yaml
 - operators
 - repositories
-- capacitor.yaml
 - cert-manager.yaml
 - external-snapshotter.yaml
 - hardware.yaml
