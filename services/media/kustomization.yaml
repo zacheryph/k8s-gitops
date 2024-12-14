@@ -9,3 +9,4 @@ resources:
 - radarr.yaml
 - sabnzbd.yaml
 - sonarr.yaml
+- sonarr-anime.yaml
