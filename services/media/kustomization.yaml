@@ -5,6 +5,7 @@ namespace: media
 resources:
 - media-pool.yaml
 - namespace.yaml
+- ersatztv.yaml
 - plex.yaml
 - radarr.yaml
 - sabnzbd.yaml
