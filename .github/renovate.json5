@@ -70,7 +70,7 @@
     {
       "description": ["Custom versioning for minio"],
       "matchDatasources": ["docker"],
-      "matchPackageNames": ["/minio/"],
+      "matchPackageNames": ["/minio/", "/mc/"],
       "versioning": "regex:^RELEASE\\.(?<major>\\d+)-(?<minor>\\d+)-(?<patch>\\d+)T.*Z$"
     },
     {
@@ -78,6 +78,12 @@
       "matchDatasources": ["docker", "helm"],
       "matchPackageNames": ["/minio/", "/postgresql/", "/reloader/"],
       "schedule": ["on the first day of the month"]
+    },
+    {
+      "description": ["Update Minio and MC Images in the same PR"],
+      "matchDatasources": ["docker"],
+      "matchPackageNames": ["minio", "mc"],
+      "groupName": "Minio"
     },
   ],
 }
