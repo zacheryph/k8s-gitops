@@ -17,15 +17,6 @@
   ignorePaths: ["config/**"],
   rebaseWhen: "conflicted",
 
-  // Don't [try to] pin these digests, You'll fail
-  pinDigest: {
-    ignorePaths: [
-      "bootstrap/flux-system/**",
-      "core/resources/hardware.yaml",
-      "services/development/forgejo.yaml",
-    ]
-  },
-
   flux: {
     fileMatch: ["(bootstrap|core|platform|services)/.+\\.yaml$"],
   },
@@ -55,6 +46,7 @@
 
   packageRules: [
     {
+      description: ["Auto-merge updates to github-action packages"],
       matchManagers: ["github-actions"],
       automerge: true,
       automergeType: "branch",
@@ -85,5 +77,18 @@
       "matchPackageNames": ["minio", "mc"],
       "groupName": "Minio"
     },
+    {
+      // pinning these breaks stuff.
+      // - flux-system: i don't quite know, but it just breaks renovate?
+      // - resource/hardware#intel-gpu-plugin: operator does not support digesting
+      // - development/forgejo: pinning the oci helm repository does not work
+      "description": ["Do not attempt to pinDigest files that cause issues"],
+      "pinDigests": false,
+      "matchFiles": [
+        "bootstrap/flux-system/**",
+        "core/resources/hardware.yaml",
+        "services/development/forgejo.yaml",
+      ]
+    }
   ],
 }
