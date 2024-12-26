@@ -1,40 +1,40 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/helmrepository_v1.json
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: GitRepository
+kind: HelmRepository
 metadata:
-  name: external-snapshotter
-  namespace: kube-system
+  name: piraeus
+  namespace: flux-system
 spec:
-  interval: 12h
-  url: https://github.com/kubernetes-csi/external-snapshotter
-  ref:
-    tag: v8.2.0
+  interval: 2h
+  url: https://piraeus.io/helm-charts/
 ---
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
 metadata:
-  name: external-snapshotter-crd
+  name: snapshot-controller
   namespace: kube-system
 spec:
   interval: 1h
-  path: /client/config/crd
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: external-snapshotter
----
-apiVersion: kustomize.toolkit.fluxcd.io/v1
-kind: Kustomization
-metadata:
-  name: external-snapshotter-csi-snapshotter
-  namespace: kube-system
-spec:
-  interval: 1h
-  dependsOn:
-  - name: external-snapshotter-crd
-  targetNamespace: kube-system
-  path: /deploy/kubernetes/csi-snapshotter
-  prune: true
-  sourceRef:
-    kind: GitRepository
-    name: external-snapshotter
+  chart:
+    spec:
+      chart: snapshot-controller
+      version: 4.0.0
+      sourceRef:
+        kind: HelmRepository
+        name: piraeus
+        namespace: flux-system
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    crds: CreateReplace
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    controller:
+      replicaCount: 1
