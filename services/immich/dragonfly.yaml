@@ -1,0 +1,15 @@
+---
+# yaml-language-server: $schema=https://kochhaus-schemas.pages.dev/dragonflydb.io/dragonfly_v1alpha1.json
+apiVersion: dragonflydb.io/v1alpha1
+kind: Dragonfly
+metadata:
+  name: dragonfly
+spec:
+  image: ghcr.io/dragonflydb/dragonfly:v1.25.6@sha256:94a8a5aabffe5e871b7442a998b0170e15702d47c639ab42ded61c2291d6cfc2
+  replicas: 1
+  args:
+  - "--default_lua_flags=allow-undeclared-keys"
+  resources:
+    limits:
+      cpu: 100m
+      memory: 384Mi
