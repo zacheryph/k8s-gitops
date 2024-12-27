@@ -13,3 +13,4 @@ resources:
 - kyverno.yaml
 - longhorn.yaml
 - metallb.yaml
+- weave-gitops.yaml
