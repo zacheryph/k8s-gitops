@@ -41,5 +41,10 @@ spec:
       enabled: true
       ingressClassName: nginx
       host: ${LONGHORN_INGRESS_HOST}
-      labels:
-        cluster.routine.sh/ingress-auth: "authelia"
+      annotations:
+        # the longhorn helm chart does not allow setting
+        # ingress labels, or... ANY labels for that matter...
+        nginx.ingress.kubernetes.io/auth-method: "GET"
+        nginx.ingress.kubernetes.io/auth-url: "http://authelia.authelia.svc.cluster.local/api/authz/auth-request"
+        nginx.ingress.kubernetes.io/auth-signin: "https://${AUTHELIA_INGRESS_HOST}?rm=$request_method"
+        nginx.ingress.kubernetes.io/auth-response-headers: "Remote-User,Remote-Name,Remote-Groups,Remote-Email"
