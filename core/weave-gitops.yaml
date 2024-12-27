@@ -10,16 +10,6 @@ spec:
   interval: 5m
   url: oci://ghcr.io/weaveworks/charts
 ---
-apiVersion: v1
-kind: Secret
-type: Opaque
-metadata:
-    name: cluster-user-auth
-    namespace: flux-system
-stringData:
-    username: ${USER_USERNAME}
-    password: ${WEAVE_GITOPS_ADMIN_PASSWORD}
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -39,7 +29,9 @@ spec:
   values:
     adminUser:
       create: true
-      createSecret: false
+      createSecret: true
+      username: ${USER_USERNAME}
+      passwordHash: ${WEAVE_GITOPS_ADMIN_PASSWORD_HASH}
     networkPolicy:
       create: false
     rbac:
