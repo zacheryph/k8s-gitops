@@ -40,10 +40,8 @@ spec:
     ingress:
       enabled: true
       className: nginx
-      labels:
-        cluster.routine.sh/ingress-auth: "authelia"
       hosts:
       - host: ${WEAVE_GITOPS_INGRESS_HOST}
         paths:
         - path: /
-          pathType: Prefix
+          pathType: ImplementationSpecific
