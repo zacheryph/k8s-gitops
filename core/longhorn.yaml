@@ -41,5 +41,5 @@ spec:
       enabled: true
       ingressClassName: nginx
       host: ${LONGHORN_INGRESS_HOST}
-      annotations:
+      labels:
         cluster.routine.sh/ingress-auth: "authelia"
