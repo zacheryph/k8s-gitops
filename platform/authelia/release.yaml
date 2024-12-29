@@ -45,6 +45,8 @@ spec:
     pod:
       kind: Deployment
       replicas: 1
+      annotations:
+        reloader.stakater.com/auto: "true"
       extraVolumes:
       - name: config-volume
         persistentVolumeClaim:
