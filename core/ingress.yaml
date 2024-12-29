@@ -31,7 +31,20 @@ spec:
   values:
     controller:
       allowSnippetAnnotations: true
+      config:
+        custom-http-errors: >-
+          401,403,404,500,501,502,503
       extraArgs:
         default-ssl-certificate: "ingress-system/default-wildcard-tls"
       service:
         loadBalancerIP: ${LOAD_BALANCER_INGRESS}
+    defaultBackend:
+      enabled: true
+      image:
+        repository: ghcr.io/tarampampam/error-pages
+        tag: '3' # using the latest tag is highly discouraged
+      extraEnvs:
+      - name: TEMPLATE_NAME # Optional: change the default theme
+        value: app-down
+      - name: SHOW_DETAILS
+        value: "true"
