@@ -47,6 +47,8 @@ spec:
       replicas: 1
       annotations:
         reloader.stakater.com/auto: "true"
+      strategy:
+        type: Recreate
       extraVolumes:
       - name: config-volume
         persistentVolumeClaim:
