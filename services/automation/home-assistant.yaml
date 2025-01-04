@@ -27,6 +27,10 @@ spec:
         namespace: flux-system
 
   values:
+    defaultPodOptions:
+      # so we can receive mDNS traffic
+      dnsPolicy: ClusterFirstWithHostNet
+      hostNetwork: true
     controllers:
       app:
         containers:
