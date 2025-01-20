@@ -100,3 +100,5 @@ spec:
         existingClaim: sonarr-anime-config
       media:
         existingClaim: media-pool
+      tmp:
+        type: emptyDir
