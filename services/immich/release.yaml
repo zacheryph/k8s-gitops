@@ -127,6 +127,11 @@ spec:
         type: emptyDir
         globalMounts:
         - path: /usr/src/app/.reverse-geocoding-dump
+      cache:
+        enabled: true
+        type: emptyDir
+        globalMounts:
+        - path: /cache
       transformers-cache:
         enabled: true
         type: emptyDir
