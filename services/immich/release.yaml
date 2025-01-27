@@ -81,7 +81,6 @@ spec:
                 name: immich-config
             resources:
               requests:
-                gpu.intel.com/i915: 1
                 cpu: 100m
                 memory: 1000Mi
               limits:
