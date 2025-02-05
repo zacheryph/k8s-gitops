@@ -26,7 +26,7 @@ spec:
       user: root
       port: 22
   k0s:
-    version: v1.31.3+k0s.0
+    version: v1.32.1+k0s.0
     config:
       apiVersion: k0s.k0sproject.io/v1beta1
       kind: ClusterConfig
