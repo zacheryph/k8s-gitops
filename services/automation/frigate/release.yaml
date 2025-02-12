@@ -60,20 +60,13 @@ spec:
               startup:
                 enabled: false
     persistence:
-      config-file:
-        type: secret
-        name: frigate-config
-        globalMounts:
-          - path: /config/config.yaml
-            subPath: config.yaml
-            readOnly: true
       cache:
         type: emptyDir
         medium: Memory
         sizeLimit: 6Gi
         globalMounts:
           - path: /dev/shm
-      data:
+      config:
         existingClaim: frigate-data
       media:
         type: nfs
