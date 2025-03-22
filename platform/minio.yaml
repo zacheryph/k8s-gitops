@@ -46,7 +46,7 @@ spec:
       tag: RELEASE.2025-03-12T18-04-18Z@sha256:46b3009bf7041eefbd90bd0d2b38c6ddc24d20a35d609551a1802c558c1c958f
     mcImage:
       repository: quay.io/minio/mc
-      tag: RELEASE.2025-02-04T04-57-50Z@sha256:c7725628ecbf8199d8af908920de97b02834becb4eea7b68a9aeda056ef4dc97
+      tag: RELEASE.2025-03-12T17-29-24Z@sha256:470f5546b596e16c7816b9c3fa7a78ce4076bb73c2c73f7faeec0c8043923123
     mode: standalone
     deploymentUpdate:
       type: Recreate
