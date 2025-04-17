@@ -5,7 +5,7 @@ kind: Dragonfly
 metadata:
   name: &name dragonfly
 spec:
-  image: ghcr.io/dragonflydb/dragonfly:v1.28.0@sha256:e28b6920608cffaf67397d3041d20dfa2d08a292b90ed1500cda485c210b8caa
+  image: ghcr.io/dragonflydb/dragonfly:v1.28.2@sha256:1b1b386d6ea70c47d32ef0be730ba1e533b8c63410170f304048f46c9dd52516
   replicas: 1
   resources:
     limits:
