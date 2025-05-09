@@ -48,7 +48,7 @@ spec:
           app:
             image:
               repository: ghcr.io/actualbudget/actual-server
-              tag: 25.4.0@sha256:c1c372993f9b90ec00a8bf3c135002bd47790e42cae5e76a01743b7fc1cf8f6e
+              tag: 25.5.0@sha256:3b486fbc0db02839917f65ed277aa509980f710b6e96dde966f5219983978179
             env:
               ACTUAL_PORT: &port 5006
             probes:
