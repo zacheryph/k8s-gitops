@@ -25,8 +25,8 @@ spec:
 
   values:
     serviceAccount:
-      create: true
-      name: *name
+      default:
+        enabled: true
     rbac:
       roles:
         dragonfly-operator:
@@ -61,9 +61,7 @@ spec:
             kind: ClusterRole
             name: dragonfly-operator
           subjects:
-            - kind: ServiceAccount
-              name: dragonfly-operator
-              namespace: operators-system
+          - identifier: *name
     controllers:
       dragonfly-operator:
         replicas: 1
