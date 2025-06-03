@@ -35,7 +35,7 @@ spec:
     clickhouse:
       enabled: true
       size: 32Gi
-    frontend:
+    signoz:
       ingress:
         enabled: true
         className: nginx
@@ -44,7 +44,7 @@ spec:
           paths:
           - path: /
             pathType: ImplementationSpecific
-            port: 3301
+            port: 8080
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
