@@ -34,6 +34,10 @@ spec:
         name: k0s-inwin
       spec:
         network:
+          kubeProxy:
+            mode: ipvs
+            ipvs:
+              strictARP: true
           nodeLocalLoadBalancing:
             enabled: true
             type: EnvoyProxy
