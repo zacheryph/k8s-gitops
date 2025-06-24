@@ -33,7 +33,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: authelia
-      version: 0.10.17
+      version: 0.10.22
 
   values:
     image:
