@@ -20,7 +20,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: emqx
-      version: 5.8.6
+      version: 5.8.7
 
   values:
     replicaCount: 3
