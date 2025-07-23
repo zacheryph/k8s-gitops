@@ -29,14 +29,16 @@ spec:
   chart:
     spec:
       chart: forgejo
-      version: 12.5.4
+      version: 13.0.0
       interval: 30m
       sourceRef:
         kind: HelmRepository
         name: forgejo
 
   values:
-    redis-cluster:
+    valkey-cluster:
+      enabled: false
+    valkey:
       enabled: false
     postgresql-ha:
       enabled: false
@@ -91,7 +93,7 @@ spec:
           USER: ${SMTP_USERNAME}
           PASSWD: ${SMTP_PASSWORD}
         migrations:
-          ALLOWED_DOMAINS: 'github.com,*.github.com,gitlab.com,*.gitlab.com'
+          ALLOWED_DOMAINS: "github.com,*.github.com,gitlab.com,*.gitlab.com"
         repository:
           DEFAULT_PRIVATE: private
         storage:
