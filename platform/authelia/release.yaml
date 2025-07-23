@@ -95,8 +95,6 @@ spec:
           enabled: true
           host: dragonfly
           port: 6379
-          timeout: '5s'
-          max_retries: 0
           database_index: 0
           maximum_active_connections: 16
           minimum_idle_connections: 4
