@@ -10,6 +10,20 @@ spec:
       storage: 1Gi
   storageClassName: longhorn
 ---
+apiVersion: kafka.strimzi.io/v1beta2
+kind: KafkaTopic
+metadata:
+  name: home-assistant
+  labels:
+    strimzi.io/cluster: kafka-development
+spec:
+  partitions: 1
+  replicas: 2
+  config:
+    retention.ms: -1
+    retention.bytes: 1073741824
+    segment.bytes: 4194304
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
