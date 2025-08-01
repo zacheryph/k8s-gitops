@@ -59,7 +59,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: signoz
-      version: 0.13.0
+      version: 0.14.1
   interval: 1h
   values:
     clusterName: k0s-inwin
