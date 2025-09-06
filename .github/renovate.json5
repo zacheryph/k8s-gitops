@@ -1,100 +1,147 @@
 {
-  $schema: "https://docs.renovatebot.com/renovate-schema.json",
+  $schema: 'https://docs.renovatebot.com/renovate-schema.json',
   extends: [
-    "config:recommended",
-    ":dependencyDashboard",
-    ":enableRenovate",
-    ":renovatePrefix",
-    ":semanticCommits",
-    ":separateMajorReleases",
-    ":separateMultipleMajorReleases",
-    ":timezone(America/Chicago)",
-    "docker:pinDigests",
-    "helpers:pinGitHubActionDigests",
-    "replacements:k8s-registry-move",
+    'config:recommended',
+    ':dependencyDashboard',
+    ':enableRenovate',
+    ':renovatePrefix',
+    ':semanticCommits',
+    ':separateMajorReleases',
+    ':separateMultipleMajorReleases',
+    ':timezone(America/Chicago)',
+    'docker:pinDigests',
+    'helpers:pinGitHubActionDigests',
+    'replacements:k8s-registry-move',
   ],
-  dependencyDashboardTitle: "🤖 Renovate Dashboard",
-  ignorePaths: ["config/**"],
-  rebaseWhen: "conflicted",
-
+  dependencyDashboardTitle: '🤖 Renovate Dashboard',
+  ignorePaths: [
+    'config/**',
+  ],
+  rebaseWhen: 'conflicted',
   flux: {
-    fileMatch: ["(bootstrap|core|platform|services)/.+\\.yaml$"],
+    managerFilePatterns: [
+      '/(bootstrap|core|platform|services)/.+\\.yaml$/',
+    ],
   },
-  "helm-values": {
-    fileMatch: ["(bootstrap|core|platform|services)/.+\\.yaml$"],
+  'helm-values': {
+    managerFilePatterns: [
+      '/(bootstrap|core|platform|services)/.+\\.yaml$/',
+    ],
   },
   kubernetes: {
-    fileMatch: ["(bootstrap|core|platform|services)/.+\\.yaml$"],
+    managerFilePatterns: [
+      '/(bootstrap|core|platform|services)/.+\\.yaml$/',
+    ],
   },
-
   customManagers: [
     {
-      customType: "regex",
-      description: "Process GitHub download dependencies in YAML files",
-      fileMatch: ["\\.yaml$"],
-      matchStrings: [
-        // https://github.com/rancher/system-upgrade-controller/releases/download/v0.13.2/crd.yaml
-        "https:\\/\\/github.com\\/(?<depName>\\S+?\\/\\S+?)\\/releases\\/download\\/(?<currentValue>(v|\\d)\\S+?)\\/\\S+",
-        // https://raw.githubusercontent.com/external-secrets/external-secrets/v0.9.11/docs/snippets/dashboard.json
-        "https:\\/\\/raw.githubusercontent.com\\/(?<depName>\\S+?\\/\\S+?)\\/(?<currentValue>(v|\\d)\\S+?)\\/\\S+",
+      customType: 'regex',
+      description: 'Process GitHub download dependencies in YAML files',
+      managerFilePatterns: [
+        '/\\.yaml$/',
       ],
-      datasourceTemplate: "{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}",
-      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
-      // extractVersionTemplate: "{{#if extractVersion}}{{{extractVersion}}}{{else}}^v?(?<version>.*)${{/if}}",
+      matchStrings: [
+        'https:\\/\\/github.com\\/(?<depName>\\S+?\\/\\S+?)\\/releases\\/download\\/(?<currentValue>(v|\\d)\\S+?)\\/\\S+',
+        'https:\\/\\/raw.githubusercontent.com\\/(?<depName>\\S+?\\/\\S+?)\\/(?<currentValue>(v|\\d)\\S+?)\\/\\S+',
+      ],
+      datasourceTemplate: '{{#if datasource}}{{{datasource}}}{{else}}github-releases{{/if}}',
+      versioningTemplate: '{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}',
     },
   ],
-
   packageRules: [
     {
-      description: ["Auto-merge updates to github-action packages"],
-      matchManagers: ["github-actions"],
+      description: [
+        'Auto-merge updates to github-action packages',
+      ],
+      matchManagers: [
+        'github-actions',
+      ],
       automerge: true,
-      automergeType: "branch",
-      matchUpdateTypes: ["minor", "patch", "digest"],
+      automergeType: 'branch',
+      matchUpdateTypes: [
+        'minor',
+        'patch',
+        'digest',
+      ],
       ignoreTests: true,
     },
     {
-      description: ["Loose versioning for non-semver packages"],
-      matchDatasources: ["docker"],
-      matchPackageNames: ["/plex/"],
-      versioning: "loose",
+      description: [
+        'Loose versioning for non-semver packages',
+      ],
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        '/plex/',
+      ],
+      versioning: 'loose',
     },
     {
-      "description": ["Custom versioning for minio"],
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["/minio/", "/mc/"],
-      "versioning": "regex:^RELEASE\\.(?<major>\\d+)-(?<minor>\\d+)-(?<patch>\\d+)T.*Z$"
+      description: [
+        'Custom versioning for minio',
+      ],
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        '/minio/',
+        '/mc/',
+      ],
+      versioning: 'regex:^RELEASE\\.(?<major>\\d+)-(?<minor>\\d+)-(?<patch>\\d+)T.*Z$',
     },
     {
-      "description": ["Custom schedule for frequently updated packages"],
-      "matchDatasources": ["docker", "helm"],
-      "matchPackageNames": ["/minio/", "/postgresql/", "/reloader/"],
-      "schedule": ["on the first day of the month"]
+      description: [
+        'Custom schedule for frequently updated packages',
+      ],
+      matchDatasources: [
+        'docker',
+        'helm',
+      ],
+      matchPackageNames: [
+        '/minio/',
+        '/postgresql/',
+        '/reloader/',
+      ],
+      schedule: [
+        'on the first day of the month',
+      ],
     },
     {
-      "description": ["Update Minio and MC Images in the same PR"],
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["minio", "mc"],
-      "groupName": "Minio"
+      description: [
+        'Update Minio and MC Images in the same PR',
+      ],
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        'minio',
+        'mc',
+      ],
+      groupName: 'Minio',
     },
     {
-      "description": ["Update Immich Images in the same PR"],
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["/immich/"],
-      "groupName": "Immich"
+      description: [
+        'Update Immich Images in the same PR',
+      ],
+      matchDatasources: [
+        'docker',
+      ],
+      matchPackageNames: [
+        '/immich/',
+      ],
+      groupName: 'Immich',
     },
     {
-      // pinning these breaks stuff.
-      // - flux-system: i don't quite know, but it just breaks renovate?
-      // - resource/hardware#intel-gpu-plugin: operator does not support digesting
-      // - development/forgejo: pinning the oci helm repository does not work
-      "description": ["Do not attempt to pinDigest files that cause issues"],
-      "pinDigests": false,
-      "matchFiles": [
-        "bootstrap/flux-system/**",
-        "core/resources/hardware.yaml",
-        "services/development/forgejo.yaml",
-      ]
-    }
+      description: [
+        'Do not attempt to pinDigest files that cause issues',
+      ],
+      pinDigests: false,
+      matchFileNames: [
+        'bootstrap/flux-system/**',
+        'core/resources/hardware.yaml',
+        'services/development/forgejo.yaml',
+      ],
+    },
   ],
 }
