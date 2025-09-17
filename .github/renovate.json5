@@ -18,20 +18,20 @@
   rebaseWhen: "conflicted",
 
   flux: {
-    fileMatch: ["(bootstrap|core|platform|services)/.+\\.yaml$"],
+    managerFilePatterns: ["/(bootstrap|core|platform|services)/.+\\.yaml$/"],
   },
   "helm-values": {
-    fileMatch: ["(bootstrap|core|platform|services)/.+\\.yaml$"],
+    managerFilePatterns: ["/(bootstrap|core|platform|services)/.+\\.yaml$/"],
   },
   kubernetes: {
-    fileMatch: ["(bootstrap|core|platform|services)/.+\\.yaml$"],
+    managerFilePatterns: ["/(bootstrap|core|platform|services)/.+\\.yaml$/"],
   },
 
   customManagers: [
     {
       customType: "regex",
       description: "Process GitHub download dependencies in YAML files",
-      fileMatch: ["\\.yaml$"],
+      managerFilePatterns: ["/\\.yaml$/"],
       matchStrings: [
         // https://github.com/rancher/system-upgrade-controller/releases/download/v0.13.2/crd.yaml
         "https:\\/\\/github.com\\/(?<depName>\\S+?\\/\\S+?)\\/releases\\/download\\/(?<currentValue>(v|\\d)\\S+?)\\/\\S+",
@@ -60,37 +60,37 @@
       versioning: "loose",
     },
     {
-      "description": ["Custom versioning for minio"],
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["/minio/", "/mc/"],
-      "versioning": "regex:^RELEASE\\.(?<major>\\d+)-(?<minor>\\d+)-(?<patch>\\d+)T.*Z$"
+      description: ["Custom versioning for minio"],
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/minio/", "/mc/"],
+      versioning: "regex:^RELEASE\\.(?<major>\\d+)-(?<minor>\\d+)-(?<patch>\\d+)T.*Z$"
     },
     {
-      "description": ["Custom schedule for frequently updated packages"],
-      "matchDatasources": ["docker", "helm"],
-      "matchPackageNames": ["/minio/", "/postgresql/", "/reloader/"],
-      "schedule": ["on the first day of the month"]
+      description: ["Custom schedule for frequently updated packages"],
+      matchDatasources: ["docker", "helm"],
+      matchPackageNames: ["/minio/", "/postgresql/", "/reloader/"],
+      schedule: ["on the first day of the month"]
     },
     {
-      "description": ["Update Minio and MC Images in the same PR"],
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["minio", "mc"],
-      "groupName": "Minio"
+      description: ["Update Minio and MC Images in the same PR"],
+      matchDatasources: ["docker"],
+      matchPackageNames: ["minio", "mc"],
+      groupName: "Minio"
     },
     {
-      "description": ["Update Immich Images in the same PR"],
-      "matchDatasources": ["docker"],
-      "matchPackageNames": ["/immich/"],
-      "groupName": "Immich"
+      description: ["Update Immich Images in the same PR"],
+      matchDatasources: ["docker"],
+      matchPackageNames: ["/immich/"],
+      groupName: "Immich"
     },
     {
       // pinning these breaks stuff.
       // - flux-system: i don't quite know, but it just breaks renovate?
       // - resource/hardware#intel-gpu-plugin: operator does not support digesting
       // - development/forgejo: pinning the oci helm repository does not work
-      "description": ["Do not attempt to pinDigest files that cause issues"],
-      "pinDigests": false,
-      "matchFiles": [
+      description: ["Do not attempt to pinDigest files that cause issues"],
+      pinDigests: false,
+      matchFileNames: [
         "bootstrap/flux-system/**",
         "core/resources/hardware.yaml",
         "services/development/forgejo.yaml",
