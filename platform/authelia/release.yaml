@@ -38,7 +38,7 @@ spec:
   values:
     image:
       repository: authelia/authelia
-      tag: 4.39.10@sha256:ed52a81c71dfb3b84327a1397081423773804281519b4f6c337cb12a4c58bef9
+      tag: 4.39.12@sha256:3d374f212b4e0d4b980e5e3fffced788c04912103b824649ae53b42110afeefb
     ingress:
       enabled: true
       className: nginx
