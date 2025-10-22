@@ -29,7 +29,7 @@ spec:
   chart:
     spec:
       chart: forgejo
-      version: 14.0.4
+      version: 15.0.1
       interval: 30m
       sourceRef:
         kind: HelmRepository
