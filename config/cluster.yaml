@@ -4,29 +4,29 @@ metadata:
   name: k0s-inwin
 spec:
   hosts:
-  - hostname: k0s-inwin-01
-    role: controller+worker
-    noTaints: true
-    ssh:
-      address: 10.72.13.11
-      user: root
-      port: 22
-  - hostname: k0s-inwin-02
-    role: controller+worker
-    noTaints: true
-    ssh:
-      address: 10.72.13.12
-      user: root
-      port: 22
-  - hostname: k0s-inwin-03
-    role: controller+worker
-    noTaints: true
-    ssh:
-      address: 10.72.13.13
-      user: root
-      port: 22
+    - hostname: k0s-inwin-01
+      role: controller+worker
+      noTaints: true
+      ssh:
+        address: 10.72.13.11
+        user: root
+        port: 22
+    - hostname: k0s-inwin-02
+      role: controller+worker
+      noTaints: true
+      ssh:
+        address: 10.72.13.12
+        user: root
+        port: 22
+    - hostname: k0s-inwin-03
+      role: controller+worker
+      noTaints: true
+      ssh:
+        address: 10.72.13.13
+        user: root
+        port: 22
   k0s:
-    version: v1.33.1+k0s.1
+    version: v1.34.1+k0s.1
     config:
       apiVersion: k0s.k0sproject.io/v1beta1
       kind: ClusterConfig
