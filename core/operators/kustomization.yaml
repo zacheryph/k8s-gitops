@@ -4,7 +4,7 @@ kind: Kustomization
 namespace: operators-system
 resources:
 - https://raw.githubusercontent.com/dragonflydb/dragonfly-operator/v1.3.0/manifests/crd.yaml
+- https://raw.githubusercontent.com/dragonflydb/dragonfly-operator/v1.3.0/manifests/dragonfly-operator.yaml
 - cloudnative-pg.yaml
-- dragonfly.yaml
 - namespace.yaml
 - strimzi.yaml
