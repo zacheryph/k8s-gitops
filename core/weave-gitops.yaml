@@ -44,4 +44,4 @@ spec:
       - host: ${WEAVE_GITOPS_INGRESS_HOST}
         paths:
         - path: /
-          pathType: ImplementationSpecific
+          pathType: Prefix
