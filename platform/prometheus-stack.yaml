@@ -1,0 +1,133 @@
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: prometheus-stack
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+    namespace: prometheus-stack
+    name: administrative-user
+stringData:
+    username: "${USER_USERNAME}"
+    password: "${SERVICES_INIT_PASSWORD}"
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: kube-prometheus-stack
+  namespace: prometheus-stack
+spec:
+  interval: 12h
+  url: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+  namespace: prometheus-stack
+spec:
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: kube-prometheus-stack
+      version: v0.86.2
+  interval: 1h
+  values:
+    namespaceOverride: prometheus-stack
+    cleanPrometheusOperatorObjectNames: true
+
+    crds:
+      enabled: true
+      upgradeJob:
+        enabled: true
+
+    global:
+      rbac:
+        create: true
+
+    alertManager:
+      enabled: true
+      alertmanagerSpec:
+        externalURL: "https://${ALERTMANAGER_INGRESS_HOST}"
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClass: longhorn
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 1Gi
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        hosts: [ "${ALERTMANAGER_INGRESS_HOST}" ]
+        paths: [ "/" ]
+
+    grafana:
+      enabled: true
+      admin:
+        existingSecret: administrative-user
+        userKey: username
+        passwordKey: password
+      defaultDashboardsEnabled: true
+      defaultDashboardsTimezone: "${CLUSTER_TIMEZONE}"
+      operator:
+        dashboardsConfigMapRefEnabled: true
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        hosts: [ "${GRAFANA_INGRESS_HOST}" ]
+        paths: [ "/" ]
+
+    prometheus:
+      enabled: true
+      ingress:
+        enabled: true
+        ingressClassname: nginx
+        hosts: [ "${PROMETHEUS_INGRESS_HOST}" ]
+        paths: [ "/" ]
+      prometheusSpec:
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClass: longhorn
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 16Gi
+
+    # monitoring sources
+    coreDns:
+      enabled: true
+    kubeDns:
+      enabled: false
+    kubeEtcd:
+      enabled: true
+    kubeScheduler:
+      enabled: true
+    kubeProxy:
+      enabled: true
+    kubeStateMetrics:
+      enabled: true
+    kubernetesServiceMonitors:
+      enabled: true
+    kubeApiServer:
+      enabled: true
+    kubelet:
+      enabled: true
+    kubeControllerManager:
+      enabled: true
+    nodeExporter:
+      enabled: true
+    windowsMonitoring:
+      enabled: false
+
+    defaultRules:
+      create: true
+    # customRules:

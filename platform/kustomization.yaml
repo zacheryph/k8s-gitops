@@ -5,4 +5,5 @@ resources:
 - authelia
 - database
 - minio.yaml
+- prometheus-stack.yaml
 - signoz.yaml
