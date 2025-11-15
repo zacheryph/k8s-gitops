@@ -25,7 +25,6 @@ metadata:
 spec:
   kafka:
     version: 4.1.0
-    replicas: 3
     listeners:
       - name: plain
         port: 9092
