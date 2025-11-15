@@ -6,7 +6,7 @@ metadata:
   name: forgejo
 spec:
   type: oci
-  interval: 1h
+  interval: 12h
   url: oci://code.forgejo.org/forgejo-helm
 ---
 apiVersion: v1

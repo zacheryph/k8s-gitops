@@ -7,7 +7,7 @@ metadata:
   namespace: flux-system
 spec:
   type: oci
-  interval: 5m
+  interval: 12h
   url: oci://ghcr.io/weaveworks/charts
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
