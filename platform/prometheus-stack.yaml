@@ -37,7 +37,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: kube-prometheus-stack
-      version: v0.86.2
+      version: "79.5.0"
   interval: 1h
   values:
     namespaceOverride: prometheus-stack
