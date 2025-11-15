@@ -78,8 +78,6 @@ spec:
         passwordKey: password
       defaultDashboardsEnabled: true
       defaultDashboardsTimezone: "${CLUSTER_TIMEZONE}"
-      operator:
-        dashboardsConfigMapRefEnabled: true
       ingress:
         enabled: true
         ingressClassName: nginx
