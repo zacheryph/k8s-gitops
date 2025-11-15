@@ -70,6 +70,8 @@ spec:
         ingressClassName: nginx
         hosts: [ "${ALERTMANAGER_INGRESS_HOST}" ]
         paths: [ "/" ]
+        labels:
+          cluster.routine.sh/ingress-auth: "authelia"
 
     grafana:
       enabled: true
@@ -92,6 +94,8 @@ spec:
         ingressClassName: nginx
         hosts: [ "${PROMETHEUS_INGRESS_HOST}" ]
         paths: [ "/" ]
+        labels:
+          cluster.routine.sh/ingress-auth: "authelia"
       prometheusSpec:
         storageSpec:
           volumeClaimTemplate:
