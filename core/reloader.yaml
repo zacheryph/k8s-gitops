@@ -15,7 +15,7 @@ metadata:
   name: reloader
   namespace: kube-system
 spec:
-  interval: 30m
+  interval: 1h
   chart:
     spec:
       chart: reloader
@@ -24,7 +24,6 @@ spec:
         kind: HelmRepository
         name: stakater
         namespace: kube-system
-      interval: 30m
   driftDetection:
     mode: enabled
   values:

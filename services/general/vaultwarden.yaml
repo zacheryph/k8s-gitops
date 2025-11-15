@@ -11,12 +11,11 @@ metadata:
   name: &name vaultwarden
   namespace: vaultwarden
 spec:
-  interval: 30m
+  interval: 1h
   chart:
     spec:
       chart: app-template
       version: 4.4.0
-      interval: 30m
       sourceRef:
         kind: HelmRepository
         name: bjw-s-labs

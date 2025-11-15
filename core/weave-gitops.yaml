@@ -17,7 +17,7 @@ metadata:
   name: weave-gitops
   namespace: flux-system
 spec:
-  interval: 30m
+  interval: 1h
   chart:
     spec:
       chart: weave-gitops

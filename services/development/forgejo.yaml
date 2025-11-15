@@ -25,12 +25,11 @@ kind: HelmRelease
 metadata:
   name: &name forgejo
 spec:
-  interval: 30m
+  interval: 1h
   chart:
     spec:
       chart: forgejo
       version: 15.0.2
-      interval: 30m
       sourceRef:
         kind: HelmRepository
         name: forgejo

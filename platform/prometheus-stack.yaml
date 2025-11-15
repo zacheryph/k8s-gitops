@@ -21,7 +21,7 @@ metadata:
   namespace: prometheus-stack
 spec:
   type: oci
-  interval: 1h
+  interval: 12h
   url: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
