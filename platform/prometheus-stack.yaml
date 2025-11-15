@@ -113,8 +113,6 @@ spec:
       enabled: false
     kubeEtcd:
       enabled: true
-    kubeScheduler:
-      enabled: true
     kubeProxy:
       enabled: true
     kubeStateMetrics:
@@ -125,10 +123,12 @@ spec:
       enabled: true
     kubelet:
       enabled: true
-    kubeControllerManager:
-      enabled: true
     nodeExporter:
       enabled: true
+    kubeControllerManager:
+      enabled: false
+    kubeScheduler:
+      enabled: false
     windowsMonitoring:
       enabled: false
 
