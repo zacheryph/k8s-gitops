@@ -1,0 +1,45 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/postgresql.cnpg.io/cluster_v1.json
+apiVersion: postgresql.cnpg.io/v1
+kind: Cluster
+metadata:
+  name: postgresql-18
+spec:
+  instances: 3
+  imageName: ghcr.io/cloudnative-pg/postgresql:18.0
+  primaryUpdateStrategy: unsupervised
+  enableSuperuserAccess: true
+  resources:
+    requests:
+      cpu: 100m
+      memory: 512Mi
+    limits:
+      cpu: 2000m
+      memory: 2Gi
+  storage:
+    storageClass: longhorn
+    size: 4Gi
+
+  bootstrap:
+    initdb:
+      import:
+        type: monolith
+        databases:
+          - authelia
+          - forgejo
+          - vaultwarden
+        roles:
+          - authelia
+          - forgejo
+          - vaultwarden
+        source:
+          externalCluster: postgresql-17
+  externalClusters:
+    - name: postgresql-17
+      connectionParameters:
+        host: postgresql-17-rw.database.svc
+        user: postgres
+        dbname: postgres
+      password:
+        name: postgresql-17-superuser
+        key: password
