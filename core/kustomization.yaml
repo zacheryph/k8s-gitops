@@ -14,4 +14,3 @@ resources:
 - longhorn.yaml
 - metallb.yaml
 - reloader.yaml
-- weave-gitops.yaml
