@@ -17,12 +17,12 @@ stringData:
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: HelmRepository
 metadata:
-  name: kube-prometheus-stack
+  name: prometheus-community
   namespace: prometheus-stack
 spec:
   type: oci
   interval: 12h
-  url: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
+  url: oci://ghcr.io/prometheus-community/charts
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -36,7 +36,7 @@ spec:
       reconcileStrategy: ChartVersion
       sourceRef:
         kind: HelmRepository
-        name: kube-prometheus-stack
+        name: prometheus-community
       version: "79.5.0"
   interval: 1h
   values:
