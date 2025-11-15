@@ -6,5 +6,4 @@ resources:
   - emqx.yaml
   - kafka.yaml
   - namespace.yaml
-  - postgresql-17.yaml
   - postgresql-18.yaml
