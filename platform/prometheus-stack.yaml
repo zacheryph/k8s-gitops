@@ -41,6 +41,7 @@ spec:
   interval: 1h
   values:
     namespaceOverride: prometheus-stack
+    fullnameOverride: prom-stack
     cleanPrometheusOperatorObjectNames: true
 
     crds:
@@ -52,7 +53,7 @@ spec:
       rbac:
         create: true
 
-    alertManager:
+    alertmanager:
       enabled: true
       alertmanagerSpec:
         externalURL: "https://${ALERTMANAGER_INGRESS_HOST}"
@@ -88,7 +89,7 @@ spec:
       enabled: true
       ingress:
         enabled: true
-        ingressClassname: nginx
+        ingressClassName: nginx
         hosts: [ "${PROMETHEUS_INGRESS_HOST}" ]
         paths: [ "/" ]
       prometheusSpec:
