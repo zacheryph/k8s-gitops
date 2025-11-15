@@ -22,7 +22,7 @@ spec:
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 128Gi
+      storage: 32Gi
   storageClassName: longhorn
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
@@ -73,32 +73,32 @@ spec:
         nginx.ingress.kubernetes.io/proxy-send-timeout: "600s"
       path: "/"
       hosts:
-      - ${MINIO_INGRESS_HOST}
+        - ${MINIO_INGRESS_HOST}
     consoleIngress:
       enabled: true
       ingressClassName: nginx
       path: "/"
       hosts:
-      - ${MINIO_INGRESS_ADMIN}
+        - ${MINIO_INGRESS_ADMIN}
 
     # buckets, policies, and users
     buckets:
-    - name: family
-      policy: download
-    - name: forgejo
-      policy: none
-    - name: private
-      policy: none
-    - name: public
-      policy: download
+      - name: family
+        policy: download
+      - name: forgejo
+        policy: none
+      - name: private
+        policy: none
+      - name: public
+        policy: download
     policies:
-    - name: forgejo
-      statements:
-      - resources:
-        - "arn:aws:s3:::forgejo/*"
-        actions:
-        - "s3:*"
+      - name: forgejo
+        statements:
+          - resources:
+              - "arn:aws:s3:::forgejo/*"
+            actions:
+              - "s3:*"
     users:
-    - accessKey: ${MINIO_FORGEJO_ACCESS_KEY}
-      secretKey: ${MINIO_FORGEJO_SECRET_KEY}
-      policy: forgejo
+      - accessKey: ${MINIO_FORGEJO_ACCESS_KEY}
+        secretKey: ${MINIO_FORGEJO_SECRET_KEY}
+        policy: forgejo
