@@ -5,4 +5,5 @@ resources:
 - authelia
 - database
 - minio.yaml
+- loki-stack.yaml
 - prometheus-stack.yaml
