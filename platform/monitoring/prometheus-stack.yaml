@@ -1,0 +1,118 @@
+---
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+    name: administrative-user
+stringData:
+    username: "${USER_USERNAME}"
+    password: "${SERVICES_INIT_PASSWORD}"
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: kube-prometheus-stack
+spec:
+  chart:
+    spec:
+      chart: kube-prometheus-stack
+      reconcileStrategy: ChartVersion
+      sourceRef:
+        kind: HelmRepository
+        name: prometheus-community
+      version: "79.5.0"
+  interval: 1h
+  values:
+    cleanPrometheusOperatorObjectNames: true
+
+    crds:
+      enabled: true
+      upgradeJob:
+        enabled: true
+
+    global:
+      rbac:
+        create: true
+
+    alertmanager:
+      enabled: true
+      alertmanagerSpec:
+        externalURL: "https://${ALERTMANAGER_INGRESS_HOST}"
+        storage:
+          volumeClaimTemplate:
+            spec:
+              storageClass: longhorn
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 1Gi
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        hosts: [ "${ALERTMANAGER_INGRESS_HOST}" ]
+        paths: [ "/" ]
+        labels:
+          cluster.routine.sh/ingress-auth: "authelia"
+
+    grafana:
+      enabled: true
+      admin:
+        existingSecret: administrative-user
+        userKey: username
+        passwordKey: password
+      defaultDashboardsEnabled: true
+      defaultDashboardsTimezone: "${CLUSTER_TIMEZONE}"
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        hosts: [ "${GRAFANA_INGRESS_HOST}" ]
+        paths: [ "/" ]
+
+    prometheus:
+      enabled: true
+      ingress:
+        enabled: true
+        ingressClassName: nginx
+        hosts: [ "${PROMETHEUS_INGRESS_HOST}" ]
+        paths: [ "/" ]
+        labels:
+          cluster.routine.sh/ingress-auth: "authelia"
+      prometheusSpec:
+        storageSpec:
+          volumeClaimTemplate:
+            spec:
+              storageClass: longhorn
+              accessModes: ["ReadWriteOnce"]
+              resources:
+                requests:
+                  storage: 16Gi
+
+    # monitoring sources
+    coreDns:
+      enabled: true
+    kubeDns:
+      enabled: false
+    kubeEtcd:
+      enabled: true
+    kubeProxy:
+      enabled: true
+    kubeStateMetrics:
+      enabled: true
+    kubernetesServiceMonitors:
+      enabled: true
+    kubeApiServer:
+      enabled: true
+    kubelet:
+      enabled: true
+    nodeExporter:
+      enabled: true
+    kubeControllerManager:
+      enabled: false
+    kubeScheduler:
+      enabled: false
+    windowsMonitoring:
+      enabled: false
+
+    defaultRules:
+      create: true
+    # customRules:

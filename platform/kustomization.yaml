@@ -4,4 +4,5 @@ kind: Kustomization
 resources:
 - authelia
 - database
+- monitoring
 - minio.yaml
