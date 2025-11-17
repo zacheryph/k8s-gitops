@@ -62,6 +62,12 @@ spec:
         passwordKey: password
       defaultDashboardsEnabled: true
       defaultDashboardsTimezone: "${CLUSTER_TIMEZONE}"
+      additionalDataSources:
+        - name: Loki
+          type: loki
+          access: proxy
+          url: http://loki-gateway
+          isDefault: false
       ingress:
         enabled: true
         ingressClassName: nginx
