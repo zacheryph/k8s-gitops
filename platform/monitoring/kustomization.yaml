@@ -7,3 +7,4 @@ resources:
 - helm-repository.yaml
 - loki.yaml
 - prometheus-stack.yaml
+- promtail.yaml
