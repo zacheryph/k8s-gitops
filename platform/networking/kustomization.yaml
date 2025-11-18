@@ -5,3 +5,5 @@ namespace: gateway
 resources:
 - namespace.yaml
 - envoy-gateway.yaml
+- gateway.yaml
+- httproutes.yaml

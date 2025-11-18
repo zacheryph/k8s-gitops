@@ -1,0 +1,70 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.envoyproxy.io/envoyproxy_v1alpha1.json
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: EnvoyProxy
+metadata:
+  name: envoy
+spec:
+  logging:
+    level:
+      default: info
+  provider:
+    type: Kubernetes
+    kubernetes:
+      envoyDeployment:
+        replicas: 2
+        container:
+          imageRepository: mirror.gcr.io/envoyproxy/envoy
+          resources:
+            requests:
+              cpu: 100m
+            limits:
+              memory: 1Gi
+      envoyService:
+        externalTrafficPolicy: Local
+  shutdown:
+    drainTimeout: 180s
+  telemetry:
+    metrics:
+      prometheus:
+        compression:
+          type: Gzip
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.networking.k8s.io/gatewayclass_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: GatewayClass
+metadata:
+  name: envoy
+spec:
+  controllerName: gateway.envoyproxy.io/gatewayclass-controller
+  parametersRef:
+    group: gateway.envoyproxy.io
+    kind: EnvoyProxy
+    name: envoy
+    namespace: gateway
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.networking.k8s.io/gateway_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: external
+spec:
+  gatewayClassName: envoy
+  listeners:
+    - name: http
+      protocol: HTTP
+      port: 80
+      allowedRoutes:
+        namespaces:
+          from: Same
+    - name: https
+      protocol: HTTPS
+      port: 443
+      allowedRoutes:
+        namespaces:
+          from: All
+      tls:
+        certificateRefs:
+          - kind: Secret
+            name: default-wildcard-tls
+            namespace: ingress-system
