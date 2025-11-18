@@ -56,3 +56,6 @@ spec:
       enabled: false
     test:
       enabled: false
+    monitoring:
+      dashboards:
+        enabled: true
