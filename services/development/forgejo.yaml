@@ -113,3 +113,9 @@ spec:
           paths:
             - path: /
               pathType: Prefix
+    httpRoute:
+      enabled: true
+      hostnames: [ "${FORGEJO_INGRESS_HOST}" ]
+      parentRefs:
+        - name: external
+          namespace: gateway
