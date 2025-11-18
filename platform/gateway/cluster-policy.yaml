@@ -31,10 +31,10 @@ spec:
           metadata:
             labels:
               generated-by: kyverno
-              source-httproute: "{{request.object.metadata.namespace}}/{{request.object.metadata.name}}"
+              source-httproute: "{{request.object.metadata.namespace}}-{{request.object.metadata.name}}"
           spec:
-            targetRef:
-              group: gateway.networking.k8s.io
+            targetRefs:
+            - group: gateway.networking.k8s.io
               kind: HTTPRoute
               name: "{{request.object.metadata.name}}"
             # Add your SecurityPolicy spec here
