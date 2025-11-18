@@ -4,6 +4,6 @@ kind: Kustomization
 resources:
 - authelia
 - database
+- gateway
 - monitoring
-- networking
 - minio.yaml
