@@ -50,6 +50,9 @@ metadata:
   name: external
 spec:
   gatewayClassName: envoy
+  addresses:
+    - type: IPAddress
+      value: ${LOAD_BALANCER_GATEWAY}
   listeners:
     - name: http
       protocol: HTTP
