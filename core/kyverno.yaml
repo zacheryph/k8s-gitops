@@ -32,3 +32,59 @@ spec:
   values:
     crds:
       install: true
+    # the admission controller needs to be able to read httproutes
+    # and the background controller manages the policies generated
+    admissionController:
+      rbac:
+        clusterRole:
+          extraResources:
+          - apiGroups:
+            - gateway.networking.k8s.io
+            resources:
+            - httproutes
+            - referencegrants
+            verbs:
+            - list
+            - get
+          - apiGroups:
+            - gateway.envoyproxy.io
+            resources:
+            - securitypolicies
+            verbs:
+            - get
+            - list
+    backgroundController:
+      rbac:
+        clusterRole:
+          extraResources:
+          - apiGroups:
+            - gateway.networking.k8s.io
+            resources:
+            - httproutes
+            verbs:
+            - list
+            - get
+          - apiGroups:
+            - gateway.networking.k8s.io
+            resources:
+            - referencegrants
+            verbs:
+            - create
+            - delete
+            - get
+            - list
+            - patch
+            - update
+            - watch
+          - apiGroups:
+            - gateway.envoyproxy.io
+            resources:
+            - securitypolicies
+            verbs:
+            - create
+            - delete
+            - get
+            - list
+            - patch
+            - update
+            - watch
