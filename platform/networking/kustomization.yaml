@@ -7,3 +7,4 @@ resources:
 - envoy-gateway.yaml
 - gateway.yaml
 - httproutes.yaml
+- security-policy.yaml

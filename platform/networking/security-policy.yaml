@@ -1,0 +1,31 @@
+---
+# allow securing httproute w/ authelia by applying a label
+apiVersion: gateway.envoyproxy.io/v1alpha1
+kind: SecurityPolicy
+metadata:
+  name: authelia-authorization-by-route
+spec:
+  targetSelectors:
+    - group: gateway.networking.k8s.io
+      kind: HTTPRoute
+      matchLabels:
+        cluster.routine.sh/authorization: "authelia"
+  extAuth:
+    headersToExtAuth:
+      - accept
+      - cookie
+      - authorization
+      - header-authorization
+      - x-forwarded-proto
+    failOpen: false
+    http:
+      backendRefs:
+        - name: authelia
+          namespace: authelia
+          port: 80
+      path: /api/authz/ext-authz/
+      headersToBackend:
+        - Remote-User
+        - Remote-Groups
+        - Remote-Name
+        - Remote-Email
