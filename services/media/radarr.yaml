@@ -93,6 +93,16 @@ spec:
                 service:
                   identifier: app
                   port: http
+    route:
+      app:
+        enabled: true
+        kind: HTTPRoute
+        hostnames: [ "${RADARR_INGRESS_HOST}" ]
+        parentRefs:
+          - name: external
+            namespace: gateway
+        labels:
+          cluster.routine.sh/authorization: "authelia"
 
     persistence:
       config:

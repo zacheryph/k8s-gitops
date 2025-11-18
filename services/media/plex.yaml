@@ -101,3 +101,11 @@ spec:
                 service:
                   identifier: app
                   port: http
+    route:
+      app:
+        enabled: true
+        kind: HTTPRoute
+        hostnames: [ "${PLEX_INGRESS_HOST}" ]
+        parentRefs:
+          - name: external
+            namespace: gateway
