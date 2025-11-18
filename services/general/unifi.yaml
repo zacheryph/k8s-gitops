@@ -107,6 +107,14 @@ spec:
               port: controller
         tls:
         - hosts: [*host]
+    route:
+      app:
+        enabled: true
+        kind: HTTPRoute
+        hostnames: [ "${UNIFI_INGRESS_HOST}" ]
+        parentRefs:
+          - name: external
+            namespace: gateway
 
     persistence:
       config:

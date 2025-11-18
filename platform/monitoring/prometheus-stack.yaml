@@ -53,6 +53,15 @@ spec:
         paths: [ "/" ]
         labels:
           cluster.routine.sh/ingress-auth: "authelia"
+      route:
+        main:
+          enabled: true
+          hostnames: [ "${ALERTMANAGER_INGRESS_HOST}" ]
+          parentRefs:
+            - name: external
+              namespace: gateway
+          labels:
+            cluster.routine.sh/authorization: "authelia"
 
     grafana:
       enabled: true
@@ -73,6 +82,13 @@ spec:
         ingressClassName: nginx
         hosts: [ "${GRAFANA_INGRESS_HOST}" ]
         paths: [ "/" ]
+      route:
+        main:
+          enabled: true
+          hostnames: [ "${GRAFANA_INGRESS_HOST}" ]
+          parentRefs:
+            - name: external
+              namespace: gateway
 
     prometheus:
       enabled: true
@@ -83,6 +99,15 @@ spec:
         paths: [ "/" ]
         labels:
           cluster.routine.sh/ingress-auth: "authelia"
+      route:
+        main:
+          enabled: true
+          hostnames: [ "${PROMETHEUS_INGRESS_HOST}" ]
+          parentRefs:
+            - name: external
+              namespace: gateway
+          labels:
+            cluster.routine.sh/authorization: "authelia"
       prometheusSpec:
         storageSpec:
           volumeClaimTemplate:

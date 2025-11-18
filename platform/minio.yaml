@@ -102,3 +102,51 @@ spec:
       - accessKey: ${MINIO_FORGEJO_ACCESS_KEY}
         secretKey: ${MINIO_FORGEJO_SECRET_KEY}
         policy: forgejo
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: minio
+  namespace: minio
+spec:
+  hostnames: [ "${MINIO_INGRESS_HOST}" ]
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: external
+      namespace: gateway
+  rules:
+    - backendRefs:
+      - group: ""
+        kind: Service
+        name: minio
+        port: 9000
+        weight: 1
+      matches:
+      - path:
+          type: PathPrefix
+          value: /
+---
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: minio-console
+  namespace: minio
+spec:
+  hostnames: [ "${MINIO_INGRESS_ADMIN}" ]
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: external
+      namespace: gateway
+  rules:
+    - backendRefs:
+      - group: ""
+        kind: Service
+        name: minio-console
+        port: 9001
+        weight: 1
+      matches:
+      - path:
+          type: PathPrefix
+          value: /

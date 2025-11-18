@@ -42,6 +42,11 @@ spec:
     ingress:
       enabled: true
       className: nginx
+      gatewayAPI:
+        enabled: true
+        parentRefs:
+          - name: external
+            namespace: gateway
     pod:
       kind: Deployment
       replicas: 1

@@ -77,6 +77,14 @@ spec:
               service:
                 identifier: app
                 port: http
+    route:
+      app:
+        enabled: true
+        kind: HTTPRoute
+        hostnames: [ "${HOME_ASSISTANT_INGRESS_HOST}" ]
+        parentRefs:
+          - name: external
+            namespace: gateway
     persistence:
       config:
         existingClaim: home-assistant-config
