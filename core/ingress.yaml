@@ -37,3 +37,18 @@ spec:
         default-ssl-certificate: "ingress-system/default-wildcard-tls"
       service:
         loadBalancerIP: ${LOAD_BALANCER_INGRESS}
+---
+# give envoy gateway access to certificates so it can replace us.
+apiVersion: gateway.networking.k8s.io/v1beta1
+kind: ReferenceGrant
+metadata:
+  name: allow-certificates-from-ingress-system
+  namespace: ingress-system
+spec:
+  from:
+  - group: gateway.networking.k8s.io
+    kind: Gateway
+    namespace: gateway
+  to:
+  - group: ""
+    kind: Secret
