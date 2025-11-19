@@ -70,4 +70,3 @@ spec:
         certificateRefs:
           - kind: Secret
             name: default-wildcard-tls
-            namespace: ingress-system

@@ -79,18 +79,6 @@ spec:
         ports:
           http:
             port: 8409
-    ingress:
-      app:
-        className: nginx
-        labels:
-          cluster.routine.sh/ingress-auth: authelia
-        hosts:
-          - host: ${ERSATZTV_INGRESS_HOST}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
     persistence:
       config:
         existingClaim: ersatztv-config

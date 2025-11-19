@@ -81,18 +81,6 @@ spec:
           http:
             port: *port
 
-    ingress:
-      app:
-        className: nginx
-        labels:
-          cluster.routine.sh/ingress-auth: authelia
-        hosts:
-          - host: ${SONARR_INGRESS_HOST}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
     route:
       app:
         enabled: true

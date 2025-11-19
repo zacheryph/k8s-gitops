@@ -7,4 +7,3 @@ resources:
 - envoy-gateway.yaml
 - gateway.yaml
 - httproutes.yaml
-- cluster-policy.yaml

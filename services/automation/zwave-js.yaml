@@ -70,19 +70,6 @@ spec:
             port: *port
           websocket:
             port: 3000
-    ingress:
-      app:
-        className: nginx
-        labels:
-          cluster.routine.sh/ingress-auth: authelia
-        hosts:
-          - host: ${ZWAVE_INGRESS_HOST}
-            paths:
-              - path: /
-                pathType: Prefix
-                service:
-                  identifier: app
-                  port: http
     route:
       app:
         enabled: true

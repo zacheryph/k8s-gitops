@@ -97,22 +97,6 @@ spec:
           DEFAULT_PRIVATE: private
         storage:
           STORAGE_TYPE: local
-    ingress:
-      enabled: true
-      className: nginx
-      annotations:
-        nginx.ingress.kubernetes.io/custom-http-errors: "502,503"
-        nginx.ingress.kubernetes.io/proxy-body-size: "1000m"
-        # nginx.ingress.kubernetes.io/server-snippet: |
-        #   # Do not expose metrics to the outside.
-        #   location = /metrics {
-        #     return 404;
-        #   }
-      hosts:
-        - host: ${FORGEJO_INGRESS_HOST}
-          paths:
-            - path: /
-              pathType: Prefix
     httpRoute:
       enabled: true
       hostnames: [ "${FORGEJO_INGRESS_HOST}" ]

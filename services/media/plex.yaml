@@ -91,16 +91,6 @@ spec:
         ports:
           http:
             port: 32400
-    ingress:
-      app:
-        className: nginx
-        hosts:
-          - host: ${PLEX_INGRESS_HOST}
-            paths:
-              - path: /
-                service:
-                  identifier: app
-                  port: http
     route:
       app:
         enabled: true

@@ -67,16 +67,6 @@ spec:
         ports:
           http:
             port: 8123
-    ingress:
-      app:
-        className: "nginx"
-        hosts:
-        - host: ${HOME_ASSISTANT_INGRESS_HOST}
-          paths:
-            - path: /
-              service:
-                identifier: app
-                port: http
     route:
       app:
         enabled: true

@@ -64,22 +64,6 @@ spec:
     environment:
       MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL}
       MINIO_SERVER_URL: ${MINIO_SERVER_URL}
-    ingress:
-      enabled: true
-      ingressClassName: nginx
-      annotations:
-        nginx.ingress.kubernetes.io/proxy-body-size: "0"
-        nginx.ingress.kubernetes.io/proxy-read-timeout: "600s"
-        nginx.ingress.kubernetes.io/proxy-send-timeout: "600s"
-      path: "/"
-      hosts:
-        - ${MINIO_INGRESS_HOST}
-    consoleIngress:
-      enabled: true
-      ingressClassName: nginx
-      path: "/"
-      hosts:
-        - ${MINIO_INGRESS_ADMIN}
 
     # buckets, policies, and users
     buckets:

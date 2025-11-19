@@ -4,5 +4,5 @@ kind: Kustomization
 resources:
 - cert-manager.yaml
 - hardware.yaml
-- ingress-certificate.yaml
+- gateway-certificate.yaml
 - metallb.yaml

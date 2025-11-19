@@ -46,13 +46,6 @@ spec:
               resources:
                 requests:
                   storage: 1Gi
-      ingress:
-        enabled: true
-        ingressClassName: nginx
-        hosts: [ "${ALERTMANAGER_INGRESS_HOST}" ]
-        paths: [ "/" ]
-        labels:
-          cluster.routine.sh/ingress-auth: "authelia"
       route:
         main:
           enabled: true
@@ -77,11 +70,6 @@ spec:
           access: proxy
           url: http://loki:3100
           isDefault: false
-      ingress:
-        enabled: true
-        ingressClassName: nginx
-        hosts: [ "${GRAFANA_INGRESS_HOST}" ]
-        paths: [ "/" ]
       route:
         main:
           enabled: true
@@ -92,13 +80,6 @@ spec:
 
     prometheus:
       enabled: true
-      ingress:
-        enabled: true
-        ingressClassName: nginx
-        hosts: [ "${PROMETHEUS_INGRESS_HOST}" ]
-        paths: [ "/" ]
-        labels:
-          cluster.routine.sh/ingress-auth: "authelia"
       route:
         main:
           enabled: true

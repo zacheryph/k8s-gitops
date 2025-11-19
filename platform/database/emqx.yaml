@@ -41,11 +41,6 @@ spec:
       EMQX_LOADED_PLUGINS: "emqx_management,emqx_recon,emqx_retainer,emqx_dashboard,emqx_rule_engine,emqx_auth_mnesia,emqx_prometheus"
       EMQX_CLUSTER__DISCOVERY_STRATEGY: k8s
       EMQX_DASHBOARD__DEFAULT_PASSWORD: ${SERVICES_INIT_PASSWORD}
-    ingress:
-      dashboard:
-        enabled: true
-        ingressClassName: nginx
-        hosts: ["${EMQX_INGRESS_HOST}"]
 ---
 apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute

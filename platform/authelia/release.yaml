@@ -41,7 +41,6 @@ spec:
       tag: 4.39.14@sha256:88f1494b6ac1174641770f106335ab67752d66e5822b4059badca220b5d6153b
     ingress:
       enabled: true
-      className: nginx
       gatewayAPI:
         enabled: true
         parentRefs:

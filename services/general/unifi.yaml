@@ -95,18 +95,6 @@ spec:
             enabled: true
             port: 10001
             protocol: UDP
-    ingress:
-      app:
-        className: nginx
-        hosts:
-        - host: &host "${UNIFI_INGRESS_HOST}"
-          paths:
-          - path: /
-            service:
-              identifier: app
-              port: controller
-        tls:
-        - hosts: [*host]
     route:
       app:
         enabled: true
