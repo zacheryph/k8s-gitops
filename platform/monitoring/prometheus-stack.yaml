@@ -20,7 +20,7 @@ spec:
       sourceRef:
         kind: HelmRepository
         name: prometheus-community
-      version: "79.5.0"
+      version: "79.6.1"
   interval: 1h
   values:
     cleanPrometheusOperatorObjectNames: true
