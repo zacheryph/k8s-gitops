@@ -1,0 +1,21 @@
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: markopolo123-provider-backblaze
+spec:
+  package: xpkg.upbound.io/markopolo123/provider-backblaze:v0.1.0
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: crossplane-contrib-provider-upjet-digitalocean
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/provider-upjet-digitalocean:v0.3.0
+---
+apiVersion: pkg.crossplane.io/v1
+kind: Provider
+metadata:
+  name: crossplane-contrib-provider-upjet-github
+spec:
+  package: xpkg.upbound.io/crossplane-contrib/provider-upjet-github:v0.18.6
