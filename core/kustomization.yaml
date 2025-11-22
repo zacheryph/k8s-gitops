@@ -6,6 +6,7 @@ resources:
 - operators
 - repositories
 - cert-manager.yaml
+- crossplane.yaml
 - external-snapshotter.yaml
 - hardware.yaml
 - k8tz.yaml
