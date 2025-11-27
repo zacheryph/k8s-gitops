@@ -7,6 +7,25 @@ metadata:
     grafana.internal/instance: grafana
 spec:
   config:
+    auth:
+      disable_login_form: "true"
+    auth.anonymous:
+      enabled: "false"
+    auth.basic:
+      enabled: "false"
+    auth.generic_oauth:
+      allow_assign_grafana_admin: "true"
+      allow_sign_up: "true"
+      api_url: https://${POCKETID_INGRESS_HOST}/api/oidc/userinfo
+      auth_url: https://${POCKETID_INGRESS_HOST}/authorize
+      client_id: ${POCKETID_GRAFANA_AUTH_CLIENT_ID}
+      client_secret: ${POCKETID_GRAFANA_AUTH_CLIENT_SECRET}
+      enabled: "True"
+      groups_attribute_path: groups
+      name: Zro ID
+      role_attribute_path: "contains(groups[*], 'admin') && 'Admin' || 'Viewer'"
+      scopes: openid,profile,email,groups
+      token_url: https://${POCKETID_INGRESS_HOST}/api/oidc/token
     log:
       mode: console
     metrics:
@@ -19,8 +38,6 @@ spec:
       check_for_plugin_updates: "false"
       feedback_links_enabled: "false"
       reporting_enabled: "false"
-    auth.anonymous:
-      enabled: "true"
     news:
       news_feed_enabled: "false"
     plugins:
@@ -50,8 +67,6 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: grafana
-  labels:
-    cluster.routine.sh/authorization: authelia
 spec:
   hostnames: [ "${GRAFANA_INGRESS_HOST}" ]
   parentRefs:
