@@ -5,15 +5,20 @@ kind: Namespace
 metadata:
   name: longhorn-system
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/helmrepository_v1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/ocirepository_v1.json
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
+kind: OCIRepository
 metadata:
   name: longhorn
   namespace: longhorn-system
 spec:
-  interval: 12h
-  url: https://charts.longhorn.io
+  interval: 1h
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: 1.10.1
+  url: oci://ghcr.io/home-operations/charts-mirror/longhorn
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
@@ -22,14 +27,9 @@ metadata:
   name: longhorn
   namespace: longhorn-system
 spec:
-  chart:
-    spec:
-      chart: longhorn
-      reconcileStrategy: ChartVersion
-      sourceRef:
-        kind: HelmRepository
-        name: longhorn
-      version: 1.10.1
+  chartRef:
+    kind: OCIRepository
+    name: longhorn
   interval: 1h
   values:
     metrics:

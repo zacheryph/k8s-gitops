@@ -1,13 +1,18 @@
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/helmrepository_v1.json
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/ocirepository_v1.json
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
+kind: OCIRepository
 metadata:
   name: k8tz
   namespace: kube-system
 spec:
   interval: 12h
-  url: https://k8tz.github.io/k8tz/
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: 0.18.0
+  url: oci://ghcr.io/home-operations/charts-mirror/k8tz
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
@@ -17,14 +22,9 @@ metadata:
   namespace: kube-system
 spec:
   interval: 1h
-  chart:
-    spec:
-      chart: k8tz
-      reconcileStrategy: ChartVersion
-      sourceRef:
-        kind: HelmRepository
-        name: k8tz
-      version: 0.18.0
+  chartRef:
+    kind: OCIRepository
+    name: k8tz
 
   values:
     replicaCount: 2
