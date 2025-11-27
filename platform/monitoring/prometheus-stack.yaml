@@ -54,26 +54,8 @@ spec:
             cluster.routine.sh/authorization: "authelia"
 
     grafana:
-      enabled: true
-      admin:
-        existingSecret: administrative-user
-        userKey: username
-        passwordKey: password
-      defaultDashboardsEnabled: true
-      defaultDashboardsTimezone: "${CLUSTER_TIMEZONE}"
-      additionalDataSources:
-        - name: Loki
-          type: loki
-          access: proxy
-          url: http://loki:3100
-          isDefault: false
-      route:
-        main:
-          enabled: true
-          hostnames: [ "${GRAFANA_INGRESS_HOST}" ]
-          parentRefs:
-            - name: external
-              namespace: gateway
+      enabled: false
+      forceDeployDashboards: true
 
     prometheus:
       enabled: true
