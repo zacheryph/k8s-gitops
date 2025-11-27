@@ -36,4 +36,6 @@ spec:
     dns01RecursiveNameservers: "https://1.1.1.1/dns-query,https://9.9.9.9/dns-query"
     dns01RecursiveNameserversOnly: true
     prometheus:
-      enabled: false
+      enabled: true
+      servicemonitor:
+        enabled: true

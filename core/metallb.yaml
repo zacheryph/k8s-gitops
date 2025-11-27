@@ -39,3 +39,9 @@ spec:
     speaker:
       frr:
         enabled: true
+    prometheus:
+      namespace: monitoring
+      podMonitor:
+        enabled: true
+      serviceMonitor:
+        enabled: true
