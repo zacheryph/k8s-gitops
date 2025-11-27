@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/persistentvolumeclaim.json
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -10,6 +11,7 @@ spec:
       storage: 1Gi
   storageClassName: longhorn
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kafka.strimzi.io/kafkatopic_v1beta2.json
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaTopic
 metadata:

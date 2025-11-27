@@ -8,8 +8,8 @@ metadata:
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
 metadata:
-  namespace: cert-manager
   name: cert-manager
+  namespace: cert-manager
 spec:
   interval: 12h
   layerSelector:

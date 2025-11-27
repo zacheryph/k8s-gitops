@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/metallb.io/ipaddresspool_v1beta1.json
 ---
 apiVersion: metallb.io/v1beta1
 kind: IPAddressPool
@@ -10,6 +11,7 @@ spec:
   autoAssign: true
   avoidBuggyIPs: true
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/metallb.io/bgppeer_v1beta2.json
 apiVersion: metallb.io/v1beta2
 kind: BGPPeer
 metadata:
@@ -22,6 +24,7 @@ spec:
   myASN: ${CLUSTER_ASN}
   holdTime: 1m30s
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/metallb.io/bgpadvertisement_v1beta1.json
 apiVersion: metallb.io/v1beta1
 kind: BGPAdvertisement
 metadata:

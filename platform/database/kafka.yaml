@@ -1,3 +1,4 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kafka.strimzi.io/kafkanodepool_v1beta2.json
 ---
 apiVersion: kafka.strimzi.io/v1beta2
 kind: KafkaNodePool
@@ -15,6 +16,7 @@ spec:
     class: longhorn
     size: 16Gi
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kafka.strimzi.io/kafka_v1beta2.json
 apiVersion: kafka.strimzi.io/v1beta2
 kind: Kafka
 metadata:
