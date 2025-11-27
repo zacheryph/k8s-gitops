@@ -110,7 +110,6 @@ spec:
         kind: Service
         name: minio
         port: 9000
-        weight: 1
       matches:
       - path:
           type: PathPrefix
@@ -135,7 +134,6 @@ spec:
         kind: Service
         name: minio-console
         port: 9001
-        weight: 1
       matches:
       - path:
           type: PathPrefix
