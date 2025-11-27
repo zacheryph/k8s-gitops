@@ -4,14 +4,9 @@ kind: HelmRelease
 metadata:
   name: promtail
 spec:
-  chart:
-    spec:
-      chart: promtail
-      reconcileStrategy: ChartVersion
-      sourceRef:
-        kind: HelmRepository
-        name: grafana
-      version: "6.17.1"
+  chartRef:
+    kind: OCIRepository
+    name: promtail
   interval: 1h
   values:
     serviceMonitor:

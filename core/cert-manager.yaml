@@ -4,14 +4,20 @@ kind: Namespace
 metadata:
   name: cert-manager
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/ocirepository_v1.json
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
+kind: OCIRepository
 metadata:
-  name: jetstack
   namespace: cert-manager
+  name: cert-manager
 spec:
   interval: 12h
-  url: https://charts.jetstack.io
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: v1.19.1
+  url: oci://quay.io/jetstack/charts/cert-manager
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -19,14 +25,9 @@ metadata:
   name: cert-manager
   namespace: cert-manager
 spec:
-  chart:
-    spec:
-      chart: cert-manager
-      reconcileStrategy: ChartVersion
-      sourceRef:
-        kind: HelmRepository
-        name: jetstack
-      version: v1.19.1
+  chartRef:
+    kind: OCIRepository
+    name: cert-manager
   interval: 1h
   values:
     crds:

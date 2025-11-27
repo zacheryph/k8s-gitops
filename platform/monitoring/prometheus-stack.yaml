@@ -13,14 +13,9 @@ kind: HelmRelease
 metadata:
   name: kube-prometheus-stack
 spec:
-  chart:
-    spec:
-      chart: kube-prometheus-stack
-      reconcileStrategy: ChartVersion
-      sourceRef:
-        kind: HelmRepository
-        name: prometheus-community
-      version: "79.8.2"
+  chartRef:
+    kind: OCIRepository
+    name: kube-prometheus-stack
   interval: 1h
   values:
     cleanPrometheusOperatorObjectNames: true

@@ -1,13 +1,17 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/helmrepository_v1.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/ocirepository_v1.json
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
+kind: OCIRepository
 metadata:
   name: forgejo
 spec:
-  type: oci
   interval: 12h
-  url: oci://code.forgejo.org/forgejo-helm
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: 15.0.3
+  url: oci://code.forgejo.org/forgejo-helm/forgejo
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -26,14 +30,9 @@ metadata:
   name: &name forgejo
 spec:
   interval: 1h
-  chart:
-    spec:
-      chart: forgejo
-      version: 15.0.3
-      sourceRef:
-        kind: HelmRepository
-        name: forgejo
-
+  chartRef:
+    kind: OCIRepository
+    name: forgejo
   values:
     valkey-cluster:
       enabled: false

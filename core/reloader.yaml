@@ -1,14 +1,20 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/ocirepository_v1.json
 apiVersion: source.toolkit.fluxcd.io/v1
-kind: HelmRepository
+kind: OCIRepository
 metadata:
-  name: stakater
+  name: reloader
   namespace: kube-system
 spec:
   interval: 12h
-  url: https://stakater.github.io/stakater-charts
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: v2.2.5
+  url: oci://ghcr.io/stakater/charts/reloader
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2beta2.json
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
@@ -16,14 +22,9 @@ metadata:
   namespace: kube-system
 spec:
   interval: 1h
-  chart:
-    spec:
-      chart: reloader
-      version: 2.2.5
-      sourceRef:
-        kind: HelmRepository
-        name: stakater
-        namespace: kube-system
+  chartRef:
+    kind: OCIRepository
+    name: reloader
   driftDetection:
     mode: enabled
   values:

@@ -4,14 +4,9 @@ kind: HelmRelease
 metadata:
   name: loki
 spec:
-  chart:
-    spec:
-      chart: loki
-      reconcileStrategy: ChartVersion
-      sourceRef:
-        kind: HelmRepository
-        name: grafana
-      version: "6.46.0"
+  chartRef:
+    kind: OCIRepository
+    name: loki
   interval: 1h
   values:
     deploymentMode: SingleBinary

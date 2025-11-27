@@ -4,7 +4,7 @@ kind: Kustomization
 namespace: monitoring
 resources:
 - namespace.yaml
-- helm-repository.yaml
+- oci-repositories.yaml
 - loki.yaml
 - prometheus-stack.yaml
 - promtail.yaml
