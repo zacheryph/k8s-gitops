@@ -1,0 +1,115 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/persistentvolumeclaim.json
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pocket-id
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: longhorn
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: pocket-id
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  interval: 1h
+  values:
+    controllers:
+      main:
+        type: deployment
+        containers:
+          app:
+            image:
+              repository: ghcr.io/pocket-id/pocket-id
+              tag: v1.15.0@sha256:92a5624ea14dc96e91ef236950d4d858e97119ce811075648ffd8343e364735d
+            env:
+              ALLOW_USER_SIGNUPS: "disabled"
+              ANALYTICS_DISABLED: "true"
+              APP_URL: "https://${POCKETID_INGRESS_HOST}"
+              DB_CONNECTION_STRING: /config/pocket-id.db
+              EMAILS_VERIFIED: "true"
+              EMAIL_LOGIN_NOTIFICATION_ENABLED: "true"
+              # GEOLITE_DB_PATH: /data/GeoLite2-City.mmdb
+              INTERNAL_APP_URL: "http://pocket-id.security.svc.cluster.local"
+              KEYS_STORAGE: database
+              ENCRYPTION_KEY: "${POCKETID_ENCRYPTION_KEY}"
+              LOG_JSON: "true"
+              METRICS_ENABLED: "true"
+              OTEL_EXPORTER_PROMETHEUS_HOST: 0.0.0.0
+              OTEL_EXPORTER_PROMETHEUS_PORT: &metrics 9464
+              OTEL_METRICS_EXPORTER: prometheus
+              SMTP_FROM: "PocketID <pocket-id@${CLUSTER_EXTERNAL_DOMAIN}>"
+              SMTP_HOST: "${SMTP_HOSTNAME}"
+              SMTP_PORT: "${SMTP_PORT}"
+              SMTP_USER: "${SMTP_USERNAME}"
+              SMTP_PASSWORD: "${SMTP_PASSWORD}"
+              TRUST_PROXY: "true"
+              UPLOAD_PATH: /data/uploads
+            probes:
+              liveness: &probes
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /healthz
+                    port: &port 1411
+                  initialDelaySeconds: 0
+                  periodSeconds: 10
+                  timeoutSeconds: 1
+                  failureThreshold: 3
+              readiness: *probes
+            resources:
+              requests:
+                cpu: 25m
+                memory: 128Mi
+              limits:
+                memory: 256Mi
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop: [ "ALL" ]
+    defaultPodOptions:
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+    service:
+      main:
+        ports:
+          http:
+            port: *port
+          metrics:
+            port: *metrics
+    route:
+      main:
+        hostnames:
+          - "${POCKETID_INGRESS_HOST}"
+        parentRefs:
+          - name: external
+            namespace: gateway
+    serviceMonitor:
+      main:
+        endpoints:
+          - port: metrics
+    persistence:
+      config:
+        existingClaim: pocket-id
+        globalMounts:
+          - path: /config
+            subPath: config
+          - path: /data
+            subPath: data
