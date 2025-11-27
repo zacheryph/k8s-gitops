@@ -38,7 +38,8 @@ spec:
               DB_CONNECTION_STRING: /config/pocket-id.db
               EMAILS_VERIFIED: "true"
               EMAIL_LOGIN_NOTIFICATION_ENABLED: "true"
-              # GEOLITE_DB_PATH: /data/GeoLite2-City.mmdb
+              GEOLITE_DB_PATH: /data/GeoLite2-City.mmdb
+              MAXMIND_LICENSE_KEY: "${MAXMIND_LICENSE_KEY}"
               INTERNAL_APP_URL: "http://pocket-id.security.svc.cluster.local"
               KEYS_STORAGE: database
               ENCRYPTION_KEY: "${POCKETID_ENCRYPTION_KEY}"
