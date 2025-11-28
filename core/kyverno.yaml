@@ -16,7 +16,7 @@ spec:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: 3.6.0
+    tag: 3.6.0@sha256:2e9f7bb15413b25e0bd7d36ae46b1dcc6239c1e83a83168cc05db63c464836dc
   url: oci://ghcr.io/kyverno/charts/kyverno
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2

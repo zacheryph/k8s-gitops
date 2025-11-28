@@ -16,7 +16,7 @@ spec:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: 2.1.1
+    tag: 2.1.1@sha256:e3761d4c2d26fa07798313c5ae7bc18fafa459991144e154a00b97c92e294e8d
   url: oci://ghcr.io/home-operations/charts-mirror/crossplane
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
