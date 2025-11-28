@@ -52,7 +52,7 @@ spec:
                   - name: tinyauth
                     namespace: security
                     port: 3000
-                path: /api/authz/ext-authz/
+                path: /api/auth/pocketid
                 headersToBackend:
                   - Remote-User
                   - Remote-Groups

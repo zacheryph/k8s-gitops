@@ -51,7 +51,7 @@ metadata:
   name: longhorn-ui
   namespace: longhorn-system
   labels:
-    cluster.routine.sh/authorization: "authelia"
+    cluster.routine.sh/authorization: "tinyauth"
 spec:
   hostnames: [ "${LONGHORN_INGRESS_HOST}" ]
   parentRefs:
