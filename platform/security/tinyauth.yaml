@@ -1,0 +1,56 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: tinyauth
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  values:
+    controllers:
+      tinyauth:
+        containers:
+          app:
+            image:
+              repository: ghcr.io/steveiliop56/tinyauth
+              tag: v4.1.0@sha256:402ee231204757a3e01b4aaba9e4aa09a3c7c4680a82bc47135632ec8864b8c8
+            env:
+              APP_TITLE: "Zro ID"
+              APP_URL: https://${TINYAUTH_INGRESS_HOST}
+              DISABLE_CONTINUE: "true"
+              LOG_JSON: "true"
+              TRUSTED_PROXIES: 10.0.0.0/8
+              PROVIDERS_POCKETID_NAME: Zro ID
+              PROVIDERS_POCKETID_AUTH_URL: https://${POCKETID_INGRESS_HOST}/authorize
+              PROVIDERS_POCKETID_TOKEN_URL: https://${POCKETID_INGRESS_HOST}/api/oidc/token
+              PROVIDERS_POCKETID_USER_INFO_URL: https://${POCKETID_INGRESS_HOST}/api/oidc/userinfo
+              PROVIDERS_POCKETID_REDIRECT_URL: https://${POCKETID_INGRESS_HOST}/api/oauth/callback/pocketid
+              PROVIDERS_POCKETID_SCOPES: openid email profile groups
+              PROVIDERS_POCKETID_CLIENT_ID: "${POCKETID_TINYAUTH_AUTH_CLIENT_ID}"
+              PROVIDERS_POCKETID_CLIENT_SECRET: "${POCKETID_TINYAUTH_AUTH_CLIENT_SECRET}"
+    service:
+      app:
+        controller: tinyauth
+        ports:
+          http:
+            port: 80
+            targetPort: 3000
+    route:
+      main:
+        hostnames:
+          - "${TINYAUTH_INGRESS_HOST}"
+        parentRefs:
+          - name: external
+            namespace: gateway
+    persistence:
+      tmpfs:
+        type: emptyDir
+        advancedMounts:
+          tinyauth:
+            app:
+              - path: /data
+                subPath: data
