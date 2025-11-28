@@ -1,0 +1,30 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: security-routes
+spec:
+  hostnames: [ "${POCKETID_INGRESS_HOST}" ]
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: external
+      namespace: gateway
+  rules:
+    - backendRefs:
+      - kind: Service
+        name: oauth2-proxy
+        port: 80
+      matches:
+      - path:
+          type: PathPrefix
+          value: /proxy
+    - backendRefs:
+      - kind: Service
+        name: pocket-id
+        port: 80
+      matches:
+      - path:
+          type: PathPrefix
+          value: /

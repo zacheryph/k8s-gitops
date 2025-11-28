@@ -51,7 +51,7 @@ metadata:
   name: longhorn-ui
   namespace: longhorn-system
   labels:
-    cluster.routine.sh/authorization: "tinyauth"
+    cluster.routine.sh/authorization: "oauth2-proxy"
 spec:
   hostnames: [ "${LONGHORN_INGRESS_HOST}" ]
   parentRefs:
