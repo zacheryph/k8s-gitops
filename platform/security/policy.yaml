@@ -3,18 +3,18 @@
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
 metadata:
-  name: httproute-authelia-security-policy
+  name: httproute-tinyauth-security-policy
   annotations:
-    policies.kyverno.io/title: Generate SecurityPolicy & ReferenceGrant for Authelia HTTPRoutes
+    policies.kyverno.io/title: Generate SecurityPolicy & ReferenceGrant for Tinyauth HTTPRoutes
     policies.kyverno.io/category: Security
     policies.kyverno.io/subject: HTTPRoute, SecurityPolicy, ReferenceGrant
     policies.kyverno.io/description: >-
       This policy generates a SecurityPolicy resource for HTTPRoutes
-      that are labeled with 'auth: authelia'.
+      that are labeled with 'auth: tinyauth'.
 spec:
   generateExisting: true
   rules:
-    - name: generate-authelia-security-policy
+    - name: generate-tinyauth-security-policy
       match:
         any:
           - resources:
@@ -22,11 +22,11 @@ spec:
                 - HTTPRoute
               selector:
                 matchLabels:
-                  cluster.routine.sh/authorization: authelia
+                  cluster.routine.sh/authorization: tinyauth
       generate:
         apiVersion: gateway.envoyproxy.io/v1alpha1
         kind: SecurityPolicy
-        name: "{{request.object.metadata.name}}-authelia-authorization"
+        name: "{{request.object.metadata.name}}-tinyauth-authorization"
         namespace: "{{request.object.metadata.namespace}}"
         synchronize: true
         data:
@@ -49,16 +49,16 @@ spec:
               failOpen: false
               http:
                 backendRefs:
-                  - name: authelia
-                    namespace: authelia
-                    port: 80
+                  - name: tinyauth
+                    namespace: security
+                    port: 3000
                 path: /api/authz/ext-authz/
                 headersToBackend:
                   - Remote-User
                   - Remote-Groups
                   - Remote-Name
                   - Remote-Email
-    - name: generate-authelia-reference-grant
+    - name: generate-tinyauth-reference-grant
       match:
         any:
           - resources:
@@ -66,12 +66,12 @@ spec:
                 - HTTPRoute
               selector:
                 matchLabels:
-                  cluster.routine.sh/authorization: authelia
+                  cluster.routine.sh/authorization: tinyauth
       generate:
         apiVersion: gateway.networking.k8s.io/v1beta1
         kind: ReferenceGrant
-        name: "{{request.object.metadata.namespace}}-{{request.object.metadata.name}}-authelia"
-        namespace: "authelia"
+        name: "{{request.object.metadata.namespace}}-{{request.object.metadata.name}}-tinyauth"
+        namespace: "tinyauth"
         synchronize: true
         data:
           metadata:
