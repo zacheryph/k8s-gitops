@@ -51,7 +51,7 @@ spec:
                 backendRefs:
                   - name: tinyauth
                     namespace: security
-                    port: 3000
+                    port: 80
                 path: /api/auth/pocketid
                 headersToBackend:
                   - Remote-User
@@ -71,7 +71,7 @@ spec:
         apiVersion: gateway.networking.k8s.io/v1beta1
         kind: ReferenceGrant
         name: "{{request.object.metadata.namespace}}-{{request.object.metadata.name}}-tinyauth"
-        namespace: "tinyauth"
+        namespace: "security"
         synchronize: true
         data:
           metadata:
