@@ -5,8 +5,4 @@ kind: Kustomization
 namespace: security
 resources:
 - namespace.yaml
-- oauth2-proxy.yaml
 - pocket-id.yaml
-- policy.yaml
-- routes.yaml
-- tinyauth.yaml

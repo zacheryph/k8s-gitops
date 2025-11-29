@@ -96,6 +96,13 @@ spec:
             targetPort: *port
           metrics:
             port: *metrics
+    route:
+      main:
+        hostnames:
+          - "${POCKETID_INGRESS_HOST}"
+        parentRefs:
+          - name: external
+            namespace: gateway
     serviceMonitor:
       main:
         endpoints:
