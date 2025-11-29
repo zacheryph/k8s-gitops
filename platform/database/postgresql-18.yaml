@@ -25,11 +25,9 @@ spec:
       import:
         type: monolith
         databases:
-          - authelia
           - forgejo
           - vaultwarden
         roles:
-          - authelia
           - forgejo
           - vaultwarden
         source:
