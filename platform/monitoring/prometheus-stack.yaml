@@ -9,6 +9,26 @@ stringData:
     username: "${USER_USERNAME}"
     password: "${SERVICES_INIT_PASSWORD}"
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: alertmanager-oidc-credentials
+stringData:
+  client-id: ${OIDC_ALERTMANAGER_CLIENT_ID}
+  client-secret: ${OIDC_ALERTMANAGER_CLIENT_SECRET}
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: prometheus-oidc-credentials
+stringData:
+  client-id: ${OIDC_PROMETHEUS_CLIENT_ID}
+  client-secret: ${OIDC_PROMETHEUS_CLIENT_SECRET}
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -51,7 +71,7 @@ spec:
             - name: external
               namespace: gateway
           labels:
-            cluster.routine.sh/authorization: "authelia"
+            cluster.routine.sh/oidc-credentials: alertmanager-oidc-credentials
 
     grafana:
       enabled: false
@@ -67,7 +87,7 @@ spec:
             - name: external
               namespace: gateway
           labels:
-            cluster.routine.sh/authorization: "authelia"
+            cluster.routine.sh/oidc-credentials: prometheus-oidc-credentials
       prometheusSpec:
         storageSpec:
           volumeClaimTemplate:

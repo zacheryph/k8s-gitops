@@ -12,6 +12,16 @@ spec:
       storage: 4Gi
   storageClassName: longhorn
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: sabnzbd-oidc-credentials
+stringData:
+  client-id: ${OIDC_SABNZBD_CLIENT_ID}
+  client-secret: ${OIDC_SABNZBD_CLIENT_SECRET}
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -83,7 +93,7 @@ spec:
           - name: external
             namespace: gateway
         labels:
-          cluster.routine.sh/authorization: "authelia"
+          cluster.routine.sh/oidc-credentials: sabnzbd-oidc-credentials
 
     persistence:
       config:
