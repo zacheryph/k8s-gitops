@@ -5,6 +5,17 @@ kind: Namespace
 metadata:
   name: longhorn-system
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: longhorn-ui-oidc-credentials
+  namespace: longhorn-system
+stringData:
+  client-id: ${OIDC_LONGHORN_CLIENT_ID}
+  client-secret: ${OIDC_LONGHORN_CLIENT_SECRET}
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/ocirepository_v1.json
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
@@ -51,7 +62,7 @@ metadata:
   name: longhorn-ui
   namespace: longhorn-system
   labels:
-    cluster.routine.sh/authorization: "oauth2-proxy"
+    cluster.routine.sh/oidc-credentials: longhorn-ui-oidc-credentials
 spec:
   hostnames: [ "longhorn.${CLUSTER_DOMAIN}" ]
   parentRefs:
