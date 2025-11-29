@@ -19,7 +19,7 @@ spec:
                   - key: cluster.routine.sh/oidc-credentials
                     operator: Exists
       generate:
-        apiVersion: security.routine.sh/v1alpha1
+        apiVersion: gateway.envoyproxy.io/v1alpha1
         kind: SecurityPolicy
         name: "{{request.object.metadata.name}}-oidc"
         namespace: "{{request.object.metadata.namespace}}"
@@ -30,15 +30,17 @@ spec:
               source-httproute: "{{request.object.metadata.namespace}}-{{request.object.metadata.name}}"
           spec:
             targetRefs:
-              - apiVersion: gateway.networking.k8s.io/v1
+              - group: gateway.networking.k8s.io
                 kind: HTTPRoute
                 name: "{{request.object.metadata.name}}"
             oidc:
+              cookieDomain: ${CLUSTER_DOMAIN}
+              scopes: [ openid profile email groups ]
+              provider:
+                issuer: ${OIDC_ISSUER_URL}
               clientIDRef:
                 kind: Secret
                 name: "{{request.object.metadata.labels.\"cluster.routine.sh/oidc-credentials\"}}"
               clientSecret:
                 kind: Secret
                 name: "{{request.object.metadata.labels.\"cluster.routine.sh/oidc-credentials\"}}"
-              provider:
-                issuer: ${OIDC_ISSUER_URL}
