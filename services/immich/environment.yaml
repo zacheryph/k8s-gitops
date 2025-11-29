@@ -6,10 +6,10 @@ type: Opaque
 metadata:
   name: immich-config
 stringData:
-  DB_HOSTNAME: ${DATABASE_HOSTNAME}
+  DB_HOSTNAME: ${POSTGRES_HOSTNAME}
   DB_PORT: "5432"
   DB_USERNAME: immich
-  DB_PASSWORD: ${DATABASE_IMMICH_PASSWORD}
+  DB_PASSWORD: ${POSTGRES_IMMICH_PASSWORD}
   DB_DATABASE_NAME: immich
   DB_VECTOR_EXTENSION: pgvector
   REDIS_HOSTNAME: dragonfly.immich.svc

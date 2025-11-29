@@ -70,10 +70,10 @@ spec:
       config:
         database:
           DB_TYPE: postgres
-          HOST: ${DATABASE_HOSTNAME}
+          HOST: ${POSTGRES_HOSTNAME}
           NAME: forgejo
           USER: forgejo
-          PASSWD: ${DATABASE_FORGEJO_PASSWORD}
+          PASSWD: ${POSTGRES_FORGEJO_PASSWORD}
           SCHEMA: public
         cache:
           ADAPTER: memory
@@ -82,11 +82,11 @@ spec:
           COOKIE_SECURE: true
           SAME_SITE: strict
         server:
-          DOMAIN: ${FORGEJO_INGRESS_HOST}
-          ROOT_URL: https://${FORGEJO_INGRESS_HOST}
+          DOMAIN: git.${CLUSTER_DOMAIN}
+          ROOT_URL: https://git.${CLUSTER_DOMAIN}
         mailer:
           ENABLED: true
-          FROM: "Forgejo <forgejo@${CLUSTER_EXTERNAL_DOMAIN}>"
+          FROM: "Forgejo <forgejo@${CLUSTER_DOMAIN}>"
           PROTOCOL: smtp+starttls
           SMTP_ADDR: ${SMTP_HOSTNAME}
           SMTP_PORT: ${SMTP_PORT}
@@ -100,7 +100,7 @@ spec:
           STORAGE_TYPE: local
     httpRoute:
       enabled: true
-      hostnames: [ "${FORGEJO_INGRESS_HOST}" ]
+      hostnames: [ "git.${CLUSTER_DOMAIN}" ]
       parentRefs:
         - name: external
           namespace: gateway

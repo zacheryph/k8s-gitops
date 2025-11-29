@@ -34,7 +34,7 @@ spec:
     alertmanager:
       enabled: true
       alertmanagerSpec:
-        externalURL: "https://${ALERTMANAGER_INGRESS_HOST}"
+        externalURL: "https://alertmanager.${CLUSTER_DOMAIN}"
         storage:
           volumeClaimTemplate:
             spec:
@@ -46,7 +46,7 @@ spec:
       route:
         main:
           enabled: true
-          hostnames: [ "${ALERTMANAGER_INGRESS_HOST}" ]
+          hostnames: [ "alertmanager.${CLUSTER_DOMAIN}" ]
           parentRefs:
             - name: external
               namespace: gateway
@@ -62,7 +62,7 @@ spec:
       route:
         main:
           enabled: true
-          hostnames: [ "${PROMETHEUS_INGRESS_HOST}" ]
+          hostnames: [ "prometheus.${CLUSTER_DOMAIN}" ]
           parentRefs:
             - name: external
               namespace: gateway

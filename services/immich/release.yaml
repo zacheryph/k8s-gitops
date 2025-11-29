@@ -103,7 +103,7 @@ spec:
       app:
         enabled: true
         kind: HTTPRoute
-        hostnames: [ "${IMMICH_INGRESS_HOST}" ]
+        hostnames: [ "photos.${CLUSTER_DOMAIN}" ]
         parentRefs:
           - name: external
             namespace: gateway

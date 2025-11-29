@@ -83,8 +83,8 @@ spec:
           username: ${SMTP_USERNAME}
           password:
             value: ${SMTP_PASSWORD}
-          sender: "Authelia <authelia@${CLUSTER_EXTERNAL_DOMAIN}>"
-          identifier: 'k0s-cluster.cluster.${CLUSTER_EXTERNAL_DOMAIN}'
+          sender: "Authelia <authelia@${CLUSTER_DOMAIN}>"
+          identifier: 'k0s-cluster.cluster.${CLUSTER_DOMAIN}'
           subject: "[Authelia] {title}"
           startup_check_address: ${USER_EMAIL}
           disable_require_tls: false
@@ -95,9 +95,9 @@ spec:
         expiration: "6h"
         remember_me: "3M"
         cookies:
-        - domain: ${CLUSTER_EXTERNAL_DOMAIN}
+        - domain: ${CLUSTER_DOMAIN}
           subdomain: auth
-          authelia_url: https://${AUTHELIA_INGRESS_HOST}
+          authelia_url: https://auth.${CLUSTER_DOMAIN}
         redis:
           enabled: true
           host: dragonfly
@@ -110,10 +110,10 @@ spec:
           value: ${AUTHELIA_STORAGE_ENCRYPTION_KEY}
         postgres:
           enabled: true
-          address: tcp://${DATABASE_ADDRESS}
+          address: tcp://${POSTGRES_ADDRESS}
           database: authelia
           schema: public
           username: authelia
           password:
-            value: ${DATABASE_AUTHELIA_PASSWORD}
+            value: ${POSTGRES_AUTHELIA_PASSWORD}
           timeout: '5s'

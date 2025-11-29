@@ -86,7 +86,7 @@ spec:
       app:
         enabled: true
         kind: HTTPRoute
-        hostnames: [ "${FRIGATE_INGRESS_HOST}" ]
+        hostnames: [ "frigate.${CLUSTER_DOMAIN}" ]
         parentRefs:
           - name: external
             namespace: gateway

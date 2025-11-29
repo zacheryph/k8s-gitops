@@ -50,7 +50,7 @@ kind: HTTPRoute
 metadata:
   name: emqx
 spec:
-  hostnames: [ "${EMQX_INGRESS_HOST}" ]
+  hostnames: [ "mqtt.${CLUSTER_DOMAIN}" ]
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway

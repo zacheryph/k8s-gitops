@@ -97,7 +97,7 @@ spec:
       app:
         enabled: true
         kind: HTTPRoute
-        hostnames: [ "${UNIFI_INGRESS_HOST}" ]
+        hostnames: [ "unifi-controller.${CLUSTER_DOMAIN}" ]
         parentRefs:
           - name: external
             namespace: gateway

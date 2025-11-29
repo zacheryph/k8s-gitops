@@ -40,7 +40,7 @@ spec:
               repository: ghcr.io/home-operations/plex
               tag: 1.42.2.10156@sha256:9ad8a3506e1d8ebda873a668603c1a2c10e6887969564561be669efd65ae8871
             env:
-              PLEX_ADVERTISE_URL: https://${PLEX_INGRESS_HOST}:443,http://${LOAD_BALANCER_PLEX}:32400
+              PLEX_ADVERTISE_URL: https://plex.${CLUSTER_DOMAIN}:443,http://${LOAD_BALANCER_PLEX}:32400
             probes:
               liveness: &probes
                 enabled: true
@@ -92,7 +92,7 @@ spec:
       app:
         enabled: true
         kind: HTTPRoute
-        hostnames: [ "${PLEX_INGRESS_HOST}" ]
+        hostnames: [ "plex.${CLUSTER_DOMAIN}" ]
         parentRefs:
           - name: external
             namespace: gateway

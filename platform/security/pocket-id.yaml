@@ -34,7 +34,7 @@ spec:
             env:
               ALLOW_USER_SIGNUPS: "disabled"
               ANALYTICS_DISABLED: "true"
-              APP_URL: "https://${POCKETID_INGRESS_HOST}"
+              APP_URL: "${OIDC_ISSUER_URL}"
               DB_CONNECTION_STRING: /config/pocket-id.db
               EMAILS_VERIFIED: "true"
               EMAIL_LOGIN_NOTIFICATION_ENABLED: "true"
@@ -48,7 +48,7 @@ spec:
               OTEL_EXPORTER_PROMETHEUS_HOST: 0.0.0.0
               OTEL_EXPORTER_PROMETHEUS_PORT: &metrics 9464
               OTEL_METRICS_EXPORTER: prometheus
-              SMTP_FROM: "PocketID <pocket-id@${CLUSTER_EXTERNAL_DOMAIN}>"
+              SMTP_FROM: "PocketID <pocket-id@${CLUSTER_DOMAIN}>"
               SMTP_HOST: "${SMTP_HOSTNAME}"
               SMTP_PORT: "${SMTP_PORT}"
               SMTP_USER: "${SMTP_USERNAME}"
@@ -99,7 +99,7 @@ spec:
     route:
       main:
         hostnames:
-          - "${POCKETID_INGRESS_HOST}"
+          - "id.${CLUSTER_DOMAIN}"
         parentRefs:
           - name: external
             namespace: gateway

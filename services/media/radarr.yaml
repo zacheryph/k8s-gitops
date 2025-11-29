@@ -43,7 +43,7 @@ spec:
               RADARR__PORT: &port 7878
               RADARR__AUTHENTICATION_METHOD: External
               RADARR__AUTHENTICATION_REQUIRED: DisabledForLocalAddresses
-              RADARR__APPLICATION_URL: https://${RADARR_INGRESS_HOST}
+              RADARR__APPLICATION_URL: https://radarr.${CLUSTER_DOMAIN}
               RADARR__LOG_LEVEL: info
             probes:
               liveness: &probes
@@ -82,7 +82,7 @@ spec:
       app:
         enabled: true
         kind: HTTPRoute
-        hostnames: [ "${RADARR_INGRESS_HOST}" ]
+        hostnames: [ "radarr.${CLUSTER_DOMAIN}" ]
         parentRefs:
           - name: external
             namespace: gateway

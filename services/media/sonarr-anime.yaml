@@ -43,7 +43,7 @@ spec:
               SONARR__PORT: &port 8989
               SONARR__AUTHENTICATION_METHOD: External
               SONARR__AUTHENTICATION_REQUIRED: DisabledForLocalAddresses
-              SONARR__APPLICATION_URL: https://${SONARR_ANIME_INGRESS_HOST}
+              SONARR__APPLICATION_URL: https://sonarr-anime.${CLUSTER_DOMAIN}
               SONARR__LOG_LEVEL: info
             probes:
               liveness: &probes
@@ -82,7 +82,7 @@ spec:
       app:
         enabled: true
         kind: HTTPRoute
-        hostnames: [ "${SONARR_ANIME_INGRESS_HOST}" ]
+        hostnames: [ "sonarr-anime.${CLUSTER_DOMAIN}" ]
         parentRefs:
           - name: external
             namespace: gateway

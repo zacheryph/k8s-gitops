@@ -66,8 +66,8 @@ spec:
       limits:
         memory: 1Gi
     environment:
-      MINIO_BROWSER_REDIRECT_URL: ${MINIO_BROWSER_REDIRECT_URL}
-      MINIO_SERVER_URL: ${MINIO_SERVER_URL}
+      MINIO_BROWSER_REDIRECT_URL: minio.${CLUSTER_DOMAIN}
+      MINIO_SERVER_URL: s3.${CLUSTER_DOMAIN}
 
     # buckets, policies, and users
     buckets:
@@ -98,7 +98,7 @@ metadata:
   name: minio
   namespace: minio
 spec:
-  hostnames: [ "${MINIO_INGRESS_HOST}" ]
+  hostnames: [ "s3.${CLUSTER_DOMAIN}" ]
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway
@@ -122,7 +122,7 @@ metadata:
   name: minio-console
   namespace: minio
 spec:
-  hostnames: [ "${MINIO_INGRESS_ADMIN}" ]
+  hostnames: [ "minio.${CLUSTER_DOMAIN}" ]
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway

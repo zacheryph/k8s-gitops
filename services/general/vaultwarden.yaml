@@ -28,16 +28,16 @@ spec:
               tag: 1.34.3-alpine@sha256:d70118b9dafb8588ee2651ceb5df68db27dcbd8e18467722010644ba48d5d6d6
             env:
               ADMIN_TOKEN: ${VAULTWARDEN_ADMIN_TOKEN}
-              DOMAIN: https://${VAULTWARDEN_INGRESS_HOST}
+              DOMAIN: https://warden.${CLUSTER_DOMAIN}
               SIGNUPS_ALLOWED: "false"
               SMTP_HOST: ${SMTP_HOSTNAME}
-              SMTP_FROM: vaultwarden@${CLUSTER_EXTERNAL_DOMAIN}
+              SMTP_FROM: vaultwarden@${CLUSTER_DOMAIN}
               SMTP_FROM_NAME: Vaultwarden
               SMTP_USERNAME: ${SMTP_USERNAME}
               SMTP_PASSWORD: ${SMTP_PASSWORD}
               SMTP_SECURITY: ${SMTP_SECURITY}
               SMTP_PORT: "${SMTP_PORT}"
-              DATABASE_URL: postgresql://vaultwarden:${DATABASE_VAULTWARDEN_PASSWORD}@${DATABASE_ADDRESS}
+              DATABASE_URL: postgresql://vaultwarden:${POSTGRES_VAULTWARDEN_PASSWORD}@${POSTGRES_ADDRESS}
 
     service:
       app:
@@ -49,7 +49,7 @@ spec:
       app:
         enabled: true
         kind: HTTPRoute
-        hostnames: [ "${VAULTWARDEN_INGRESS_HOST}" ]
+        hostnames: [ "warden.${CLUSTER_DOMAIN}" ]
         parentRefs:
           - name: external
             namespace: gateway

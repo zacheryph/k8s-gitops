@@ -16,22 +16,22 @@ spec:
     auth.generic_oauth:
       allow_assign_grafana_admin: "true"
       allow_sign_up: "true"
-      api_url: https://${POCKETID_INGRESS_HOST}/api/oidc/userinfo
-      auth_url: https://${POCKETID_INGRESS_HOST}/authorize
-      client_id: ${POCKETID_GRAFANA_AUTH_CLIENT_ID}
-      client_secret: ${POCKETID_GRAFANA_AUTH_CLIENT_SECRET}
+      api_url: ${OIDC_ISSUER_URL}/api/oidc/userinfo
+      auth_url: ${OIDC_ISSUER_URL}/authorize
+      client_id: ${OIDC_GRAFANA_CLIENT_ID}
+      client_secret: ${OIDC_GRAFANA_CLIENT_SECRET}
       enabled: "True"
       groups_attribute_path: groups
       name: Zro ID
       role_attribute_path: "contains(groups[*], 'admin') && 'Admin' || 'Viewer'"
       scopes: openid,profile,email,groups
-      token_url: https://${POCKETID_INGRESS_HOST}/api/oidc/token
+      token_url: ${OIDC_ISSUER_URL}/api/oidc/token
     log:
       mode: console
     metrics:
       enabled: "true"
     server:
-      root_url: "https://${GRAFANA_INGRESS_HOST}"
+      root_url: "https://grafana.${CLUSTER_DOMAIN}"
     # disable all the things
     analytics:
       check_for_updates: "false"
@@ -68,7 +68,7 @@ kind: HTTPRoute
 metadata:
   name: grafana
 spec:
-  hostnames: [ "${GRAFANA_INGRESS_HOST}" ]
+  hostnames: [ "grafana.${CLUSTER_DOMAIN}" ]
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway

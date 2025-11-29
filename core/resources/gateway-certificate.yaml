@@ -11,10 +11,10 @@ spec:
   renewBefore: 720h0m0s
   subject:
     organizations: ["${ORGANIZATION_NAME}"]
-  commonName: "${CLUSTER_EXTERNAL_DOMAIN}"
+  commonName: "${CLUSTER_DOMAIN}"
   dnsNames:
-  - "${CLUSTER_EXTERNAL_DOMAIN}"
-  - "*.${CLUSTER_EXTERNAL_DOMAIN}"
+  - "${CLUSTER_DOMAIN}"
+  - "*.${CLUSTER_DOMAIN}"
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt

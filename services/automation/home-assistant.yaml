@@ -51,7 +51,7 @@ spec:
               repository: homeassistant/home-assistant
               tag: 2025.11.3@sha256:f971850a6ec1fb5c5fd4e1748058e9e1f589aaf0da933b8d88bb5dee03f5b5e8
             env:
-              DATABASE_URL: postgresql://home_assistant:${DATABASE_HOME_ASSISTANT_PASSWORD}@${DATABASE_ADDRESS}/home_assistant
+              DATABASE_URL: postgresql://home_assistant:${POSTGRES_HOME_ASSISTANT_PASSWORD}@${POSTGRES_ADDRESS}/home_assistant
             resources:
               requests:
                 cpu: 100m
@@ -69,7 +69,7 @@ spec:
       app:
         enabled: true
         kind: HTTPRoute
-        hostnames: [ "${HOME_ASSISTANT_INGRESS_HOST}" ]
+        hostnames: [ "home-assistant.${CLUSTER_DOMAIN}" ]
         parentRefs:
           - name: external
             namespace: gateway

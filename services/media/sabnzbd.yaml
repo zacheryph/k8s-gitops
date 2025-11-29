@@ -47,7 +47,7 @@ spec:
                 sabnzbd.media.svc,
                 sabnzbd.media.svc.cluster,
                 sabnzbd.media.svc.cluster.local,
-                ${SABNZBD_INGRESS_HOST}
+                nzb.${CLUSTER_DOMAIN}
             resources:
               requests:
                 cpu: 50m
@@ -78,7 +78,7 @@ spec:
       app:
         enabled: true
         kind: HTTPRoute
-        hostnames: [ "${SABNZBD_INGRESS_HOST}" ]
+        hostnames: [ "nzb.${CLUSTER_DOMAIN}" ]
         parentRefs:
           - name: external
             namespace: gateway

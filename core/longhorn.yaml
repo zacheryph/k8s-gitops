@@ -53,7 +53,7 @@ metadata:
   labels:
     cluster.routine.sh/authorization: "oauth2-proxy"
 spec:
-  hostnames: [ "${LONGHORN_INGRESS_HOST}" ]
+  hostnames: [ "longhorn.${CLUSTER_DOMAIN}" ]
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway
