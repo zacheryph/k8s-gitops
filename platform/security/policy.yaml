@@ -1,0 +1,44 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kyverno.io/clusterpolicy_v1.json
+apiVersion: kyverno.io/v1
+kind: ClusterPolicy
+metadata:
+  name: httproute-oidc-security-policy
+spec:
+  background: true
+  generateExisting: true
+  rules:
+    - name: generate-oidc-security-policy
+      match:
+        any:
+          - resources:
+              kinds:
+                - HTTPRoute
+              selector:
+                matchExpressions:
+                  - key: cluster.routine.sh/oidc-credentials
+                    operator: Exists
+      generate:
+        apiVersion: security.routine.sh/v1alpha1
+        kind: SecurityPolicy
+        name: "{{request.object.metadata.name}}-oidc"
+        namespace: "{{request.object.metadata.namespace}}"
+        synchronize: true
+        data:
+          metadata:
+            labels:
+              source-httproute: "{{request.object.metadata.namespace}}-{{request.object.metadata.name}}"
+          spec:
+            targetRefs:
+              - apiVersion: gateway.networking.k8s.io/v1
+                kind: HTTPRoute
+                name: "{{request.object.metadata.name}}"
+            oidc:
+              clientIDRef:
+                kind: Secret
+                name: "{{request.object.metadata.labels.\"cluster.routine.sh/oidc-credentials\"}}"
+              clientSecret:
+                kind: Secret
+                name: "{{request.object.metadata.labels.\"cluster.routine.sh/oidc-credentials\"}}"
+              provider:
+                issuer: ${OIDC_ISSUER_URL}

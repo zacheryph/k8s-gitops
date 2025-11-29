@@ -6,3 +6,4 @@ namespace: security
 resources:
 - namespace.yaml
 - pocket-id.yaml
+- policy.yaml
