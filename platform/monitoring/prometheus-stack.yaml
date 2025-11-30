@@ -1,13 +1,3 @@
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
----
-apiVersion: v1
-kind: Secret
-type: Opaque
-metadata:
-    name: administrative-user
-stringData:
-    username: "${USER_USERNAME}"
-    password: "${SERVICES_INIT_PASSWORD}"
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
 apiVersion: v1
@@ -89,6 +79,11 @@ spec:
           labels:
             cluster.routine.sh/oidc-credentials: prometheus-oidc-credentials
       prometheusSpec:
+        ruleSelectorNilUsesHelmValues: false
+        serviceMonitorSelectorNilUsesHelmValues: false
+        podMonitorSelectorNilUsesHelmValues: false
+        probeSelectorNilUsesHelmValues: false
+        scrapeConfigSelectorNilUsesHelmValues: false
         storageSpec:
           volumeClaimTemplate:
             spec:
