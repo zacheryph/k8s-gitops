@@ -10,7 +10,7 @@ spec:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: v5.20.0@sha256:95e0abf93cda2227f60a8712ea2f012d4b04f3735588f98f41413ab17cea1f9b
+    tag: 5.21.3@sha256:fa2bf64ee4201d75941a5ae4e1af8d177b08a57c6cfc1d82a6890e8fb202da42
   url: oci://ghcr.io/grafana/helm-charts/grafana-operator
 ---
 apiVersion: helm.toolkit.fluxcd.io/v2
