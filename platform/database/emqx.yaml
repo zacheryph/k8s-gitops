@@ -29,7 +29,7 @@ spec:
     recreatePods: true
     image:
       repository: emqx/emqx
-      tag: 6.0.1@sha256:227984a1d31b16b991cdd101f3dfb6dd10699b28b248488fbf7b38b5420004cd
+      tag: 6.1.0@sha256:d8dacf2e4a1b3366495eec50eb552f1004cf97c3f55c358316fb57709ef16cce
     persistence:
       enabled: true
       storageClass: longhorn
