@@ -13,8 +13,10 @@ spec:
     organizations: ["${ORGANIZATION_NAME}"]
   commonName: "${CLUSTER_DOMAIN}"
   dnsNames:
-  - "${CLUSTER_DOMAIN}"
-  - "*.${CLUSTER_DOMAIN}"
+    - "${CLUSTER_DOMAIN}"
+    - "*.${CLUSTER_DOMAIN}"
+    - "*.s3.${CLUSTER_DOMAIN}"
+    - "*.web.${CLUSTER_DOMAIN}"
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt
