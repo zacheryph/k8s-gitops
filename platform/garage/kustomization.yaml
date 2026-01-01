@@ -7,3 +7,4 @@ resources:
   - configuration.yaml
   - namespace.yaml
   - release.yaml
+  - webui.yaml
