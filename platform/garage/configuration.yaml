@@ -1,0 +1,33 @@
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: garage-config
+data:
+  garage.toml: |
+    replication_factor = 1
+
+    metadata_dir = "/meta"
+    data_dir = "/data"
+
+    db_engine = "lmdb"
+
+    compression_level = 1
+
+    rpc_bind_addr = "[::]:3901"
+
+    [s3_api]
+    api_bind_addr = "[::]:3900"
+    s3_region = "garage"
+
+    [admin]
+    api_bind_addr = "[::]:3903"
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: garage-secret
+stringData:
+  GARAGE_ADMIN_TOKEN: "${GARAGE_ADMIN_TOKEN}"
+  GARAGE_METRICS_TOKEN: "${GARAGE_METRICS_TOKEN}"
+  GARAGE_RPC_SECRET: "${GARAGE_RPC_SECRET}"
