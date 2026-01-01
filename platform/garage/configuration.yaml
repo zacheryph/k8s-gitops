@@ -20,6 +20,11 @@ data:
     s3_region = "us-central-1"
     root_domain = ".s3.${CLUSTER_DOMAIN}"
 
+    [s3_web]
+    bind_addr = "[::]:3902"
+    root_domain = ".web.${CLUSTER_DOMAIN}"
+    index = "index.html"
+
     [admin]
     api_bind_addr = "[::]:3903"
 ---

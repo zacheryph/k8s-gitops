@@ -45,19 +45,31 @@ spec:
       app:
         ports:
           s3:
-            port: &port 3900
+            port: &s3-port 3900
+          web:
+            port: &web-port 3902
           api:
             port: 3903
     route:
       app:
-        hostnames: ["s3.${CLUSTER_DOMAIN}"]
+        hostnames: ["s3.${CLUSTER_DOMAIN}", "*.s3.${CLUSTER_DOMAIN}"]
         parentRefs:
           - name: external
             namespace: gateway
         rules:
           - backendRefs:
               - name: *app
-                port: *port
+                port: *s3-port
+      web:
+        enabled: true
+        hostnames: ["*.web.${CLUSTER_DOMAIN}"]
+        parentRefs:
+          - name: external
+            namespace: gateway
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *web-port
     persistence:
       config:
         enabled: true
