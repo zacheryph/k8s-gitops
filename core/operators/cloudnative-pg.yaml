@@ -10,7 +10,7 @@ spec:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: 0.27.0@sha256:0165e6c6a33effaae7b199126f6494ce8b19f7788d034c8a0996d1ae342e54ba
+    tag: 0.27.0@sha256:f29b916c95c7acedb7a4af507d7a9848a83312f1544121d7bb19149297a0c77a
   url: oci://ghcr.io/cloudnative-pg/charts/cloudnative-pg
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
