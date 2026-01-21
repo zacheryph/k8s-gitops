@@ -46,6 +46,12 @@
 
   packageRules: [
     {
+      description: ["Disable digest pinning for OCIRepository resources"],
+      matchManagers: ["flux"],
+      matchDatasources: ["docker"],
+      pinDigests: false,
+    },
+    {
       description: ["Auto-merge updates to github-action packages"],
       matchManagers: ["github-actions"],
       automerge: true,
