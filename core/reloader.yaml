@@ -11,7 +11,7 @@ spec:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: 2.2.7@sha256:4cf4f5847889a858d99d5bb92438e8fedf1a2688920fdd26cfd4907958b6bad3
+    tag: 2.2.7
   url: oci://ghcr.io/stakater/charts/reloader
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json

@@ -10,7 +10,7 @@ spec:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: 0.49.1@sha256:02285d4e25f508739da7542f405e4b719df38e39604637f9d930ca96661d6662
+    tag: 0.49.1
   url: oci://quay.io/strimzi-helm/strimzi-kafka-operator
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json

@@ -10,7 +10,7 @@ spec:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: 6.49.0@sha256:88f7cc76d5f666d603509e6b1209c536618ee8934206575c3773ab450e5612a9
+    tag: 6.49.0
   url: oci://ghcr.io/grafana/helm-charts/loki
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/ocirepository_v1.json
@@ -24,7 +24,7 @@ spec:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: 6.17.1@sha256:ef3211a4c9d85e4c62a8802d1c10eb13efe8fbf0653aadd7945829240aedc2a6
+    tag: 6.17.1
   url: oci://ghcr.io/grafana/helm-charts/promtail
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/ocirepository_v1.json
@@ -38,5 +38,5 @@ spec:
     mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
     operation: copy
   ref:
-    tag: 80.14.4@sha256:5241135144bfd1f37bfbc46aaffde425c4ebdbe242b8c11ea58607f9e4c1b611
+    tag: 80.14.4
   url: oci://ghcr.io/prometheus-community/charts/kube-prometheus-stack
