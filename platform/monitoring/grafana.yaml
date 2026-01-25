@@ -12,10 +12,10 @@ spec:
     auth.anonymous:
       enabled: "false"
     auth.basic:
-      enabled: "false"
+      enabled: "true"
     auth.generic_oauth:
       allow_assign_grafana_admin: "true"
-      allow_sign_up: "true"
+      allow_sign_up: "false"
       api_url: ${OIDC_ISSUER_URL}/api/oidc/userinfo
       auth_url: ${OIDC_ISSUER_URL}/authorize
       client_id: ${OIDC_GRAFANA_CLIENT_ID}
@@ -68,7 +68,7 @@ kind: HTTPRoute
 metadata:
   name: grafana
 spec:
-  hostnames: [ "grafana.${CLUSTER_DOMAIN}" ]
+  hostnames: ["grafana.${CLUSTER_DOMAIN}"]
   parentRefs:
     - group: gateway.networking.k8s.io
       kind: Gateway
@@ -76,14 +76,14 @@ spec:
       namespace: gateway
   rules:
     - backendRefs:
-      - group: ""
-        kind: Service
-        name: grafana-service
-        port: 3000
+        - group: ""
+          kind: Service
+          name: grafana-service
+          port: 3000
       matches:
-      - path:
-          type: PathPrefix
-          value: /
+        - path:
+            type: PathPrefix
+            value: /
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/servicemonitor_v1.json
 apiVersion: monitoring.coreos.com/v1
