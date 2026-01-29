@@ -15,7 +15,7 @@ spec:
       enabled: "true"
     auth.generic_oauth:
       allow_assign_grafana_admin: "true"
-      allow_sign_up: "false"
+      allow_sign_up: "true"
       api_url: ${OIDC_ISSUER_URL}/api/oidc/userinfo
       auth_url: ${OIDC_ISSUER_URL}/authorize
       client_id: ${OIDC_GRAFANA_CLIENT_ID}
