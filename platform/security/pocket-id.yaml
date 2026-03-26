@@ -30,7 +30,7 @@ spec:
           app:
             image:
               repository: ghcr.io/pocket-id/pocket-id
-              tag: v2.3.0@sha256:3e3714a7efe20ade573c77844955ce3d096455f8b1f888068ec32a874792f781
+              tag: v2.5.0@sha256:1549f31f76a6c158af0056a4f2c62a590627886a84e9da9bda76eb1e142a449a
             env:
               ALLOW_USER_SIGNUPS: "disabled"
               ANALYTICS_DISABLED: "true"
