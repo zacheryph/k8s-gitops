@@ -5,7 +5,7 @@ kind: Dragonfly
 metadata:
   name: dragonfly
 spec:
-  image: ghcr.io/dragonflydb/dragonfly:v1.37.0@sha256:84b1009aee0b68327758bce8e99ed514f782d713353acc46caf5738feaa481d6
+  image: ghcr.io/dragonflydb/dragonfly:v1.38.0@sha256:243bf004df5e137d9432c35367d7c86e6d2b5bcb6700be4b6397fcb9306b794b
   replicas: 1
   args:
   - "--default_lua_flags=allow-undeclared-keys"
