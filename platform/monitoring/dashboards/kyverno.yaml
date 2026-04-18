@@ -3,7 +3,7 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: cert-manager
+  name: kyverno
 spec:
   allowCrossNamespaceImport: true
   instanceSelector:
@@ -12,7 +12,7 @@ spec:
   datasources:
     - datasourceName: prometheus
       inputName: DS_PROMETHEUS
-  # Ref: https://grafana.com/grafana/dashboards/20842-cert-manager-kubernetes/
+  # Ref: https://grafana.com/grafana/dashboards/15987-kyverno/
   grafanaCom:
-    id: 20842
-    revision: 3
+    id: 15987
+    revision: 2

@@ -5,5 +5,7 @@ kind: Kustomization
 resources:
   - cert-manager.yaml
   - flux-system.yaml
+  - kyverno.yaml
+  - longhorn.yaml
   - metallb.yaml
   - monitoring.yaml

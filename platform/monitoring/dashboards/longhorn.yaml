@@ -3,7 +3,7 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  name: cert-manager
+  name: longhorn
 spec:
   allowCrossNamespaceImport: true
   instanceSelector:
@@ -12,7 +12,7 @@ spec:
   datasources:
     - datasourceName: prometheus
       inputName: DS_PROMETHEUS
-  # Ref: https://grafana.com/grafana/dashboards/20842-cert-manager-kubernetes/
+  # Ref: https://grafana.com/grafana/dashboards/16888-longhorn-monitoring/
   grafanaCom:
-    id: 20842
-    revision: 3
+    id: 16888
+    revision: 11
