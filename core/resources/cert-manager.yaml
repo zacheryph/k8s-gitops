@@ -48,21 +48,3 @@ spec:
           apiTokenSecretRef:
             name: cloudflare-token
             key: token
----
-apiVersion: grafana.integreatly.org/v1beta1
-kind: GrafanaDashboard
-metadata:
-  namespace: cert-manager
-  name: cert-manager
-spec:
-  allowCrossNamespaceImport: true
-  instanceSelector:
-    matchLabels:
-      grafana.internal/instance: grafana
-  datasources:
-    - datasourceName: prometheus
-      inputName: DS_PROMETHEUS
-  # Ref: https://grafana.com/grafana/dashboards/20842-cert-manager-kubernetes/
-  grafanaCom:
-    id: 20842
-    revision: 3

@@ -3,8 +3,8 @@
 apiVersion: grafana.integreatly.org/v1beta1
 kind: GrafanaDashboard
 metadata:
-  namespace: cert-manager
-  name: cert-manager
+  namespace: metallb
+  name: metallb-system
 spec:
   allowCrossNamespaceImport: true
   instanceSelector:
@@ -13,7 +13,7 @@ spec:
   datasources:
     - datasourceName: prometheus
       inputName: DS_PROMETHEUS
-  # Ref: https://grafana.com/grafana/dashboards/20842-cert-manager-kubernetes/
+  # Ref: https://grafana.com/grafana/dashboards/20162-metallb/
   grafanaCom:
-    id: 20842
-    revision: 3
+    id: 20162
+    revision: 6
