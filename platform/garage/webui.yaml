@@ -34,7 +34,7 @@ spec:
             securityContext:
               allowPrivilegeEscalation: false
               readOnlyRootFilesystem: true
-              capabilities: { drop: [ALL] }
+              capabilities: {drop: [ALL]}
             resources:
               requests:
                 cpu: 10m
@@ -50,7 +50,7 @@ spec:
         hostnames: ["garage.${CLUSTER_DOMAIN}"]
         parentRefs:
           - name: external
-            namespace: network
+            namespace: gateway
         rules:
           - backendRefs:
               - name: *app
