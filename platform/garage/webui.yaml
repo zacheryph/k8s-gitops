@@ -1,4 +1,15 @@
 ---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: garage-oidc-credentials
+stringData:
+  client-id: ${OIDC_GARAGE_CLIENT_ID}
+  client-secret: ${OIDC_GARAGE_CLIENT_SECRET}
+
+---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
@@ -47,6 +58,8 @@ spec:
             port: &port 3909
     route:
       app:
+        labels:
+          cluster.routine.sh/oidc-credentials: garage-oidc-credentials
         hostnames: ["garage.${CLUSTER_DOMAIN}"]
         parentRefs:
           - name: external
