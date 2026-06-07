@@ -28,6 +28,10 @@ spec:
   upgrade:
     crds: Skip
   values:
+    image:
+      repository: nousresearch/hermes-agent
+      tag: "v2026.6.5"
+
     # LLM via OpenRouter (base_url is the chart default; set explicitly for clarity)
     config:
       values:
