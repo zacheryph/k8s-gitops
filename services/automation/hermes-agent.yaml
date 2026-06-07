@@ -1,0 +1,60 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/gitrepository_v1.json
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: GitRepository
+metadata:
+  name: hermes-agent
+spec:
+  interval: 12h
+  url: https://github.com/ultraworkers/hermes-agent-helm-chart
+  ref:
+    commit: e3b685d4d0288668a37216435742cd0a659ebc6c
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &name hermes-agent
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: ./
+      sourceRef:
+        kind: GitRepository
+        name: hermes-agent
+  install:
+    crds: Skip
+  upgrade:
+    crds: Skip
+  values:
+    # LLM via OpenRouter (base_url is the chart default; set explicitly for clarity)
+    config:
+      values:
+        model:
+          default: deepseek/deepseek-v4-flash
+          provider: auto
+          base_url: https://openrouter.ai/api/v1
+
+    # Slack gateway — comma-separated Slack user IDs allowed to DM the agent
+    env:
+      SLACK_ALLOWED_USERS: ${HERMES_SLACK_ALLOWED_USERS}
+
+    # Secrets rendered into a Kubernetes Secret by the chart
+    secrets:
+      OPENROUTER_API_KEY: ${HERMES_OPENROUTER_API_KEY}
+      SLACK_BOT_TOKEN: ${HERMES_SLACK_BOT_TOKEN}
+      SLACK_APP_TOKEN: ${HERMES_SLACK_APP_TOKEN}
+
+    persistence:
+      enabled: true
+      storageClass: longhorn
+      size: 16Gi
+
+    resources:
+      requests:
+        cpu: 250m
+        memory: 512Mi
+      limits:
+        cpu: "2"
+        memory: 4Gi
