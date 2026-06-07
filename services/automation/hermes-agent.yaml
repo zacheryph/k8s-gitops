@@ -40,9 +40,22 @@ spec:
           provider: auto
           base_url: https://openrouter.ai/api/v1
 
+    # s6-overlay starts as root then drops to HERMES_UID/GID internally
+    podSecurityContext:
+      runAsUser: 0
+      runAsNonRoot: false
+    securityContext:
+      allowPrivilegeEscalation: true
+      readOnlyRootFilesystem: false
+      runAsNonRoot: false
+      capabilities:
+        drop: []
+
     # Slack gateway — comma-separated Slack user IDs allowed to DM the agent
     env:
       SLACK_ALLOWED_USERS: ${HERMES_SLACK_ALLOWED_USERS}
+      HERMES_UID: "1000"
+      HERMES_GID: "1000"
 
     # Secrets rendered into a Kubernetes Secret by the chart
     secrets:
