@@ -4,9 +4,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: automation
 resources:
-- frigate
-- namespace.yaml
-- home-assistant.yaml
-- zwave-js.yaml
-- signal-cli-rest-api.yaml
-- hermes-agent.yaml
+  - frigate
+  - namespace.yaml
+  - home-assistant.yaml
+  - zwave-js.yaml
+  #- signal-cli-rest-api.yaml
+  - hermes-agent.yaml
