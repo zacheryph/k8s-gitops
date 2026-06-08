@@ -8,4 +8,5 @@ resources:
 - namespace.yaml
 - home-assistant.yaml
 - zwave-js.yaml
+- signal-cli-rest-api.yaml
 - hermes-agent.yaml

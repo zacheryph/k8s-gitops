@@ -64,6 +64,7 @@ spec:
     # Slack gateway — comma-separated Slack user IDs allowed to DM the agent
     env:
       SLACK_ALLOWED_USERS: ${HERMES_SLACK_ALLOWED_USERS}
+      SIGNAL_ALLOWED_USERS: ${HERMES_SIGNAL_ALLOWED_USERS}
       HERMES_UID: "1000"
       HERMES_GID: "1000"
 
@@ -73,6 +74,8 @@ spec:
       SLACK_BOT_TOKEN: ${HERMES_SLACK_BOT_TOKEN}
       SLACK_APP_TOKEN: ${HERMES_SLACK_APP_TOKEN}
       API_SERVER_KEY: ${HERMES_API_SERVER_KEY}
+      SIGNAL_HTTP_URL: http://signal-cli-rest-api:8080
+      SIGNAL_ACCOUNT: ${HERMES_SIGNAL_ACCOUNT}
 
     persistence:
       enabled: true
