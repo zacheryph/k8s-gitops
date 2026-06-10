@@ -57,7 +57,7 @@ spec:
                 memory: 250Mi
               limits:
                 gpu.intel.com/i915: 1
-                memory: 4Gi
+                memory: 6Gi
             probes:
               liveness:
                 enabled: false
