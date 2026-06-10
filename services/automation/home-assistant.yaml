@@ -12,7 +12,7 @@ spec:
   storageClassName: longhorn
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kafka.strimzi.io/kafkatopic_v1beta2.json
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: KafkaTopic
 metadata:
   name: home-assistant

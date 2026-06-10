@@ -1,6 +1,6 @@
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kafka.strimzi.io/kafkanodepool_v1beta2.json
 ---
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: KafkaNodePool
 metadata:
   name: broker
@@ -17,7 +17,7 @@ spec:
     size: 16Gi
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kafka.strimzi.io/kafka_v1beta2.json
-apiVersion: kafka.strimzi.io/v1beta2
+apiVersion: kafka.strimzi.io/v1
 kind: Kafka
 metadata:
   name: kafka-development
