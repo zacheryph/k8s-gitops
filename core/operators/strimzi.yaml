@@ -28,7 +28,7 @@ spec:
   values:
     replicas: 1
     watchNamespaces: [database, api, automation]
-    tmpDirSizeLimit: 128Mi
+    tmpDirSizeLimit: 256Mi
     generateNetworkPolicy: false
     resources:
       requests:
