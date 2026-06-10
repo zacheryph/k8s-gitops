@@ -19,25 +19,3 @@ spec:
   storage:
     storageClass: longhorn
     size: 4Gi
-
-  bootstrap:
-    initdb:
-      import:
-        type: monolith
-        databases:
-          - forgejo
-          - vaultwarden
-        roles:
-          - forgejo
-          - vaultwarden
-        source:
-          externalCluster: postgresql-17
-  externalClusters:
-    - name: postgresql-17
-      connectionParameters:
-        host: postgresql-17-rw.database.svc
-        user: postgres
-        dbname: postgres
-      password:
-        name: postgresql-17-superuser
-        key: password

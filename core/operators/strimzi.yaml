@@ -23,6 +23,8 @@ spec:
   chartRef:
     kind: OCIRepository
     name: strimzi
+  upgrade:
+    crds: CreateReplace
   values:
     replicas: 1
     watchNamespaces: [database, api, automation]

@@ -14,7 +14,6 @@ stringData:
   DB_VECTOR_EXTENSION: pgvector
   REDIS_HOSTNAME: dragonfly.immich.svc
   REDIS_PORT: "6379"
-  IMMICH_SERVER_URL: http://immich-server.immich.svc:3001
+  IMMICH_SERVER_URL: http://immich-server.immich.svc:2283
   IMMICH_MACHINE_LEARNING_URL: http://immich-machine-learning.immich.svc:3003
-  IMMICH_WEB_URL: http://immich-web.immich.svc:3000
   TRANSFORMERS_CACHE: /usr/src/app/.transformers_cache
