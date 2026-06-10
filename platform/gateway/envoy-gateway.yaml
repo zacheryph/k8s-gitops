@@ -23,6 +23,8 @@ spec:
   chartRef:
     kind: OCIRepository
     name: envoy-gateway
+  upgrade:
+    crds: CreateReplace
   values:
     hpa:
       enabled: true
