@@ -36,9 +36,6 @@ spec:
     name: metallb
   interval: 1h
   values:
-    speaker:
-      frr:
-        enabled: true
     prometheus:
       namespace: monitoring
       serviceAccount: kube-prometheus-stack-prometheus
