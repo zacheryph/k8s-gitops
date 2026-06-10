@@ -100,5 +100,9 @@ spec:
         parentRefs:
           - name: external
             namespace: gateway
+        rules:
+          - backendRefs:
+              - identifier: app
+                port: *port
         labels:
           cluster.routine.sh/oidc-credentials: frigate-oidc-credentials
