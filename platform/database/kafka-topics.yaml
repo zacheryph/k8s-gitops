@@ -1,0 +1,71 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kafka.strimzi.io/kafkatopic_v1beta2.json
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: github
+  labels:
+    strimzi.io/cluster: kafka-development
+spec:
+  partitions: 1
+  replicas: 2
+  config:
+    retention.ms: -1
+    retention.bytes: 1073741824
+    segment.bytes: 4194304
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: home-assistant
+  labels:
+    strimzi.io/cluster: kafka-development
+spec:
+  partitions: 1
+  replicas: 2
+  config:
+    retention.ms: -1
+    retention.bytes: 1073741824
+    segment.bytes: 4194304
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: mailgun
+  labels:
+    strimzi.io/cluster: kafka-development
+spec:
+  partitions: 1
+  replicas: 2
+  config:
+    retention.ms: -1
+    retention.bytes: 1073741824
+    segment.bytes: 4194304
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: statuspage
+  labels:
+    strimzi.io/cluster: kafka-development
+spec:
+  partitions: 1
+  replicas: 2
+  config:
+    retention.ms: -1
+    retention.bytes: 1073741824
+    segment.bytes: 4194304
+---
+apiVersion: kafka.strimzi.io/v1
+kind: KafkaTopic
+metadata:
+  name: test
+  labels:
+    strimzi.io/cluster: kafka-development
+spec:
+  partitions: 1
+  replicas: 2
+  config:
+    retention.ms: -1
+    retention.bytes: 1073741824
+    segment.bytes: 4194304
