@@ -1,0 +1,9 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/namespace.json
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: hermes
+  labels:
+    app.kubernetes.io/name: hermes
+    app.kubernetes.io/part-of: homelab-tooling
