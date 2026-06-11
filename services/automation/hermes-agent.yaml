@@ -46,7 +46,7 @@ spec:
     config:
       values:
         model:
-          default: deepseek/deepseek-v4-flash
+          default: minimax/minimax-m3
           provider: auto
           base_url: https://openrouter.ai/api/v1
 
