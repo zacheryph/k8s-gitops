@@ -117,3 +117,13 @@ spec:
       limits:
         cpu: "2"
         memory: 4Gi
+
+    # ServiceAccount: use the pre-created `hermes-viewer` SA in this
+    # namespace (see core/hermes-viewer/) and mount its token so the
+    # in-cluster Python kubernetes client can authenticate automatically.
+    # We set `create: false` because the SA is owned by the GitOps repo
+    # (Flux-managed), not the chart.
+    serviceAccount:
+      create: false
+      name: hermes-viewer
+      automountServiceAccountToken: true
