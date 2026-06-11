@@ -70,6 +70,7 @@ spec:
       SIGNAL_ALLOWED_USERS: ${HERMES_SIGNAL_ALLOWED_USERS}
       HERMES_UID: "1000"
       HERMES_GID: "1000"
+      HERMES_YOLO_MODE: "1"
 
     # Secrets rendered into a Kubernetes Secret by the chart
     secrets:
