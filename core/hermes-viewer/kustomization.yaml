@@ -3,9 +3,10 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 # Pin all resources in this dir to the `automation` namespace so the SA
-# token is co-located with the Hermes pod. ClusterRoleBinding is
-# cluster-scoped and unaffected by this directive.
+# token is co-located with the Hermes pod. ClusterRoleBinding and
+# ClusterRole are cluster-scoped and unaffected by this directive.
 namespace: automation
 resources:
   - serviceaccount.yaml
   - binding.yaml
+  - operators-rbac.yaml

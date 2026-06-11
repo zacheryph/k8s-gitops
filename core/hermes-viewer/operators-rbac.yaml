@@ -1,0 +1,54 @@
+# Extends the hermes-viewer (read-only) cluster access to include the
+# custom resources for the database / messaging / storage operators
+# installed by this GitOps repo.
+#
+# The built-in `view` ClusterRole bound in `binding.yaml` does NOT
+# cover these CRDs in this cluster — neither the operators' own
+# `*:view` ClusterRoles (which would normally aggregate into `view`)
+# are visible to the SA, so we add an explicit, narrow grant scoped to
+# the three operator groups the k8s health-check cron needs to read.
+#
+# Scope: get / list / watch only. No write verbs. No pod exec. No
+# secrets. The hermes-viewer SA remains read-only cluster-wide.
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/v1/clusterrole.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: hermes-viewer-operators-read
+  labels:
+    app.kubernetes.io/name: hermes-viewer
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/part-of: homelab-tooling
+rules:
+  # CloudNativePG — Postgres clusters, poolers, backups, scheduled backups
+  - apiGroups: ["postgresql.cnpg.io"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+  # Strimzi — Kafka brokers, topics, users, connectors, MM2, pod sets
+  - apiGroups: ["kafka.strimzi.io", "core.strimzi.io"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+  # Longhorn — volumes, replicas, engines, nodes, instance managers,
+  # settings, recurring jobs, backup targets, snapshots, etc.
+  - apiGroups: ["longhorn.io"]
+    resources: ["*"]
+    verbs: ["get", "list", "watch"]
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/v1/clusterrolebinding.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: hermes-viewer-operators-read
+  labels:
+    app.kubernetes.io/name: hermes-viewer
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/part-of: homelab-tooling
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hermes-viewer-operators-read
+subjects:
+  - kind: ServiceAccount
+    name: hermes-viewer
+    namespace: automation
