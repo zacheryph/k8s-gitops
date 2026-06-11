@@ -1,14 +1,4 @@
 ---
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
-apiVersion: v1
-kind: Secret
-type: Opaque
-metadata:
-  name: hermes-agent-oidc-credentials
-stringData:
-  client-id: ${OIDC_HERMES_CLIENT_ID}
-  client-secret: ${OIDC_HERMES_CLIENT_SECRET}
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/gitrepository_v1.json
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
@@ -16,9 +6,10 @@ metadata:
   name: hermes-agent
 spec:
   interval: 12h
-  url: https://github.com/ultraworkers/hermes-agent-helm-chart
+  url: https://github.com/zacheryph/hermes-agent-helm-chart
   ref:
-    commit: e3b685d4d0288668a37216435742cd0a659ebc6c
+    branch: feat/web-dashboard
+    commit: 7193ec5be50375b18e037d4a31613742cc10b0b3
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
 apiVersion: helm.toolkit.fluxcd.io/v2
@@ -89,6 +80,17 @@ spec:
     apiServer:
       enabled: true
 
+    # Web dashboard authenticates directly against pocket-id as a public
+    # PKCE client (no client secret); the gateway-level OIDC SecurityPolicy
+    # is intentionally not applied to this route to avoid a double login.
+    dashboard:
+      enabled: true
+      publicUrl: https://hermes.${CLUSTER_DOMAIN}
+      auth:
+        oidc:
+          issuer: ${OIDC_ISSUER_URL}
+          clientId: ${OIDC_HERMES_DASHBOARD_CLIENT_ID}
+
     service:
       enabled: true
 
@@ -97,8 +99,6 @@ spec:
         kind: HTTPRoute
         metadata:
           name: hermes-agent
-          labels:
-            cluster.routine.sh/oidc-credentials: hermes-agent-oidc-credentials
         spec:
           parentRefs:
             - name: external
@@ -108,7 +108,7 @@ spec:
           rules:
             - backendRefs:
                 - name: hermes-agent
-                  port: 8642
+                  port: 9119
 
     resources:
       requests:
