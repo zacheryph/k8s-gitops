@@ -64,11 +64,25 @@ spec:
               readOnlyRootFilesystem: true
               capabilities: { drop: ["ALL"] }
             resources:
+              # Plex Media Server's working set routinely exceeds 2 Gi
+              # for any non-trivial library: idle ~500-800 MiB, library
+              # scan 1.5-2.5 GiB transient, 4K transcode 2-3 GiB, plus
+              # a small long-running memory creep. With Intel QuickSync
+              # HW transcode (gpu.intel.com/i915) the frame buffers
+              # count against the cgroup limit, so transcode spikes
+              # push usage above what non-HW Plex needs.
+              #
+              # Observed on the cluster: pod OOMKilled (exit 137)
+              # ~1x/hour over 6 days = 138 restarts. Last OOM
+              # 2026-06-11 09:54:51 UTC. Bump limit 2 Gi -> 8 Gi and
+              # add a 2 Gi request so the scheduler reserves baseline
+              # memory (currently missing).
               requests:
                 cpu: 100m
+                memory: 2Gi
               limits:
                 gpu.intel.com/i915: 1
-                memory: 2Gi
+                memory: 8Gi
     persistence:
       config:
         enabled: true
