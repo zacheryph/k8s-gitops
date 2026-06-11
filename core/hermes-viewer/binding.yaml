@@ -1,8 +1,10 @@
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/v1/clusterrolebinding.json
 ---
-# Read-only cluster access for the Hermes Agent container (running outside the cluster).
-# Uses the built-in `view` ClusterRole which in k3s >= 1.21 grants get/list/watch on
-# most resources but excludes secrets, RBAC, and pod exec/attach/portforward.
+# Read-only cluster access for the Hermes Agent pod (running inside the
+# cluster, deployed by the `hermes-agent` HelmRelease in this same repo).
+# Uses the built-in `view` ClusterRole which in k3s >= 1.21 grants
+# get/list/watch on most resources but excludes secrets, RBAC, and pod
+# exec/attach/portforward.
 apiVersion: rbac.authorization.k8s.io/v1
 kind: ClusterRoleBinding
 metadata:
@@ -16,6 +18,10 @@ roleRef:
   kind: ClusterRole
   name: view
 subjects:
+  # Subject namespace must match where the SA actually lives (automation).
+  # The kustomization.yaml's `namespace: automation` directive will also
+  # rewrite this field on apply, but we set it explicitly so the file
+  # is self-documenting.
   - kind: ServiceAccount
     name: hermes-viewer
-    namespace: hermes
+    namespace: automation
