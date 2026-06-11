@@ -42,6 +42,9 @@ spec:
       repository: nousresearch/hermes-agent
       tag: "v2026.6.5@sha256:9ad3b04ec916ea2c2da22358fd43b024c788d74073210695af88bfc2e63869b4"
 
+    bootstrap:
+      overwrite: false
+
     # LLM via OpenRouter (base_url is the chart default; set explicitly for clarity)
     config:
       values:
