@@ -10,6 +10,7 @@ resources:
 - crossplane.yaml
 - external-snapshotter.yaml
 - hardware.yaml
+- hermes-viewer
 - k8tz.yaml
 - kyverno.yaml
 - longhorn.yaml

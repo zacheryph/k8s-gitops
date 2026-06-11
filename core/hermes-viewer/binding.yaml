@@ -1,0 +1,21 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/v1/clusterrolebinding.json
+---
+# Read-only cluster access for the Hermes Agent container (running outside the cluster).
+# Uses the built-in `view` ClusterRole which in k3s >= 1.21 grants get/list/watch on
+# most resources but excludes secrets, RBAC, and pod exec/attach/portforward.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: hermes-viewer
+  labels:
+    app.kubernetes.io/name: hermes-viewer
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/part-of: homelab-tooling
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: view
+subjects:
+  - kind: ServiceAccount
+    name: hermes-viewer
+    namespace: hermes
