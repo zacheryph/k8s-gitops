@@ -21,6 +21,9 @@ spec:
   chart:
     spec:
       chart: ./
+      # Repackage on git revision changes; the fork's Chart.yaml version
+      # stays 0.1.0, so the default ChartVersion strategy never rebuilds.
+      reconcileStrategy: Revision
       sourceRef:
         kind: GitRepository
         name: hermes-agent
