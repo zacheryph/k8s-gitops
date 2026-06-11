@@ -13,7 +13,7 @@ kind: Provider
 metadata:
   name: crossplane-contrib-provider-upjet-digitalocean
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/provider-upjet-digitalocean:v0.3.0
+  package: xpkg.upbound.io/crossplane-contrib/provider-upjet-digitalocean:v0.3.2
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/pkg.crossplane.io/provider_v1.json
 apiVersion: pkg.crossplane.io/v1
