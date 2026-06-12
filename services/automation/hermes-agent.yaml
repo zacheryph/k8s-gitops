@@ -72,6 +72,7 @@ spec:
       SLACK_BOT_TOKEN: ${HERMES_SLACK_BOT_TOKEN}
       SLACK_APP_TOKEN: ${HERMES_SLACK_APP_TOKEN}
       API_SERVER_KEY: ${HERMES_API_SERVER_KEY}
+      WEBHOOK_SECRET: ${HERMES_WEBHOOK_SECRET}
       #SIGNAL_HTTP_URL: http://signal-cli-rest-api:8080
       #SIGNAL_ACCOUNT: ${HERMES_SIGNAL_ACCOUNT}
 
@@ -81,6 +82,15 @@ spec:
       size: 16Gi
 
     apiServer:
+      enabled: true
+
+    # Hermes webhook listener (port 8644) — external services like GitHub,
+    # Stripe, CI/CD, etc. POST events here to trigger agent runs. HMAC-secret
+    # authenticated per subscription; the global WEBHOOK_SECRET below is the
+    # fallback for static routes and acts as a default for dynamic
+    # subscriptions. Subscriptions are created at runtime via
+    # `hermes webhook subscribe` and persist in HERMES_HOME.
+    webhook:
       enabled: true
 
     # Web dashboard authenticates directly against pocket-id as a public
@@ -112,6 +122,25 @@ spec:
             - backendRefs:
                 - name: hermes-agent
                   port: 9119
+
+      # Separate hostname for the webhook listener so subscription URLs and
+      # HMAC signatures aren't mixed with dashboard cookies. Path prefix is
+      # kept open (`/`) — hermes-agent inspects the path inside its handler
+      # and returns 404 for non-subscription routes.
+      - apiVersion: gateway.networking.k8s.io/v1
+        kind: HTTPRoute
+        metadata:
+          name: hermes-agent-webhook
+        spec:
+          parentRefs:
+            - name: external
+              namespace: gateway
+          hostnames:
+            - hermes-webhook.${CLUSTER_DOMAIN}
+          rules:
+            - backendRefs:
+                - name: hermes-agent
+                  port: 8644
 
     resources:
       requests:
