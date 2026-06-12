@@ -52,6 +52,18 @@
       pinDigests: false,
     },
     {
+      // OCI helm charts are served from docker-style registries, so the flux
+      // manager reports them as "docker tag" updates. Filter on package name
+      // (every OCI helm chart in this repo has "chart" or "-helm" in the path)
+      // and rewrite the commit subject to read as a chart update.
+      description: ["Relabel OCI helm chart commits as chart updates"],
+      matchManagers: ["flux"],
+      matchDatasources: ["docker"],
+      matchPackageNames: ["*chart*", "*-helm*"],
+      commitMessageTopic: "helm chart {{depName}}",
+      commitMessageExtra: "",
+    },
+    {
       description: ["Auto-merge updates to github-action packages"],
       matchManagers: ["github-actions"],
       automerge: true,
