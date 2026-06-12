@@ -104,6 +104,20 @@ spec:
       enabled: true
     kubeStateMetrics:
       enabled: true
+      # Override liveness probe to /healthz.
+      #
+      # The chart default is /livez, which returns 503 when kube-state-metrics
+      # briefly loses contact with the kube-apiserver (logged as
+      # "Failed to contact API server for /livez: got 0" in the container).
+      # These blips do not affect metrics scraping or the pod's ability to
+      # serve /metrics, but they generate noisy 503 events (836 over 13 days
+      # in the June 2026 run). /healthz is the documented process-alive
+      # endpoint and only fails if the HTTP server itself is wedged, which
+      # is the actual condition we want the kubelet to restart on.
+      livenessProbe:
+        httpGet:
+          path: /healthz
+          port: http
     kubernetesServiceMonitors:
       enabled: true
     kubeApiServer:
