@@ -29,6 +29,26 @@ spec:
     kind: OCIRepository
     name: kube-prometheus-stack
   interval: 1h
+
+  # Patch the rendered Deployment for kube-state-metrics to use /healthz
+  # for the liveness probe instead of the chart-default /livez. See the
+  # `kubeStateMetrics:` block below for the full root-cause writeup; the
+  # short version is that the kube-state-metrics subchart hardcodes the
+  # liveness probe path as a string literal, so values-level overrides
+  # of livenessProbe.httpGet.path are silently ignored. A kustomize
+  # strategic-merge patch on the post-rendered manifest is the only
+  # way to change it without forking the chart.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: Deployment
+              name: kube-prometheus-stack-kube-state-metrics
+            patch: |
+              - op: replace
+                path: /spec/template/spec/containers/0/livenessProbe/httpGet/path
+                value: /healthz
+
   values:
     cleanPrometheusOperatorObjectNames: true
 
@@ -110,20 +130,42 @@ spec:
       enabled: true
     kubeStateMetrics:
       enabled: true
-      # Override liveness probe to /healthz.
+      # NOTE: do NOT try to override livenessProbe.httpGet.path here. The
+      # kube-state-metrics subchart (v7.4.0, shipped with kube-prometheus-stack
+      # 86.2.2) hardcodes the liveness probe path as a string literal in
+      # `charts/kube-state-metrics/templates/deployment.yaml`:
       #
-      # The chart default is /livez, which returns 503 when kube-state-metrics
-      # briefly loses contact with the kube-apiserver (logged as
-      # "Failed to contact API server for /livez: got 0" in the container).
-      # These blips do not affect metrics scraping or the pod's ability to
-      # serve /metrics, but they generate noisy 503 events (836 over 13 days
-      # in the June 2026 run). /healthz is the documented process-alive
-      # endpoint and only fails if the HTTP server itself is wedged, which
-      # is the actual condition we want the kubelet to restart on.
-      livenessProbe:
-        httpGet:
-          path: /healthz
-          port: http
+      #   livenessProbe:
+      #     httpGet:
+      #       ...
+      #       path: /livez          # ← not a template expression, not overridable
+      #       port: http
+      #       ...
+      #
+      # Only `failureThreshold`, `httpGet.scheme`, `httpGet.httpHeaders`,
+      # `initialDelaySeconds`, `periodSeconds`, `successThreshold`, and
+      # `timeoutSeconds` are read from .Values.livenessProbe. A values-level
+      # `livenessProbe: { httpGet: { path: /healthz } }` is silently ignored.
+      #
+      # The actual fix is a Flux `postRenderers` kustomize patch (see
+      # `spec.postRenderers` above) that replaces the path in the rendered
+      # Deployment manifest. PR #3339 added the values-level override on
+      # 2026-06-12; the rendered Deployment was never actually changed, the
+      # pod was never rolled, and the noise continued.
+      #
+      # Root cause of the underlying problem: kube-state-metrics's `/livez`
+      # handler calls `cli.HealthzCheck()` on its in-cluster apiserver client
+      # and returns 503 if the apiserver's own `/livez` blips. The k0s
+      # kube-apiserver in this cluster returns empty responses (~got 0~)
+      # intermittently (visible in the pod's container log as
+      # ~Failed to contact API server for /livez: got 0~). These blips do
+      # not affect `/metrics` scraping or the pod's actual health, but
+      # produce one `Unhealthy: Liveness probe failed: HTTP probe failed
+      # with statuscode: 503` event per blip, which the k8s-health cron
+      # surfaces as a WARN. The proper fix is to point KSM's liveness
+      # probe at `/healthz` (the documented process-alive endpoint that
+      # only fails if the HTTP server itself is wedged) — which is what
+      # the postRender patch above does.
     kubernetesServiceMonitors:
       enabled: true
     kubeApiServer:
