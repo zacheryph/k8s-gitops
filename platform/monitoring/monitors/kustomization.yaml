@@ -5,3 +5,4 @@ kind: Kustomization
 resources:
 # - cert-manager.yaml
 - flux-system.yaml
+- kube-apiserver.yaml
