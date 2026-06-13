@@ -10,3 +10,4 @@ resources:
   - serviceaccount.yaml
   - binding.yaml
   - operators-rbac.yaml
+  - nodes-rbac.yaml

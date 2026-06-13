@@ -1,0 +1,64 @@
+# Extends the hermes-viewer (read-only) cluster access to include
+# node log files served by the kubelet's logs proxy endpoint:
+#
+#   GET /api/v1/nodes/{name}/proxy/logs/{path}
+#
+# This is the standard, supported way for an in-cluster pod to read
+# host-level log files (e.g. /var/log/k0s/k0s.log and the k0s journald
+# units `k0scontroller` / `k0skubelet` via their respective log
+# files) without requiring a hostPath mount or privileged access.
+#
+# Why this is needed:
+#   - The built-in `view` ClusterRole (binding.yaml) deliberately
+#     omits `nodes` and `nodes/proxy` because they are cluster-scoped,
+#     not namespaced. The Hermes health-check cron cannot diagnose
+#     issues rooted in the control plane / kubelet / k0s (e.g. the
+#     kube-state-metrics liveness probe x888 cumulative failure
+#     observed 2026-06-13) without this.
+#   - `operators-rbac.yaml` covers in-cluster workload CRDs. This
+#     file covers the host / node surface.
+#
+# Scope: get / list / watch on `nodes`; get on `nodes/proxy`. No
+# write verbs. No pod exec, no pod logs, no secrets. The SA remains
+# read-only cluster-wide.
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/v1/clusterrole.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: hermes-viewer-nodes-read
+  labels:
+    app.kubernetes.io/name: hermes-viewer
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/part-of: homelab-tooling
+rules:
+  # Discover nodes and read node metadata (addresses, conditions,
+  # capacity, taints). Required to know which node to query.
+  - apiGroups: [""]
+    resources: ["nodes"]
+    verbs: ["get", "list", "watch"]
+  # Read log files via the kubelet's `/logs` proxy endpoint. This
+  # is a subresource of nodes, NOT a wildcard on `nodes/proxy` —
+  # the kubelet only serves the `logs`, `metrics`, `pods`, `stats`,
+  # and `spec` subpaths, and we only need `logs`.
+  - apiGroups: [""]
+    resources: ["nodes/proxy"]
+    verbs: ["get"]
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/v1/clusterrolebinding.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: hermes-viewer-nodes-read
+  labels:
+    app.kubernetes.io/name: hermes-viewer
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/part-of: homelab-tooling
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hermes-viewer-nodes-read
+subjects:
+  - kind: ServiceAccount
+    name: hermes-viewer
+    namespace: automation
