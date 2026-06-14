@@ -7,6 +7,7 @@ resources:
 - dashboards
 - datasources
 - grafana.yaml
+- k0s-etcd-client-secret.yaml
 - loki.yaml
 - namespace.yaml
 - oci-repositories.yaml
