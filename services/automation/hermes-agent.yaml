@@ -43,7 +43,7 @@ spec:
     config:
       values:
         model:
-          default: minimax/minimax-m3
+          default: deepseek/deepseek-v4-pro
           provider: auto
           base_url: https://openrouter.ai/api/v1
 
