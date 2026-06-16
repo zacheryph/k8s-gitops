@@ -1,0 +1,183 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kopia-scripts
+  namespace: backup
+  labels:
+    app.kubernetes.io/part-of: backup
+    app.kubernetes.io/name: kopia
+data:
+  # Common env-var contract consumed by all three scripts.
+  # See README.md for the full list and meanings.
+  common.sh: |
+    #!/bin/sh
+    set -eu
+    : "${KOPIA_PASSWORD:?KOPIA_PASSWORD is required}"
+    : "${KOPIA_NAS_SFTP_USER:?KOPIA_NAS_SFTP_USER is required}"
+    : "${KOPIA_NAS_SFTP_HOST:?KOPIA_NAS_SFTP_HOST is required}"
+    : "${KOPIA_NAS_SFTP_PATH:?KOPIA_NAS_SFTP_PATH is required}"
+    : "${KOPIA_B2_BUCKET:?KOPIA_B2_BUCKET is required}"
+    : "${KOPIA_B2_PATH:?KOPIA_B2_PATH is required}"
+    : "${KOPIA_B2_ENDPOINT:?KOPIA_B2_ENDPOINT is required}"
+    KOPIA_NAS_SFTP_PORT="${KOPIA_NAS_SFTP_PORT:-22}"
+    KOPIA_NAS_SFTP_KEY_FILE="${KOPIA_NAS_SFTP_KEY_FILE:-/var/kopia/ssh/id_ed25519}"
+    KOPIA_NAS_SFTP_KNOWN_HOSTS="${KOPIA_NAS_SFTP_KNOWN_HOSTS:-/var/kopia/ssh/known_hosts}"
+    KOPIA_CACHE_DIR="${KOPIA_CACHE_DIR:-/var/kopia/cache}"
+    KOPIA_CONFIG_DIR="${KOPIA_CONFIG_DIR:-/var/kopia/config}"
+    KOPIA_LOG_DIR="${KOPIA_LOG_DIR:-/var/kopia/log}"
+    KOPIA_POLICY_FILE="${KOPIA_POLICY_FILE:-/etc/kopia/policy.json}"
+    KOPIA_SNAPSHOT_SOURCE="${KOPIA_SNAPSHOT_SOURCE:-/data}"
+    KOPIA_PARALLELISM="${KOPIA_PARALLELISM:-8}"
+
+    export KOPIA_PASSWORD
+
+    mkdir -p "$KOPIA_CACHE_DIR" "$KOPIA_CONFIG_DIR" "$KOPIA_LOG_DIR"
+    chmod 0700 "$KOPIA_CACHE_DIR" "$KOPIA_CONFIG_DIR"
+
+    # Stable hostname per PVC slug so Kopia groups snapshots correctly.
+    export KOPIA_HOSTNAME="${KOPIA_HOSTNAME:-$(hostname)}"
+
+    # Common global flags — cache/config paths are required because the pod is ephemeral.
+    KOPIA_GLOBAL_FLAGS="--config-file=$KOPIA_CONFIG_DIR/repository.config --cache-directory=$KOPIA_CACHE_DIR --log-dir=$KOPIA_LOG_DIR --log-level=info --parallel=$KOPIA_PARALLELISM --password=$KOPIA_PASSWORD"
+  backup.sh: |
+    #!/bin/sh
+    set -euo pipefail
+    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+    . "$SCRIPT_DIR/common.sh"
+
+    log() { printf '[%s] %s\n' "$(date -u +%FT%TZ)" "$*" >&2; }
+
+    log "Connecting to NAS repository sftp://$KOPIA_NAS_SFTP_USER@$KOPIA_NAS_SFTP_HOST:$KOPIA_NAS_SFTP_PORT$KOPIA_NAS_SFTP_PATH"
+    kopia $KOPIA_GLOBAL_FLAGS repository connect sftp \
+      --host="$KOPIA_NAS_SFTP_HOST" \
+      --port="$KOPIA_NAS_SFTP_PORT" \
+      --username="$KOPIA_NAS_SFTP_USER" \
+      --path="$KOPIA_NAS_SFTP_PATH" \
+      --keyfile="$KOPIA_NAS_SFTP_KEY_FILE" \
+      --known-hosts="$KOPIA_NAS_SFTP_KNOWN_HOSTS"
+
+    if [ -f "$KOPIA_POLICY_FILE" ]; then
+      log "Applying global policy from $KOPIA_POLICY_FILE"
+      kopia $KOPIA_GLOBAL_FLAGS policy set --global "$KOPIA_POLICY_FILE"
+    fi
+
+    log "Snapshotting $KOPIA_SNAPSHOT_SOURCE"
+    kopia $KOPIA_GLOBAL_FLAGS snapshot create "$KOPIA_SNAPSHOT_SOURCE" \
+      --description="${KOPIA_SNAPSHOT_DESCRIPTION:-kopia backup}" \
+      --parallel="$KOPIA_PARALLELISM"
+
+    log "Running maintenance (full)"
+    kopia $KOPIA_GLOBAL_FLAGS maintenance run --full
+
+    log "Syncing to S3 repository s3://$KOPIA_B2_BUCKET/$KOPIA_B2_PATH"
+    kopia $KOPIA_GLOBAL_FLAGS repository sync-to s3 \
+      --bucket="$KOPIA_B2_BUCKET" \
+      --endpoint="$KOPIA_B2_ENDPOINT" \
+      --prefix="$KOPIA_B2_PATH" \
+      --access-key="$AWS_ACCESS_KEY_ID" \
+      --secret-access-key="$AWS_SECRET_ACCESS_KEY" \
+      --sync-password
+
+    log "Disconnecting"
+    kopia $KOPIA_GLOBAL_FLAGS repository disconnect || true
+
+    log "Backup complete"
+  init.sh: |
+    #!/bin/sh
+    set -euo pipefail
+    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+    . "$SCRIPT_DIR/common.sh"
+
+    log() { printf '[%s] %s\n' "$(date -u +%FT%TZ)" "$*" >&2; }
+
+    log "Initialising NAS repository sftp://$KOPIA_NAS_SFTP_USER@$KOPIA_NAS_SFTP_HOST:$KOPIA_NAS_SFTP_PORT$KOPIA_NAS_SFTP_PATH"
+    kopia $KOPIA_GLOBAL_FLAGS repository create sftp \
+      --host="$KOPIA_NAS_SFTP_HOST" \
+      --port="$KOPIA_NAS_SFTP_PORT" \
+      --username="$KOPIA_NAS_SFTP_USER" \
+      --path="$KOPIA_NAS_SFTP_PATH" \
+      --keyfile="$KOPIA_NAS_SFTP_KEY_FILE" \
+      --known-hosts="$KOPIA_NAS_SFTP_KNOWN_HOSTS"
+
+    log "Connecting to NAS for policy + B2 mirror init"
+    kopia $KOPIA_GLOBAL_FLAGS repository connect sftp \
+      --host="$KOPIA_NAS_SFTP_HOST" \
+      --port="$KOPIA_NAS_SFTP_PORT" \
+      --username="$KOPIA_NAS_SFTP_USER" \
+      --path="$KOPIA_NAS_SFTP_PATH" \
+      --keyfile="$KOPIA_NAS_SFTP_KEY_FILE" \
+      --known-hosts="$KOPIA_NAS_SFTP_KNOWN_HOSTS"
+
+    if [ -f "$KOPIA_POLICY_FILE" ]; then
+      log "Applying global policy"
+      kopia $KOPIA_GLOBAL_FLAGS policy set --global "$KOPIA_POLICY_FILE"
+    fi
+
+    log "Initialising B2 repository via sync-to: s3://$KOPIA_B2_BUCKET/$KOPIA_B2_PATH"
+    kopia $KOPIA_GLOBAL_FLAGS repository sync-to s3 \
+      --bucket="$KOPIA_B2_BUCKET" \
+      --endpoint="$KOPIA_B2_ENDPOINT" \
+      --prefix="$KOPIA_B2_PATH" \
+      --access-key="$AWS_ACCESS_KEY_ID" \
+      --secret-access-key="$AWS_SECRET_ACCESS_KEY" \
+      --sync-password
+
+    log "Disconnecting"
+    kopia $KOPIA_GLOBAL_FLAGS repository disconnect || true
+
+    log "Init complete"
+  restore.sh: |
+    #!/bin/sh
+    set -euo pipefail
+    SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+    . "$SCRIPT_DIR/common.sh"
+
+    RESTORE_FROM="${RESTORE_FROM:-nas}"   # 'nas' or 'b2'
+    RESTORE_TARGET="${RESTORE_TARGET:-/restore}"
+    RESTORE_SNAPSHOT="${RESTORE_SNAPSHOT:-latest}"
+
+    log() { printf '[%s] %s\n' "$(date -u +%FT%TZ)" "$*" >&2; }
+
+    mkdir -p "$RESTORE_TARGET"
+
+    if [ "$RESTORE_FROM" = "b2" ]; then
+      log "Connecting to B2 repository s3://$KOPIA_B2_BUCKET/$KOPIA_B2_PATH"
+      kopia $KOPIA_GLOBAL_FLAGS repository connect s3 \
+        --bucket="$KOPIA_B2_BUCKET" \
+        --endpoint="$KOPIA_B2_ENDPOINT" \
+        --prefix="$KOPIA_B2_PATH" \
+        --access-key="$AWS_ACCESS_KEY_ID" \
+        --secret-access-key="$AWS_SECRET_ACCESS_KEY"
+    else
+      log "Connecting to NAS repository sftp://$KOPIA_NAS_SFTP_USER@$KOPIA_NAS_SFTP_HOST:$KOPIA_NAS_SFTP_PORT$KOPIA_NAS_SFTP_PATH"
+      kopia $KOPIA_GLOBAL_FLAGS repository connect sftp \
+        --host="$KOPIA_NAS_SFTP_HOST" \
+        --port="$KOPIA_NAS_SFTP_PORT" \
+        --username="$KOPIA_NAS_SFTP_USER" \
+        --path="$KOPIA_NAS_SFTP_PATH" \
+        --keyfile="$KOPIA_NAS_SFTP_KEY_FILE" \
+        --known-hosts="$KOPIA_NAS_SFTP_KNOWN_HOSTS"
+    fi
+
+    if [ "$RESTORE_SNAPSHOT" = "latest" ]; then
+      log "Resolving latest snapshot for $KOPIA_SNAPSHOT_SOURCE"
+      # kopia snapshot list output columns: root ID, time, size, reason
+      SNAP_ID="$(kopia $KOPIA_GLOBAL_FLAGS snapshot list --all 2>/dev/null | awk 'NR>1 && $1 ~ /^[a-f0-9]{16,}/ {print $1; exit}')"
+      if [ -z "$SNAP_ID" ]; then
+        log "ERROR: no snapshot found for $KOPIA_SNAPSHOT_SOURCE"
+        exit 1
+      fi
+      RESTORE_SNAPSHOT="$SNAP_ID"
+    fi
+
+    log "Restoring snapshot $RESTORE_SNAPSHOT to $RESTORE_TARGET"
+    kopia $KOPIA_GLOBAL_FLAGS snapshot restore "$RESTORE_SNAPSHOT" "$RESTORE_TARGET"
+
+    log "Restore complete. Summary:"
+    du -sh "$RESTORE_TARGET" 2>/dev/null || true
+    find "$RESTORE_TARGET" -type f 2>/dev/null | wc -l | awk '{print "files:", $1}'
+
+    log "Disconnecting"
+    kopia $KOPIA_GLOBAL_FLAGS repository disconnect || true

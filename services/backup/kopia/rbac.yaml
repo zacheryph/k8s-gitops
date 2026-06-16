@@ -1,0 +1,43 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/serviceaccount.json
+# Two ServiceAccounts in the backup namespace:
+#   kopia-backup : no API access; runs the daily backup + initialise Jobs.
+#   kopia-drill  : can create/delete drill PVCs in the backup namespace.
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kopia-backup
+  namespace: backup
+automountServiceAccountToken: false
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: kopia-drill
+  namespace: backup
+automountServiceAccountToken: true
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/role.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: kopia-drill
+  namespace: backup
+rules:
+  - apiGroups: [""]
+    resources: ["persistentvolumeclaims"]
+    verbs: ["get", "list", "watch", "create", "delete"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: kopia-drill
+  namespace: backup
+subjects:
+  - kind: ServiceAccount
+    name: kopia-drill
+    namespace: backup
+roleRef:
+  kind: Role
+  name: kopia-drill
+  apiGroup: rbac.authorization.k8s.io

@@ -1,0 +1,91 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/job.json
+---
+# One-shot repo-init Job for immich/photos-pool.
+# Run this manually once per PVC, then DELETE the Job to prevent Flux from re-creating it.
+# (Use a different "ownership" annotation so the Kustomization's prune leaves it alone if you forget.)
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: kopia-init-immich-photos-pool
+  namespace: backup
+  labels:
+    app.kubernetes.io/part-of: backup
+    app.kubernetes.io/name: kopia
+    backup.zacheryph/pvc: photos-pool
+    backup.zacheryph/pvc-namespace: immich
+    backup.zacheryph/role: init            # marker; we prune init Jobs explicitly, not via Kustomization
+  annotations:
+    # Tell kustomize/Flux to NOT prune this Job when the file is removed.
+    # (Standard pattern: this Job is created via the kustomization, but we want
+    # to delete the Job manually after it succeeds without Flux bringing it back.)
+    "kustomize.toolkit.fluxcd.io/checksum": "init-only-delete-manually"
+spec:
+  backoffLimit: 1
+  ttlSecondsAfterFinished: 604800  # 7 days after success
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/part-of: backup
+        app.kubernetes.io/name: kopia
+    spec:
+      serviceAccountName: kopia-backup
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        runAsGroup: 1000
+        fsGroup: 1000
+        seccompProfile:
+          type: RuntimeDefault
+      containers:
+        - name: kopia
+          image: kopia/kopia:0.18
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities:
+              drop: ["ALL"]
+          env:
+            - name: KOPIA_PASSWORD
+              valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_PASSWORD } }
+            - name: KOPIA_NAS_SFTP_USER
+              valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_NAS_SFTP_USER } }
+            - name: KOPIA_NAS_SFTP_HOST
+              valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_NAS_SFTP_HOST } }
+            - name: KOPIA_NAS_SFTP_PATH
+              valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_NAS_SFTP_PATH } }
+            - name: KOPIA_B2_BUCKET
+              valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_B2_BUCKET } }
+            - name: KOPIA_B2_PATH
+              valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_B2_PATH } }
+            - name: KOPIA_B2_ENDPOINT
+              valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_B2_ENDPOINT } }
+            - name: AWS_ACCESS_KEY_ID
+              valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: AWS_ACCESS_KEY_ID } }
+            - name: AWS_SECRET_ACCESS_KEY
+              valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: AWS_SECRET_ACCESS_KEY } }
+          command: ["/usr/local/bin/init.sh"]
+          resources:
+            requests: { cpu: 100m, memory: 256Mi }
+            limits:   { cpu: 1,   memory: 1Gi  }
+          volumeMounts:
+            - { name: kopia-scripts, mountPath: /usr/local/bin, readOnly: true }
+            - { name: kopia-policy,  mountPath: /etc/kopia,     readOnly: true }
+            - { name: kopia-ssh,     mountPath: /var/kopia/ssh, readOnly: true }
+            - { name: kopia-config,  mountPath: /var/kopia/config }
+            - { name: kopia-cache,   mountPath: /var/kopia/cache }
+            - { name: kopia-log,     mountPath: /var/kopia/log }
+      volumes:
+        - name: kopia-scripts
+          configMap: { name: kopia-scripts, defaultMode: 0o755 }
+        - name: kopia-policy
+          configMap: { name: kopia-policy }
+        - name: kopia-ssh
+          secret:    { secretName: kopia-immich-photos-pool-ssh, defaultMode: 0o600 }
+        - name: kopia-config
+          emptyDir:  { sizeLimit: 256Mi }
+        - name: kopia-cache
+          emptyDir:  { sizeLimit: 2Gi }
+        - name: kopia-log
+          emptyDir:  { sizeLimit: 256Mi }

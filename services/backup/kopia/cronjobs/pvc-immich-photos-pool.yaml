@@ -1,0 +1,160 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/cronjob.json
+---
+# Backup CronJob for immich/photos-pool
+# Phase-1 example; replicate this file under cronjobs/ for each PVC to back up.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kopia-backup-immich-photos-pool
+  namespace: backup
+  labels:
+    app.kubernetes.io/part-of: backup
+    app.kubernetes.io/name: kopia
+    backup.zacheryph/pvc: photos-pool
+    backup.zacheryph/pvc-namespace: immich
+spec:
+  schedule: "0 2 * * *"             # daily 02:00 cluster-local
+  timeZone: "America/Chicago"        # optional; remove to use UTC
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 3
+  failedJobsHistoryLimit: 3
+  startingDeadlineSeconds: 600
+  jobTemplate:
+    spec:
+      backoffLimit: 2
+      activeDeadlineSeconds: 21600   # 6h cap per run
+      ttlSecondsAfterFinished: 86400 # auto-clean 1d old completed jobs
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/part-of: backup
+            app.kubernetes.io/name: kopia
+        spec:
+          serviceAccountName: kopia-backup
+          restartPolicy: OnFailure
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          containers:
+            - name: kopia
+              image: kopia/kopia:0.18
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              env:
+                - name: KOPIA_PASSWORD
+                  valueFrom:
+                    secretKeyRef:
+                      name: kopia-immich-photos-pool
+                      key: KOPIA_PASSWORD
+                - name: KOPIA_NAS_SFTP_USER
+                  valueFrom:
+                    secretKeyRef:
+                      name: kopia-immich-photos-pool
+                      key: KOPIA_NAS_SFTP_USER
+                - name: KOPIA_NAS_SFTP_HOST
+                  valueFrom:
+                    secretKeyRef:
+                      name: kopia-immich-photos-pool
+                      key: KOPIA_NAS_SFTP_HOST
+                - name: KOPIA_NAS_SFTP_PATH
+                  valueFrom:
+                    secretKeyRef:
+                      name: kopia-immich-photos-pool
+                      key: KOPIA_NAS_SFTP_PATH
+                - name: KOPIA_B2_BUCKET
+                  valueFrom:
+                    secretKeyRef:
+                      name: kopia-immich-photos-pool
+                      key: KOPIA_B2_BUCKET
+                - name: KOPIA_B2_PATH
+                  valueFrom:
+                    secretKeyRef:
+                      name: kopia-immich-photos-pool
+                      key: KOPIA_B2_PATH
+                - name: KOPIA_B2_ENDPOINT
+                  valueFrom:
+                    secretKeyRef:
+                      name: kopia-immich-photos-pool
+                      key: KOPIA_B2_ENDPOINT
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom:
+                    secretKeyRef:
+                      name: kopia-immich-photos-pool
+                      key: AWS_ACCESS_KEY_ID
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom:
+                    secretKeyRef:
+                      name: kopia-immich-photos-pool
+                      key: AWS_SECRET_ACCESS_KEY
+                - name: KOPIA_SNAPSHOT_DESCRIPTION
+                  value: "kopia-backup immich/photos-pool"
+                - name: KOPIA_HOSTNAME
+                  value: "immich-photos-pool"
+              command: ["/usr/local/bin/backup.sh"]
+              resources:
+                requests:
+                  cpu: 100m
+                  memory: 256Mi
+                limits:
+                  cpu: 2
+                  memory: 4Gi
+              volumeMounts:
+                - name: source-data
+                  mountPath: /data
+                  readOnly: true
+                - name: kopia-scripts
+                  mountPath: /usr/local/bin
+                  readOnly: true
+                - name: kopia-policy
+                  mountPath: /etc/kopia
+                  readOnly: true
+                - name: kopia-ssh
+                  mountPath: /var/kopia/ssh
+                  readOnly: true
+                - name: kopia-config
+                  mountPath: /var/kopia/config
+                - name: kopia-cache
+                  mountPath: /var/kopia/cache
+                - name: kopia-log
+                  mountPath: /var/kopia/log
+              livenessProbe:
+                # The backup pod runs < 6h. If it's still running at 6h30m, something is wrong.
+                exec:
+                  command: ["sh", "-c", "test -d /var/kopia/cache"]
+                initialDelaySeconds: 60
+                periodSeconds: 300
+                timeoutSeconds: 5
+                failureThreshold: 12
+          volumes:
+            - name: source-data
+              persistentVolumeClaim:
+                claimName: photos-pool
+                readOnly: true
+            - name: kopia-scripts
+              configMap:
+                name: kopia-scripts
+                defaultMode: 0o755
+            - name: kopia-policy
+              configMap:
+                name: kopia-policy
+            - name: kopia-ssh
+              secret:
+                secretName: kopia-immich-photos-pool-ssh
+                defaultMode: 0o600
+            - name: kopia-config
+              emptyDir:
+                sizeLimit: 256Mi
+            - name: kopia-cache
+              emptyDir:
+                sizeLimit: 2Gi
+            - name: kopia-log
+              emptyDir:
+                sizeLimit: 256Mi
