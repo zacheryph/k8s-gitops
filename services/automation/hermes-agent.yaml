@@ -159,3 +159,154 @@ spec:
       create: false
       name: hermes-viewer
       automountServiceAccountToken: true
+
+    # --- Obsidian sync sidecar ---
+    # Runs obsidian-headless as a sidecar in the Hermes pod to mirror
+    # /opt/data/Obsidian <-> Obsidian Sync in real time. Non-secret
+    # configuration (vault name) is in cluster-secrets. The auth token
+    # is in the `obsidian-auth-token` Secret (created out-of-band via
+    # `kubectl create secret generic` — see the PR description for the
+    # runbook). The obsidian skill uses OBSIDIAN_VAULT_PATH=/opt/data/Obsidian.
+    extraVolumes:
+      - name: obsidian-auth
+        secret:
+          secretName: obsidian-auth-token
+          defaultMode: 0o600
+      - name: obsidian-config
+        emptyDir: {}
+    extraInitContainers:
+      - name: obsidian-sync-init
+        image: node:22-bookworm-slim
+        imagePullPolicy: IfNotPresent
+        command: [/bin/sh, -ec]
+        args:
+          - |
+            set -eu
+            # Install obsidian-headless into a persistent location on the
+            # shared data PVC. The install survives pod restarts because
+            # /opt/obsidian-headless is a subPath of the data PVC.
+            if [ ! -x /opt/obsidian-headless/bin/ob ]; then
+              mkdir -p /opt/obsidian-headless
+              npm install --prefix /opt/obsidian-headless --global \
+                "obsidian-headless@${OBSIDIAN_HEADLESS_VERSION}"
+            fi
+            # Bind the local vault path to the remote Obsidian vault.
+            # `ob sync-setup` is idempotent — re-running with the same args
+            # is a no-op, so the || true keeps this resilient.
+            /opt/obsidian-headless/bin/ob sync-setup \
+              --vault "${HERMES_OBSIDIAN_VAULT_NAME}" \
+              --path /opt/data/Obsidian \
+              --device-name hermes-server \
+              || true
+            # Apply sync options. `--conflict-strategy conflict` keeps both
+            # copies on collision (safer than `merge` for markdown).
+            /opt/obsidian-headless/bin/ob sync-config \
+              --path /opt/data/Obsidian \
+              --mode bidirectional \
+              --conflict-strategy conflict \
+              --file-types image,audio,video,pdf,unsupported \
+              --configs appearance,hotkey,core-plugin,community-plugin
+            echo "obsidian-sync-init: complete"
+        env:
+          - name: HOME
+            value: /var/lib/obsidian
+          - name: NPM_CONFIG_PREFIX
+            value: /opt/obsidian-headless
+          - name: NPM_CONFIG_CACHE
+            value: /var/lib/obsidian/.npm
+          - name: OBSIDIAN_HEADLESS_VERSION
+            value: "0.0.11"
+          - name: HERMES_OBSIDIAN_VAULT_NAME
+            value: ${HERMES_OBSIDIAN_VAULT_NAME}
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 256Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 0
+          runAsNonRoot: false
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+          - name: data
+            mountPath: /opt/data/Obsidian
+            subPath: Obsidian
+          - name: data
+            mountPath: /opt/obsidian-headless
+            subPath: obsidian-headless
+          - name: obsidian-config
+            mountPath: /var/lib/obsidian
+          - name: tmp
+            mountPath: /tmp
+    extraContainers:
+      - name: obsidian-sync
+        image: node:22-bookworm-slim
+        imagePullPolicy: IfNotPresent
+        command: [/bin/sh, -ec]
+        args:
+          - |
+            set -eu
+            # Re-install obsidian-headless if /opt/obsidian-headless is
+            # missing (e.g. first start, or PVC was wiped). The install
+            # lives on the data PVC so this is normally a no-op.
+            if [ ! -x /opt/obsidian-headless/bin/ob ]; then
+              mkdir -p /opt/obsidian-headless
+              npm install --prefix /opt/obsidian-headless --global \
+                "obsidian-headless@${OBSIDIAN_HEADLESS_VERSION}"
+            fi
+            # Supervisor loop — restart on any non-zero exit. k8s
+            # restartPolicy handles pod-level restarts; this handles
+            # process-level restarts within the same pod.
+            while true; do
+              echo "[$(date -Iseconds)] starting ob sync --continuous" \
+                | tee -a /var/lib/obsidian/sync.log
+              /opt/obsidian-headless/bin/ob sync \
+                --path /opt/data/Obsidian --continuous \
+                2>&1 | tee -a /var/lib/obsidian/sync.log
+              echo "[$(date -Iseconds)] ob sync exited rc=${PIPESTATUS[0]}, restarting in 5s" \
+                | tee -a /var/lib/obsidian/sync.log
+              sleep 5
+            done
+        env:
+          - name: HOME
+            value: /var/lib/obsidian
+          - name: NPM_CONFIG_PREFIX
+            value: /opt/obsidian-headless
+          - name: NPM_CONFIG_CACHE
+            value: /var/lib/obsidian/.npm
+          - name: OBSIDIAN_HEADLESS_VERSION
+            value: "0.0.11"
+        resources:
+          requests:
+            cpu: 50m
+            memory: 128Mi
+          limits:
+            cpu: 200m
+            memory: 384Mi
+        securityContext:
+          allowPrivilegeEscalation: false
+          readOnlyRootFilesystem: true
+          runAsUser: 0
+          runAsNonRoot: false
+          capabilities:
+            drop: ["ALL"]
+        volumeMounts:
+          - name: data
+            mountPath: /opt/data/Obsidian
+            subPath: Obsidian
+          - name: data
+            mountPath: /opt/obsidian-headless
+            subPath: obsidian-headless
+          - name: obsidian-config
+            mountPath: /var/lib/obsidian
+          - name: obsidian-auth
+            mountPath: /var/lib/obsidian/.config/obsidian-headless/auth_token
+            subPath: auth_token
+            readOnly: true
+          - name: tmp
+            mountPath: /tmp
