@@ -1,0 +1,164 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/ocirepository_v1.json
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: velero
+  namespace: velero
+spec:
+  interval: 12h
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: 12.0.3
+  url: oci://ghcr.io/vmware-tanzu/helm-charts/velero
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: velero
+  namespace: velero
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: velero
+  install:
+    crds: CreateReplace
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    crds: CreateReplace
+    remediation:
+      strategy: rollback
+      retries: 3
+  values:
+    # Node-agent (unified replacement for restic) for filesystem-level
+    # backups of volumes that don't support CSI snapshots: hostPath, NFS,
+    # emptyDir, and any PVC without a CSI driver.
+    nodeAgent:
+      enabled: true
+
+    # MinIO S3 backend configuration
+    configuration:
+      features: EnableCSI
+      backupStorageLocation:
+        - name: default
+          provider: aws
+          bucket: velero
+          prefix: backups
+          config:
+            region: us-east-1
+            s3ForcePathStyle: "true"
+            s3Url: https://minio.minio.svc:9000
+            publicUrl: https://s3.${CLUSTER_DOMAIN}
+            # MinIO uses a cert-managed TLS cert — the cluster CA should
+            # be trusted by the Velero pod. If TLS verification fails,
+            # set insecureSkipTLSVerify: "true" temporarily while debugging.
+      volumeSnapshotLocation:
+        - name: default
+          provider: aws
+          config:
+            region: us-east-1
+
+    # Credentials are created out-of-band (see README § "One-time bootstrap")
+    credentials:
+      existingSecret: velero-s3-credentials
+
+    # Resource limits
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+
+    # Metrics + ServiceMonitor for Prometheus
+    metrics:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+
+    # Plugins (CSI snapshots + AWS S3 backend)
+    initContainers:
+      - name: velero-plugin-for-aws
+        image: velero/velero-plugin-for-aws:v1.13.0
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - name: plugins
+            mountPath: /target
+      - name: velero-plugin-for-csi
+        image: velero/velero-plugin-for-csi:v0.11.0
+        imagePullPolicy: IfNotPresent
+        volumeMounts:
+          - name: plugins
+            mountPath: /target
+
+    # Backup schedules (managed by the chart)
+    schedules:
+      # Daily cluster-wide backup at 01:00 (before Kopia's 02:00 PVC backup)
+      daily-cluster:
+        disabled: false
+        schedule: "0 1 * * *"
+        useOwnerReferencesInBackup: true
+        template:
+          ttl: 720h0m0s           # 30 days
+          includedNamespaces:
+            - "*"
+          excludedNamespaces:
+            - kube-system
+            - kube-public
+            - kube-node-lease
+            - flux-system
+            - velero
+            - longhorn-system
+          snapshotVolumes: true
+          defaultVolumesToFsBackup: false
+          metadata:
+            labels:
+              backup-tier: daily
+      # Daily critical-namespaces backup at 00:00 — narrow scope for fast targeted restore
+      daily-critical:
+        disabled: false
+        schedule: "0 0 * * *"
+        useOwnerReferencesInBackup: true
+        template:
+          ttl: 720h0m0s
+          includedNamespaces:
+            - immich
+            - minio
+            - home-assistant
+            - forgejo
+          snapshotVolumes: true
+          defaultVolumesToFsBackup: false
+          metadata:
+            labels:
+              backup-tier: daily-critical
+      # Weekly full backup on Sunday 03:00, kept 90 days
+      weekly-full:
+        disabled: false
+        schedule: "0 3 * * 0"
+        useOwnerReferencesInBackup: true
+        template:
+          ttl: 2160h0m0s           # 90 days
+          includedNamespaces:
+            - "*"
+          excludedNamespaces:
+            - kube-system
+            - kube-public
+            - kube-node-lease
+            - flux-system
+            - velero
+            - longhorn-system
+          snapshotVolumes: true
+          defaultVolumesToFsBackup: false
+          metadata:
+            labels:
+              backup-tier: weekly
+
+    # Deploy the node-agent DaemonSet
+    deployNodeAgent: true
