@@ -40,7 +40,7 @@ Cluster-level backup and restore using Velero, backed by Backblaze B2 (S3-compat
 │  ┌────────────────────┐            ┌──────────────────┐           │
 │  │ watches PVCs +     │            │ velero server    │           │
 │  │ HelmReleases for   │ generate   │                  │           │
-│  │ backup.zacheryph/  │───────────▶│  schedules ──────┼──┐        │
+│  │ backup.routine.sh/  │───────────▶│  schedules ──────┼──┐        │
 │  │ enabled annotation │  Schedule  │  backups   ──────┼─┐│        │
 │  └────────────────────┘            │  restores  ──────┼┐││        │
 │                                    └──────────────────┘│││        │
@@ -86,7 +86,7 @@ Cluster-level backup and restore using Velero, backed by Backblaze B2 (S3-compat
 
 **Annotation-driven schedules (Kyverno-generated):**
 
-Annotate any PVC or HelmRelease with `backup.zacheryph/enabled: "true"` and Kyverno generates a `Schedule` in the `velero` namespace. See [Annotation-driven backup](#annotation-driven-backup-kyverno) below.
+Annotate any PVC or HelmRelease with `backup.routine.sh/enabled: "true"` and Kyverno generates a `Schedule` in the `velero` namespace. See [Annotation-driven backup](#annotation-driven-backup-kyverno) below.
 
 ---
 
@@ -175,9 +175,9 @@ Instead of writing `Schedule` YAML files for each app, annotate the PVC or HelmR
 
 | Annotation | Required | Default | Description |
 |---|---|---|---|
-| `backup.zacheryph/enabled` | Yes | — | Set to `"true"` to trigger schedule generation |
-| `backup.zacheryph/schedule` | No | `"0 1 * * *"` | Cron expression for the backup |
-| `backup.zacheryph/ttl` | No | `"720h0m0s"` | How long to keep backups (30 days) |
+| `backup.routine.sh/enabled` | Yes | — | Set to `"true"` to trigger schedule generation |
+| `backup.routine.sh/schedule` | No | `"0 1 * * *"` | Cron expression for the backup |
+| `backup.routine.sh/ttl` | No | `"720h0m0s"` | How long to keep backups (30 days) |
 
 ### PVC-level annotation
 
@@ -190,9 +190,9 @@ metadata:
   namespace: immich
   name: photos-pool
   annotations:
-    backup.zacheryph/enabled: "true"
-    backup.zacheryph/schedule: "0 23 * * *"   # daily at 23:00
-    backup.zacheryph/ttl: "720h0m0s"          # keep 30 days
+    backup.routine.sh/enabled: "true"
+    backup.routine.sh/schedule: "0 23 * * *"   # daily at 23:00
+    backup.routine.sh/ttl: "720h0m0s"          # keep 30 days
 spec:
   accessModes: ["ReadWriteOnce"]
   resources:
@@ -205,23 +205,35 @@ Kyverno generates: `Schedule/auto-pvc-immich-photos-pool` in the `velero` namesp
 
 ### HelmRelease-level annotation
 
-Annotate a HelmRelease to back up its entire namespace — resources + PVCs. Good for app-level coverage.
+Annotate a HelmRelease to back up only the resources belonging to that specific
+HelmRelease — not the entire namespace. This is important when multiple
+HelmReleases share a namespace (e.g., `monitoring` with `kube-prometheus-stack`
+and `thanos`).
+
+The generated schedule uses a `labelSelector` with
+`app.kubernetes.io/instance: <HelmRelease-name>` — the standard Helm instance
+label set by most charts. Resources deployed by other HelmReleases in the same
+namespace are excluded. PVCs created by the chart's StatefulSet/Deployment
+typically inherit the instance label and are included; manually-created PVCs
+need the label added manually to be backed up.
 
 ```yaml
 apiVersion: helm.toolkit.fluxcd.io/v2
 kind: HelmRelease
 metadata:
-  namespace: immich
-  name: immich
+  namespace: monitoring
+  name: kube-prometheus-stack
   annotations:
-    backup.zacheryph/enabled: "true"
-    backup.zacheryph/schedule: "0 2 * * *"
-    backup.zacheryph/ttl: "2160h0m0s"         # keep 90 days for app config
+    backup.routine.sh/enabled: "true"
+    backup.routine.sh/schedule: "0 2 * * *"
+    backup.routine.sh/ttl: "2160h0m0s"              # keep 90 days for app config
 spec:
   # ...
 ```
 
-Kyverno generates: `Schedule/auto-hr-immich-immich` in the `velero` namespace.
+Kyverno generates: `Schedule/auto-hr-monitoring-kube-prometheus-stack` in the
+`velero` namespace, backing up only resources labeled with
+`app.kubernetes.io/instance: kube-prometheus-stack` in the `monitoring` namespace.
 
 ### Lifecycle
 
@@ -232,7 +244,12 @@ Kyverno generates: `Schedule/auto-hr-immich-immich` in the `velero` namespace.
 
 ### Multiple annotations per namespace
 
-If a namespace has multiple annotated PVCs/HelmReleases, each generates its own `Schedule`. They'll run overlapping backups — fine for 1-2 per namespace (metadata is KB-MB). For 5+ annotated resources in one namespace, use a single annotation instead of one per resource.
+If a namespace has multiple annotated PVCs/HelmReleases, each generates its own
+`Schedule`. PVC-level schedules back up the whole namespace; HelmRelease-level
+schedules scope to only that release's labeled resources. Overlapping backups
+are low-cost (metadata is KB-MB). Fine for 1-2 per namespace. If you have 5+
+annotated resources in one namespace, use a single annotation instead of one per
+resource.
 
 ---
 
@@ -262,7 +279,7 @@ velero backup get
 velero schedule get
 
 # Show only Kyverno-generated schedules
-kubectl -n velero get schedule -l backup.zacheryph/generated-by=kyverno
+kubectl -n velero get schedule -l backup.routine.sh/generated-by=kyverno
 
 # Show backups for a specific schedule
 velero backup get --selector velero.io/schedule-name=daily-cluster
@@ -595,7 +612,7 @@ kind: PersistentVolumeClaim
 metadata:
   name: test-kyverno
   annotations:
-    backup.zacheryph/enabled: "true"
+    backup.routine.sh/enabled: "true"
 spec:
   accessModes: ["ReadWriteOnce"]
   resources:

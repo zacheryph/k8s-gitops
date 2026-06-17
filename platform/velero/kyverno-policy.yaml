@@ -1,7 +1,7 @@
 # Kyverno ClusterPolicy: annotation-driven Velero backup.
 #
 # Annotate a PersistentVolumeClaim OR a HelmRelease with
-#   backup.zacheryph/enabled: "true"
+#   backup.routine.sh/enabled: "true"
 # and Kyverno generates a Velero Schedule for that namespace.
 # Remove the annotation → Kyverno deletes the schedule.
 #
@@ -14,12 +14,12 @@
 #     namespace: immich
 #     name: photos-pool
 #     annotations:
-#       backup.zacheryph/enabled: "true"
-#       backup.zacheryph/schedule: "0 23 * * *"   # optional (default: 0 1 * * *)
-#       backup.zacheryph/ttl: "720h0m0s"          # optional (default: 720h = 30d)
+#       backup.routine.sh/enabled: "true"
+#       backup.routine.sh/schedule: "0 23 * * *"   # optional (default: 0 1 * * *)
+#       backup.routine.sh/ttl: "720h0m0s"          # optional (default: 720h = 30d)
 #
 # ---
-# Usage — HelmRelease-level (backs up the entire namespace):
+# Usage — HelmRelease-level (backs up only resources belonging to this HR):
 #
 #   apiVersion: helm.toolkit.fluxcd.io/v2
 #   kind: HelmRelease
@@ -27,16 +27,16 @@
 #     namespace: immich
 #     name: immich
 #     annotations:
-#       backup.zacheryph/enabled: "true"
-#       backup.zacheryph/schedule: "0 2 * * *"
-#       backup.zacheryph/ttl: "2160h0m0s"         # 90d for app config
+#       backup.routine.sh/enabled: "true"
+#       backup.routine.sh/schedule: "0 2 * * *"
+#       backup.routine.sh/ttl: "2160h0m0s"         # 90d for app config
 #
-# ---
-# Both resources trigger the same policy. If a namespace has multiple
-# annotated resources, each generates its own Schedule — they'll run
-# overlapping backups (low cost: metadata is KB-MB). Fine for 1-2 per
-# namespace. If you have 5+ annotated resources in one namespace, use a
-# namespace-level annotation instead.
+# The HelmRelease rule uses labelSelector
+#   app.kubernetes.io/instance: <helmrelease-name>
+# to scope the backup to resources deployed by that specific HelmRelease.
+# If your chart sets a different instance label, set the annotation
+#   backup.routine.sh/instance-label: "custom-value"
+# to override the instance label value.
 ---
 apiVersion: kyverno.io/v1
 kind: ClusterPolicy
@@ -47,7 +47,7 @@ metadata:
     policies.kyverno.io/subject: Schedule
     policies.kyverno.io/description: >
       Generate a Velero Schedule for any PVC or HelmRelease annotated
-      with backup.zacheryph/enabled: "true". The Schedule backs up the
+      with backup.routine.sh/enabled: "true". The Schedule backs up the
       resource's namespace. Uses CSI snapshots for PVC data.
 spec:
   generateExisting: true
@@ -59,7 +59,7 @@ spec:
               kinds: ["PersistentVolumeClaim"]
       preconditions:
         all:
-          - key: '{{ request.object.metadata.annotations."backup.zacheryph/enabled" }}'
+          - key: '{{ request.object.metadata.annotations."backup.routine.sh/enabled" }}'
             operator: Equals
             value: "true"
       generate:
@@ -70,19 +70,19 @@ spec:
         synchronize: true
         data:
           spec:
-            schedule: "{{ `{{ request.object.metadata.annotations.\"backup.zacheryph/schedule\" || \"0 1 * * *\" }}` }}"
+            schedule: "{{ `{{ request.object.metadata.annotations.\"backup.routine.sh/schedule\" || \"0 1 * * *\" }}` }}"
             useOwnerReferencesInBackup: true
             template:
-              ttl: "{{ `{{ request.object.metadata.annotations.\"backup.zacheryph/ttl\" || \"720h0m0s\" }}` }}"
+              ttl: "{{ `{{ request.object.metadata.annotations.\"backup.routine.sh/ttl\" || \"720h0m0s\" }}` }}"
               includedNamespaces:
                 - "{{ request.object.metadata.namespace }}"
               snapshotVolumes: true
               metadata:
                 labels:
                   backup-tier: per-pvc
-                  backup.zacheryph/generated-by: kyverno
-                  backup.zacheryph/source-kind: PersistentVolumeClaim
-                  backup.zacheryph/source-name: "{{ request.object.metadata.name }}"
+                  backup.routine.sh/generated-by: kyverno
+                  backup.routine.sh/source-kind: PersistentVolumeClaim
+                  backup.routine.sh/source-name: "{{ request.object.metadata.name }}"
 
     - name: generate-from-helmrelease
       match:
@@ -92,7 +92,7 @@ spec:
               apiGroups: ["helm.toolkit.fluxcd.io"]
       preconditions:
         all:
-          - key: '{{ request.object.metadata.annotations."backup.zacheryph/enabled" }}'
+          - key: '{{ request.object.metadata.annotations."backup.routine.sh/enabled" }}'
             operator: Equals
             value: "true"
       generate:
@@ -103,16 +103,21 @@ spec:
         synchronize: true
         data:
           spec:
-            schedule: "{{ `{{ request.object.metadata.annotations.\"backup.zacheryph/schedule\" || \"0 1 * * *\" }}` }}"
+            schedule: "{{ `{{ request.object.metadata.annotations.\"backup.routine.sh/schedule\" || \"0 1 * * *\" }}` }}"
             useOwnerReferencesInBackup: true
             template:
-              ttl: "{{ `{{ request.object.metadata.annotations.\"backup.zacheryph/ttl\" || \"720h0m0s\" }}` }}"
+              ttl: "{{ `{{ request.object.metadata.annotations.\"backup.routine.sh/ttl\" || \"720h0m0s\" }}` }}"
               includedNamespaces:
                 - "{{ request.object.metadata.namespace }}"
+              labelSelector:
+                matchLabels:
+                  # Standard Helm label: ties resources to their release.
+                  # Override with backup.routine.sh/instance-label annotation.
+                  app.kubernetes.io/instance: "{{ `{{ request.object.metadata.annotations.\"backup.routine.sh/instance-label\" || request.object.metadata.name }}` }}"
               snapshotVolumes: true
               metadata:
                 labels:
                   backup-tier: per-helmrelease
-                  backup.zacheryph/generated-by: kyverno
-                  backup.zacheryph/source-kind: HelmRelease
-                  backup.zacheryph/source-name: "{{ request.object.metadata.name }}"
+                  backup.routine.sh/generated-by: kyverno
+                  backup.routine.sh/source-kind: HelmRelease
+                  backup.routine.sh/source-name: "{{ request.object.metadata.name }}"
