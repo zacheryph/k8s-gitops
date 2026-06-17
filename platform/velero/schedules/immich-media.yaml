@@ -1,0 +1,34 @@
+# Daily backup of immich (media library + database) at 23:00.
+# Uses CSI snapshots via Longhorn for PVC data.
+# Velero must be running before this CR is applied.
+---
+apiVersion: velero.io/v1
+kind: Schedule
+metadata:
+  name: immich-media
+  namespace: velero
+spec:
+  schedule: "0 23 * * *"
+  useOwnerReferencesInBackup: true
+  template:
+    ttl: 720h0m0s              # 30 days
+    includedNamespaces:
+      - immich
+    includedResources:
+      - persistentvolumeclaims
+      - deployments
+      - services
+      - configmaps
+      - secrets
+      - postgresql.cnpg.io/clusters
+      - certificates.cert-manager.io
+      - ingresses.networking.k8s.io
+      - httproutes.gateway.networking.k8s.io
+    labelSelector:
+      matchLabels:
+        app.kubernetes.io/part-of: immich
+    snapshotVolumes: true
+    metadata:
+      labels:
+        backup-tier: per-app
+        app: immich
