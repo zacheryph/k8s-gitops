@@ -42,27 +42,26 @@ spec:
     nodeAgent:
       enabled: true
 
-    # MinIO S3 backend configuration
+    # Backblaze B2 S3-compatible backend
+    # Credentials come from the velero-s3-credentials Secret (created out-of-band).
+    # The B2 bucket, application key ID, and application key must be created
+    # in the B2 web console before Velero can start. See README § "One-time bootstrap".
     configuration:
       features: EnableCSI
       backupStorageLocation:
         - name: default
           provider: aws
-          bucket: velero
+          bucket: ${VELERO_B2_BUCKET}
           prefix: backups
           config:
-            region: us-east-1
+            region: ${VELERO_B2_REGION}
+            s3Url: https://${VELERO_B2_ENDPOINT}
             s3ForcePathStyle: "true"
-            s3Url: https://minio.minio.svc:9000
-            publicUrl: https://s3.${CLUSTER_DOMAIN}
-            # MinIO uses a cert-managed TLS cert — the cluster CA should
-            # be trusted by the Velero pod. If TLS verification fails,
-            # set insecureSkipTLSVerify: "true" temporarily while debugging.
       volumeSnapshotLocation:
         - name: default
           provider: aws
           config:
-            region: us-east-1
+            region: ${VELERO_B2_REGION}
 
     # Credentials are created out-of-band (see README § "One-time bootstrap")
     credentials:
