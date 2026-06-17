@@ -6,3 +6,4 @@ namespace: velero
 resources:
   - namespace.yaml
   - helmrelease.yaml
+  - kyverno-policy.yaml
