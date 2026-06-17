@@ -1,8 +1,8 @@
 # Velero Cluster Backup
 
-Cluster-level backup and restore using Velero, backed by in-cluster MinIO (S3-compatible) and Longhorn CSI volume snapshots.
+Cluster-level backup and restore using Velero, backed by Backblaze B2 (S3-compatible) and Longhorn CSI volume snapshots. Annotation-driven via Kyverno — annotate a PVC or HelmRelease and Kyverno generates the backup schedule.
 
-> **Kopia vs Velero:** Kopia (`services/backup/kopia/`) does per-PVC file-level backup of specific volumes (e.g., the 8 TB immich photos library). Velero backs up entire cluster resources — Deployments, Services, ConfigMaps, Secrets, PVCs (via CSI snapshots) — and is the right tool for full-namespace or full-cluster restore. They complement each other; neither replaces the other.
+> **Kopia vs Velero:** Kopia (`services/backup/kopia/`) does per-PVC file-level backup to offsite B2. Velero backs up entire cluster resources — Deployments, Services, ConfigMaps, Secrets, PVCs (via CSI snapshots) — and is the right tool for full-namespace or full-cluster restore. They complement each other; neither replaces the other.
 
 ---
 
@@ -11,6 +11,7 @@ Cluster-level backup and restore using Velero, backed by in-cluster MinIO (S3-co
 - [Architecture](#architecture)
 - [What's deployed](#whats-deployed)
 - [One-time bootstrap](#one-time-bootstrap)
+- [Annotation-driven backup (Kyverno)](#annotation-driven-backup-kyverno)
 - [Backup operations](#backup-operations)
   - [View existing backups](#view-existing-backups)
   - [Create a manual backup](#create-a-manual-backup)
@@ -35,45 +36,47 @@ Cluster-level backup and restore using Velero, backed by in-cluster MinIO (S3-co
 ┌──────────────────────────────────────────────────────────────────┐
 │  Cluster                                                          │
 │                                                                   │
-│  Velero Deployment          Velero Node-Agent (DaemonSet)          │
-│  ┌──────────────────┐      ┌──────────────────────────────┐      │
-│  │ velero server    │      │ node-agent pod (per node)    │      │
-│  │                  │      │  - fs-backup (hostPath/NFS)  │      │
-│  │  schedules ──────┼──┐   │  - CSI snapshot orchestration│      │
-│  │  backups   ──────┼─┐│   └──────────────────────────────┘      │
-│  │  restores  ──────┼┐││                                          │
-│  └────────┬─────────┘│││   Longhorn CSI Driver                     │
-│           │          │││   ┌──────────────────────────────┐      │
-│           │ S3 API   │││   │ VolumeSnapshot → Snapshot     │      │
-│           ▼          │││   │  (point-in-time PVC clone)    │      │
-│  ┌──────────────────┐│││   └──────────────────────────────┘      │
-│  │ MinIO (in-cluster)│││                                          │
-│  │ bucket: velero    │││                                          │
-│  │ prefix: backups/  │││                                          │
-│  └──────────────────┘│││                                          │
-└──────────────────────┼┼┼──────────────────────────────────────────┘
-                       │││
-           ┌───────────┘│└───────────── S3 backups (JSON metadata)
-           │            └────────────── PVC backups (CSI snapshots)
-           ▼
-  ┌────────────────────────────────────────┐
-  │  MinIO bucket `velero/`                │
-  │  backups/<name>/                        │
-  │    ├── velero-backup.json               │
-  │    ├── <name>-logs.gz                   │
+│  Kyverno ClusterPolicy              Velero Deployment             │
+│  ┌────────────────────┐            ┌──────────────────┐           │
+│  │ watches PVCs +     │            │ velero server    │           │
+│  │ HelmReleases for   │ generate   │                  │           │
+│  │ backup.zacheryph/  │───────────▶│  schedules ──────┼──┐        │
+│  │ enabled annotation │  Schedule  │  backups   ──────┼─┐│        │
+│  └────────────────────┘            │  restores  ──────┼┐││        │
+│                                    └──────────────────┘│││        │
+│                                                         │││        │
+│  Velero Node-Agent (DaemonSet)     Longhorn CSI Driver  │││        │
+│  ┌──────────────────────────┐     ┌────────────────┐    │││        │
+│  │ node-agent pod (per node)│     │ VolumeSnapshot  │    │││        │
+│  │  - fs-backup (hostPath)  │     │  → Snapshot     │    │││        │
+│  │  - CSI orchestration     │     │  (point-in-time)│    │││        │
+│  └──────────────────────────┘     └────────────────┘    │││        │
+│                                                         │││        │
+└─────────────────────────────────────────────────────────┼┼┼────────┘
+                                                          │││
+           ┌──────────────────────────────────────────────┘││
+           │           ┌───────────────────────────────────┘│
+           │           │       ┌───────────────────────────┘
+           ▼           ▼       ▼
+  ┌─────────────────────────────────────────┐
+  │  Backblaze B2                           │
+  │  bucket: <b2-bucket>                    │
+  │  prefix: backups/                        │
+  │  backups/<name>/                         │
+  │    ├── velero-backup.json                │
+  │    ├── <name>-logs.gz                    │
   │    ├── <name>-volumesnapshots.json.gz    │
-  │    ├── <name>-csi-volumesnapshot-*.json │
-  │    └── <name>-tar.gz (node-agent fs)    │
-  └────────────────────────────────────────┘
+  │    └── <name>-csi-volumesnapshot-*.json  │
+  └─────────────────────────────────────────┘
 ```
 
-**Backend:** MinIO (S3-compatible) running in the `minio` namespace.
+**Backend:** Backblaze B2 (S3-compatible). Bucket + application key created in the B2 console.
 
 **Plugins:**
 - `velero-plugin-for-aws` — S3 object store backend (v1.13.0)
 - `velero-plugin-for-csi` — CSI VolumeSnapshot integration (v0.11.0)
 
-**Schedules:**
+**Schedules (built-in, managed by the chart):**
 
 | Schedule | When | Scope | TTL |
 |---|---|---|---|
@@ -81,11 +84,9 @@ Cluster-level backup and restore using Velero, backed by in-cluster MinIO (S3-co
 | `daily-critical` | 00:00 daily | immich, minio, home-assistant, forgejo | 30 days |
 | `weekly-full` | Sun 03:00 | All namespaces (excl. system) | 90 days |
 
-**Per-app schedules** (in `schedules/`):
+**Annotation-driven schedules (Kyverno-generated):**
 
-| Schedule | When | Scope | TTL |
-|---|---|---|---|
-| `immich-media` | 23:00 daily | immich namespace + label filter | 30 days |
+Annotate any PVC or HelmRelease with `backup.zacheryph/enabled: "true"` and Kyverno generates a `Schedule` in the `velero` namespace. See [Annotation-driven backup](#annotation-driven-backup-kyverno) below.
 
 ---
 
@@ -96,11 +97,11 @@ Cluster-level backup and restore using Velero, backed by in-cluster MinIO (S3-co
 | `Namespace/velero` | — | Velero's home |
 | `OCIRepository/velero` | velero | Helm chart source (VMware Tanzu) |
 | `HelmRelease/velero` | velero | Velero server + node-agent + schedules |
-| `Secret/velero-s3-credentials` | velero | MinIO access key (created out-of-band) |
+| `Secret/velero-s3-credentials` | velero | B2 application key (created out-of-band) |
+| `ClusterPolicy/generate-velero-backup` | — | Kyverno policy: annotation → Schedule |
 | `Schedule/daily-cluster` | velero | Cluster-wide daily backup |
 | `Schedule/daily-critical` | velero | Critical namespaces daily |
 | `Schedule/weekly-full` | velero | Weekly full backup (90d retention) |
-| `Schedule/immich-media` | velero | Per-app immich backup |
 | `Kustomization/platform-velero` | flux-system | Flux pointer |
 
 ---
@@ -109,38 +110,35 @@ Cluster-level backup and restore using Velero, backed by in-cluster MinIO (S3-co
 
 After this PR merges and Flux reconciles `platform-velero`:
 
-### 1. Create the MinIO user and bucket for Velero
+### 1. Create the B2 bucket and application key
 
-Velero needs its own MinIO credentials (access key + secret key) and a dedicated bucket.
+In the [Backblaze B2 web console](https://secure.backblaze.com):
 
-```bash
-# Create a MinIO alias for the cluster's MinIO
-kubectl -n minio exec deploy/minio -- mc alias set local http://localhost:9000 \
-  ${MINIO_ROOT_USERNAME} ${MINIO_ROOT_PASSWORD}
+1. **Create a bucket** — name it `velero-<cluster>` (e.g., `velero-homelab`). Private. Default encryption is fine (Velero encrypts client-side, so B2's server-side encryption is a bonus second layer, not required).
+2. **Create an Application Key** scoped to that one bucket with `readFiles`, `writeFiles`, `listFiles`, `deleteFiles` — **NOT** the master key. Copy the `keyID` and `applicationKey`.
+3. **Note the endpoint and region.** For US West: endpoint `s3.us-west-004.backblazeb2.com`, region `us-west-004`. Check the bucket's page for the exact endpoint.
 
-# Create a dedicated user for Velero
-kubectl -n minio exec deploy/minio -- mc admin user add local \
-  <velero-access-key> <velero-secret-key>
+### 2. Add B2 config to cluster-secrets
 
-# Attach the built-in readwrite policy
-kubectl -n minio exec deploy/minio -- mc admin policy attach local readwrite \
-  --user <velero-access-key>
+Add these to the `cluster-secrets` Secret in `flux-system` (it's SOPS-encrypted):
 
-# Create the velero bucket
-kubectl -n minio exec deploy/minio -- mc mb local/velero
+```yaml
+VELERO_B2_BUCKET: velero-homelab
+VELERO_B2_REGION: us-west-004
+VELERO_B2_ENDPOINT: s3.us-west-004.backblazeb2.com
 ```
 
-### 2. Create the S3 credentials Secret
+### 3. Create the S3 credentials Secret
 
 ```bash
 kubectl create secret generic velero-s3-credentials \
   -n velero \
   --from-literal=cloud="[default]
-aws_access_key_id=<velero-access-key>
-aws_secret_access_key=<velero-secret-key>"
+aws_access_key_id=<keyID>
+aws_secret_access_key=<applicationKey>"
 ```
 
-### 3. Let Flux reconcile
+### 4. Let Flux reconcile
 
 ```bash
 flux reconcile kustomization platform-velero
@@ -148,7 +146,7 @@ flux reconcile kustomization platform-velero
 kubectl -n velero get pods -w
 ```
 
-### 4. Verify
+### 5. Verify
 
 ```bash
 # Velero server is running
@@ -160,9 +158,81 @@ velero schedule get
 # Node-agent DaemonSet is running
 kubectl -n velero get ds/node-agent
 
+# Kyverno policy is ready
+kubectl get clusterpolicy generate-velero-backup
+
 # First backup fires (or trigger one manually to test)
 velero backup create test-bootstrap --wait
 ```
+
+---
+
+## Annotation-driven backup (Kyverno)
+
+Instead of writing `Schedule` YAML files for each app, annotate the PVC or HelmRelease. Kyverno's `generate-velero-backup` ClusterPolicy watches for the annotation and creates a `Schedule` in the `velero` namespace.
+
+### Annotation reference
+
+| Annotation | Required | Default | Description |
+|---|---|---|---|
+| `backup.zacheryph/enabled` | Yes | — | Set to `"true"` to trigger schedule generation |
+| `backup.zacheryph/schedule` | No | `"0 1 * * *"` | Cron expression for the backup |
+| `backup.zacheryph/ttl` | No | `"720h0m0s"` | How long to keep backups (30 days) |
+
+### PVC-level annotation
+
+Annotate a PVC to back up its namespace. Good for data-heavy workloads where the PVC is the thing you care about.
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: immich
+  name: photos-pool
+  annotations:
+    backup.zacheryph/enabled: "true"
+    backup.zacheryph/schedule: "0 23 * * *"   # daily at 23:00
+    backup.zacheryph/ttl: "720h0m0s"          # keep 30 days
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 8Ti
+  storageClassName: longhorn
+```
+
+Kyverno generates: `Schedule/auto-pvc-immich-photos-pool` in the `velero` namespace, backing up the `immich` namespace.
+
+### HelmRelease-level annotation
+
+Annotate a HelmRelease to back up its entire namespace — resources + PVCs. Good for app-level coverage.
+
+```yaml
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  namespace: immich
+  name: immich
+  annotations:
+    backup.zacheryph/enabled: "true"
+    backup.zacheryph/schedule: "0 2 * * *"
+    backup.zacheryph/ttl: "2160h0m0s"         # keep 90 days for app config
+spec:
+  # ...
+```
+
+Kyverno generates: `Schedule/auto-hr-immich-immich` in the `velero` namespace.
+
+### Lifecycle
+
+- **Add annotation** → Kyverno creates the `Schedule`. Flux applies it. Velero starts backing up.
+- **Change `schedule` or `ttl`** → Kyverno updates the `Schedule`.
+- **Remove annotation (or set to `"false"`)** → Kyverno deletes the `Schedule`. Existing backups remain until their TTL expires.
+- **Remove the PVC/HelmRelease** → Kyverno deletes the `Schedule` (it's owned by the source resource via `synchronize: true`).
+
+### Multiple annotations per namespace
+
+If a namespace has multiple annotated PVCs/HelmReleases, each generates its own `Schedule`. They'll run overlapping backups — fine for 1-2 per namespace (metadata is KB-MB). For 5+ annotated resources in one namespace, use a single annotation instead of one per resource.
 
 ---
 
@@ -188,8 +258,11 @@ The `velero` CLI reads kubeconfig from `~/.kube/config` by default. Use `--kubec
 # List all backups
 velero backup get
 
-# List all schedules
+# List all schedules (built-in + Kyverno-generated)
 velero schedule get
+
+# Show only Kyverno-generated schedules
+kubectl -n velero get schedule -l backup.zacheryph/generated-by=kyverno
 
 # Show backups for a specific schedule
 velero backup get --selector velero.io/schedule-name=daily-cluster
@@ -214,7 +287,7 @@ velero backup create immich-manual-$(date +%Y%m%d-%H%M) \
 
 # Specific resources only (no volumes)
 velero backup create configs-only-$(date +%Y%m%d-%H%M) \
-  --include-namespaces immich,minio \
+  --include-namespaces immich,home-assistant \
   --include-resources configmaps,secrets \
   --snapshot-volumes=false \
   --wait
@@ -230,7 +303,7 @@ velero backup create immich-db-$(date +%Y%m%d-%H%M) \
 ### Create a scheduled backup
 
 ```bash
-# Via Velero CLI
+# Via Velero CLI (also possible via Kyverno annotation — preferred)
 velero schedule create home-automation-daily \
   --schedule="0 2 * * *" \
   --include-namespaces home-assistant,zwave-js \
@@ -299,8 +372,7 @@ velero restore create restore-forgejo-config \
 velero restore create restore-minio-pvc \
   --from-backup weekly-full \
   --include-namespaces minio \
-  --include-resources persistentvolumeclaims \
-  --selector "app.kubernetes.io/name=minio"
+  --include-resources persistentvolumeclaims
 ```
 
 ### Restore an entire namespace
@@ -331,7 +403,7 @@ velero restore create restore-immich --from-backup daily-critical \
 A full cluster restore from a `weekly-full` backup. Only do this when rebuilding the cluster from scratch or recovering from catastrophic failure.
 
 ```bash
-# 1. Install Velero on the fresh cluster, point it at the same MinIO bucket
+# 1. Install Velero on the fresh cluster, point it at the same B2 bucket
 #    (the bootstrap section above handles this via Flux)
 
 # 2. List available backups
@@ -351,15 +423,6 @@ velero restore logs full-restore
 #    the baseline state; Flux brings it current.
 flux reconcile kustomization --all
 ```
-
-**Restore order matters:**
-1. CRDs first (Velero backs these up)
-2. Cluster-scoped resources
-3. Namespaced resources
-4. PVCs / CSI snapshots
-5. Flux reconciles to bring state current
-
-Velero handles the ordering automatically for single-restore operations. For multi-step restores, use `--include-cluster-resources` and `--include-namespaces` to split the restore into phases.
 
 ### Restore into a different namespace
 
@@ -404,16 +467,6 @@ kubectl -n immich get pvc
 #    Longhorn handles the snapshot → volume provisioning automatically.
 ```
 
-**Verification:**
-
-```bash
-# Check the VolumeSnapshotContent was created
-kubectl get volumesnapshotcontent | grep immich
-
-# In Longhorn UI: Volume → Snapshot — the snapshot appears with
-# "Created by Velero" label
-```
-
 ---
 
 ## CSI snapshots
@@ -426,18 +479,18 @@ Velero uses Longhorn's CSI driver to create point-in-time volume snapshots.
 3. Longhorn's CSI driver creates the actual block-level snapshot
 4. On restore, Velero creates a PVC from the `VolumeSnapshot`, and Longhorn provisions a new volume with the snapshot data
 
-**Snapshots are stored in Longhorn, not MinIO.** The MinIO bucket stores backup metadata (JSON manifests) and node-agent filesystem backups. CSI snapshot data lives inside Longhorn's volume storage on the cluster nodes.
+**Snapshots are stored in Longhorn, not B2.** The B2 bucket stores backup metadata (JSON manifests) and node-agent filesystem backups. CSI snapshot data lives inside Longhorn's volume storage on the cluster nodes.
 
 **What gets a CSI snapshot vs filesystem backup:**
 
 | Volume type | Method | Notes |
 |---|---|---|
 | Longhorn PVC | CSI snapshot | Point-in-time, capacity-efficient |
-| hostPath | node-agent (fs-backup) | Tar'd to MinIO |
-| NFS | node-agent (fs-backup) | Tar'd to MinIO |
+| hostPath | node-agent (fs-backup) | Tar'd to B2 |
+| NFS | node-agent (fs-backup) | Tar'd to B2 |
 | emptyDir | Not backed up | Ephemeral by design |
 
-**Disaster recovery note:** CSI snapshots are stored on-cluster (inside Longhorn). If the cluster's disks die, CSI snapshot data is lost. The MinIO bucket contains resource manifests + filesystem backups, so you can restore resource definitions from MinIO, but PVC data backed up via CSI snapshots needs the Longhorn volumes to survive. For offsite PVC data protection, Kopia's `sync-to B2` pattern (`services/backup/kopia/`) is the complement — Tier 1 = Velero CSI snapshots (fast, on-cluster), Tier 2 = Kopia B2 sync (offsite).
+**Disaster recovery note:** CSI snapshots are stored on-cluster (inside Longhorn). If the cluster's disks die, CSI snapshot data is lost. The B2 bucket contains resource manifests + filesystem backups, so you can restore resource definitions from B2, but PVC data backed up via CSI snapshots needs the Longhorn volumes to survive. For offsite PVC data protection, Kopia's `sync-to B2` (`services/backup/kopia/`) is the complement.
 
 ---
 
@@ -454,30 +507,30 @@ kubectl -n velero logs -l velero.io/backup-name=<name>
 
 # Common causes:
 # - CSI snapshot timeout (Longhorn takes >10 min for large volumes)
-# - MinIO unreachable (check MinIO pod, S3 URL config)
+# - B2 unreachable (network, expired credentials)
 # - Node-agent DaemonSet not ready on a node
 ```
 
 ### "Failed to get backup store" / "No such bucket"
 
-Velero can't reach MinIO or the bucket doesn't exist:
+Velero can't reach B2 or the bucket doesn't exist:
 
 ```bash
-# Verify MinIO is running
-kubectl -n minio get pods
-
 # Check velero server logs for S3 errors
-kubectl -n velero logs deploy/velero | grep -i "s3\|minio\|bucket"
+kubectl -n velero logs deploy/velero | grep -i "s3\|b2\|bucket"
 
-# Verify the bucket exists
-kubectl -n minio exec deploy/minio -- mc ls local/
+# Verify the bucket exists in the B2 console
+# Verify the application key still has access (they can be revoked)
+
+# Verify cluster-secrets values are set correctly
+kubectl -n flux-system get secret cluster-secrets -o jsonpath='{.data.VELERO_B2_BUCKET}' | base64 -d
 
 # Re-create credentials if needed
 kubectl -n velero delete secret velero-s3-credentials
 kubectl create secret generic velero-s3-credentials -n velero \
   --from-literal=cloud="[default]
-aws_access_key_id=<correct-key>
-aws_secret_access_key=<correct-secret>"
+aws_access_key_id=<correct-keyID>
+aws_secret_access_key=<correct-applicationKey>"
 kubectl -n velero rollout restart deploy/velero
 ```
 
@@ -523,24 +576,49 @@ kubectl -n velero get schedule <schedule-name> -o yaml
 velero backup create --from-schedule <schedule-name> --wait
 ```
 
-### TLS certificate errors
-
-If Velero can't verify MinIO's TLS certificate:
+### Kyverno policy not generating schedules
 
 ```bash
-# Check if the cert is trusted
-kubectl -n velero exec deploy/velero -- curl -v https://minio.minio.svc:9000
+# Check the ClusterPolicy is applied
+kubectl get clusterpolicy generate-velero-backup
 
-# Temporary fix (for debugging):
-# Add to helmrelease.yaml values:
-#   configuration:
-#     backupStorageLocation:
-#       - config:
-#           insecureSkipTLSVerify: "true"
-# Then: flux reconcile kustomization platform-velero
+# Check Kyverno logs for generation errors
+kubectl -n kyverno logs -l app.kubernetes.io/name=kyverno | grep generate-velero-backup
 
-# Permanent fix: ensure MinIO's cert is issued by a CA the pods trust,
-# or mount the CA bundle into the Velero pod.
+# Verify the annotation is correct (case-sensitive, quoted "true")
+kubectl -n <namespace> get <kind>/<name> -o jsonpath='{.metadata.annotations}'
+
+# Manual test: create a throwaway PVC with the annotation
+kubectl -n default apply -f - <<EOF
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: test-kyverno
+  annotations:
+    backup.zacheryph/enabled: "true"
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: longhorn
+EOF
+# Check if the schedule was created
+kubectl -n velero get schedule auto-pvc-default-test-kyverno
+# Clean up
+kubectl -n default delete pvc test-kyverno
+```
+
+### TLS / SSL errors (B2 endpoint)
+
+```bash
+# B2 uses public CA-issued certs — no custom CA needed.
+# If you see TLS errors, verify the endpoint URL:
+#   s3Url: https://s3.us-west-004.backblazeb2.com
+# (Must include https:// prefix, no trailing slash)
+
+# Test connectivity from the Velero pod
+kubectl -n velero exec deploy/velero -- curl -v https://s3.us-west-004.backblazeb2.com
 ```
 
 ### Restore fails with "resource already exists"
@@ -625,32 +703,39 @@ kubectl delete namespace temp-restore
 # 1. Provision new cluster (k0s, same config)
 # 2. Bootstrap Flux (points at the same GitOps repo)
 # 3. Flux reconciles core → platform → services in order
-# 4. Velero is deployed, connects to the existing MinIO bucket
-# 5. Restore from the latest weekly-full backup
+# 4. Add B2 config to cluster-secrets, create velero-s3-credentials
+# 5. Velero is deployed, connects to the existing B2 bucket
+# 6. Restore from the latest weekly-full backup
 velero restore create full-restore \
   --from-backup weekly-full \
   --restore-volumes=true
 
-# 6. Flux reconciles, overwriting with current git state
+# 7. Flux reconciles, overwriting with current git state
 #    (restore provides PVC data + resource baseline; Flux updates config)
 flux reconcile kustomization --all
 ```
 
-### Scenario 5: MinIO bucket lost (Velero metadata gone)
+### Scenario 5: B2 bucket lost (Velero metadata gone)
 
 **Impact:** Velero metadata + filesystem backups are gone. CSI snapshots still exist in Longhorn.
 
 ```bash
-# 1. Recreate the bucket and credentials
-kubectl -n minio exec deploy/minio -- mc mb local/velero
+# 1. Recreate the bucket and application key in B2 console
+# 2. Update cluster-secrets if bucket name changed
+# 3. Recreate velero-s3-credentials with new application key
+kubectl -n velero delete secret velero-s3-credentials
+kubectl create secret generic velero-s3-credentials -n velero \
+  --from-literal=cloud="[default]
+aws_access_key_id=<new-keyID>
+aws_secret_access_key=<new-applicationKey>"
 
-# 2. Restart Velero (it sees an empty bucket and starts fresh)
+# 4. Restart Velero (it sees an empty bucket and starts fresh)
 kubectl -n velero rollout restart deploy/velero
 
-# 3. Run a new full backup immediately
+# 5. Run a new full backup immediately
 velero backup create post-recovery --wait
 
-# 4. CSI snapshots from before the loss still exist in Longhorn,
+# 6. CSI snapshots from before the loss still exist in Longhorn,
 #    but Velero's metadata linking backups → snapshots is gone.
 #    For critical PVCs, manually create PVCs from surviving snapshots:
 kubectl get volumesnapshot -A
@@ -661,9 +746,10 @@ kubectl get volumesnapshot -A
 ## Operational notes
 
 - **Velero consumes ~128-512 MB RAM** for the server; the node-agent runs on every node with modest resources (~50m CPU, 64Mi RAM).
-- **Backup size in MinIO** varies: metadata is small (KB-MB), node-agent filesystem backups can be large (GB). CSI snapshots don't consume MinIO space.
-- **MinIO bucket lifecycle:** Set a lifecycle rule on the `velero` bucket to expire incomplete multipart uploads after 7 days (prevents orphaned uploads from failed backups).
+- **Backup size in B2** varies: metadata is small (KB-MB), node-agent filesystem backups can be large (GB). CSI snapshots don't consume B2 space (they live in Longhorn).
+- **B2 costs:** Storage (~$6/TB/month) + download ($0.01/GB). Velero backups are incremental within a schedule, so ongoing storage grows slowly.
+- **Application key scope:** Use a key scoped to the one bucket, not the master key. If the key is compromised, rotate it in the B2 console and update the Secret.
 - **`prune: true` on the Flux Kustomization** means Flux will delete Velero resources if the kustomization is removed from git.
-- **Plugin updates:** When Renovate bumps the chart version, verify plugin compatibility. The chart bundles specific plugin versions that may need manual updating in `initContainers`.
-- **Supplement with Kopia for offsite PVC data:** Velero's CSI snapshots live on-cluster (Longhorn). For offsite PVC data protection, Kopia's `sync-to B2` (`services/backup/kopia/`) is the complement. Together they form a two-tier strategy: Velero CSI snapshots (fast, on-cluster, resource + volume) + Kopia B2 sync (offsite, file-level, per-PVC).
-- **Schedule overlap is fine.** `daily-cluster` at 01:00, `daily-critical` at 00:00, `immich-media` at 23:00 — they back up overlapping data but from different scopes and for different purposes. The extra backups cost MinIO metadata space (KB-MB each) but give you more restore granularity.
+- **Plugin updates:** When Renovate bumps the chart version, verify plugin compatibility. The chart bundles specific plugin versions set in `initContainers`.
+- **Supplement with Kopia for offsite PVC data:** Velero backs up to B2 (metadata + resource config). Kopia backs up to B2 (file-level PVC data). Together they give you full coverage: Velero = cluster resources + on-cluster CSI snapshots, Kopia = offsite file-level PVC data.
+- **Schedule overlap is fine.** `daily-cluster` at 01:00, `daily-critical` at 00:00, Kyverno-generated schedules at configurable times — they may overlap but each costs only metadata space (KB-MB) in B2 and gives you more restore granularity.
