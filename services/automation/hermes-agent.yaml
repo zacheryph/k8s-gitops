@@ -47,10 +47,15 @@ spec:
           provider: auto
           base_url: https://openrouter.ai/api/v1
 
-    # s6-overlay starts as root then drops to HERMES_UID/GID internally
+    # s6-overlay starts as root then drops to HERMES_UID/GID internally.
+    # fsGroup must match the dropped GID (10000) so the SA token —
+    # group-owned by fsGroup, mode 0640 — is readable by the hermes
+    # process. Without this, token rotations render the Python
+    # kubernetes client unusable (PermissionError on token read).
     podSecurityContext:
       runAsUser: 0
       runAsNonRoot: false
+      fsGroup: 10000
     securityContext:
       allowPrivilegeEscalation: true
       readOnlyRootFilesystem: false
