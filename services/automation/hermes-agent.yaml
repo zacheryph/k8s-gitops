@@ -56,6 +56,7 @@ spec:
       runAsUser: 0
       runAsNonRoot: false
       fsGroup: 10000
+      fsGroupChangePolicy: OnRootMismatch
     securityContext:
       allowPrivilegeEscalation: true
       readOnlyRootFilesystem: false
