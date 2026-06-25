@@ -60,12 +60,29 @@ spec:
       runAsNonRoot: false
       fsGroup: 10000
       fsGroupChangePolicy: OnRootMismatch
+
+    # s6-overlay requires these capabilities to initialize (chown
+    # supervision directories, drop privileges to HERMES_UID/GID).
+    # Dropping ALL then adding back only the minimum set reduces the
+    # attack surface substantially vs retaining the default capability
+    # set (which includes NET_RAW, SYS_PTRACE, and ~30 others).
+    #   CHOWN        — chown /run/s6 and supervision directories
+    #   DAC_OVERRIDE — access files regardless of permissions during init
+    #   SETGID/SETUID — drop from root to the hermes user (10000:10000)
+    #   KILL         — signal child processes during shutdown
     securityContext:
       allowPrivilegeEscalation: true
       readOnlyRootFilesystem: false
       runAsNonRoot: false
       capabilities:
-        drop: []
+        drop:
+          - ALL
+        add:
+          - CHOWN
+          - DAC_OVERRIDE
+          - SETGID
+          - SETUID
+          - KILL
 
     # Slack gateway — comma-separated Slack user IDs allowed to DM the agent
     env:
@@ -156,6 +173,59 @@ spec:
       limits:
         cpu: "2"
         memory: 4Gi
+
+    # HTTP health probes against the API server (port 8642). The /health
+    # endpoint returns 200 once the gateway is fully initialized.
+    probes:
+      startup:
+        httpGet:
+          path: /health
+          port: api-server
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        failureThreshold: 30   # up to 150s for cold start
+      liveness:
+        httpGet:
+          path: /health
+          port: api-server
+        periodSeconds: 30
+        timeoutSeconds: 5
+        failureThreshold: 3
+      readiness:
+        httpGet:
+          path: /health
+          port: api-server
+        periodSeconds: 10
+        timeoutSeconds: 5
+        failureThreshold: 3
+
+    # Prevent voluntary eviction during node drains (single-replica service).
+    pdb:
+      enabled: true
+      minAvailable: 1
+
+    # Restrict ingress to the gateway namespace (Envoy Gateway) and
+    # monitoring namespace (Prometheus scrapes). The policy is additive
+    # with any Kyverno-generated network policies in the namespace.
+    networkPolicy:
+      enabled: true
+      policyTypes:
+        - Ingress
+      ingress:
+        - from:
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: gateway
+            - namespaceSelector:
+                matchLabels:
+                  kubernetes.io/metadata.name: monitoring
+          ports:
+            - port: 9119
+              protocol: TCP
+            - port: 8644
+              protocol: TCP
+            - port: 8642
+              protocol: TCP
 
     # ServiceAccount: use the pre-created `hermes-viewer` SA in this
     # namespace (see core/hermes-viewer/) and mount its token so the
