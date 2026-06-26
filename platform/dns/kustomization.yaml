@@ -5,5 +5,4 @@ kind: Kustomization
 namespace: dns
 resources:
 - namespace.yaml
-- external-dns-cloudflare.yaml
 - external-dns-adguard.yaml
