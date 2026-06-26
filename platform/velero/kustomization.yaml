@@ -2,12 +2,8 @@
 ---
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
+namespace: velero
 resources:
-  - crossplane
-  - database
-  - garage
-  - gateway
-  - monitoring
-  - security
-  - minio.yaml
-  - velero
+  - namespace.yaml
+  - helmrelease.yaml
+  - kyverno-policy.yaml
