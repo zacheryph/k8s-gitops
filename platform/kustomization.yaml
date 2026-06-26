@@ -5,6 +5,7 @@ kind: Kustomization
 resources:
   - crossplane
   - database
+  - dns
   - garage
   - gateway
   - monitoring
