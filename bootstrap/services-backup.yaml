@@ -1,0 +1,29 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/kustomize.toolkit.fluxcd.io/kustomization_v1.json
+---
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: services-backup
+  namespace: flux-system
+spec:
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./services/backup
+  interval: 10m0s
+  prune: true
+  # NOTE: Init Jobs are exempt from pruning (we delete them by hand after success).
+  # The cluster-secrets secret is decrypted by Flux's sops-gpg provider and its values
+  # are substituted into `${VAR}` placeholders inside the resources.
+  decryption:
+    provider: sops
+    secretRef:
+      name: sops-gpg
+  postBuild:
+    substituteFrom:
+      - kind: Secret
+        name: cluster-secrets
+  dependsOn:
+    - name: platform
+    - name: core-resources
+    - name: services-immich

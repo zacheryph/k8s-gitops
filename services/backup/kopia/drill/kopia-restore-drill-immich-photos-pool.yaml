@@ -1,0 +1,137 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/cronjob.json
+---
+# Quarterly restore-drill CronJob for immich/photos-pool.
+# Schedule: 1st of Jan/Apr/Jul/Oct at 04:00 cluster-local.
+# Set RESTORE_FROM=b2 (Q2/Q4) to drill the DR path, or RESTORE_FROM=nas (Q1/Q3) for the fast path.
+# The Job creates a temporary PVC, restores into it, summarises, then auto-cleans via ttlSecondsAfterFinished.
+apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: kopia-restore-drill-immich-photos-pool
+  namespace: backup
+  labels:
+    app.kubernetes.io/part-of: backup
+    app.kubernetes.io/name: kopia
+    backup.zacheryph/pvc: photos-pool
+    backup.zacheryph/pvc-namespace: immich
+    backup.zacheryph/role: drill
+spec:
+  schedule: "0 4 1 1,4,7,10 *"
+  timeZone: "America/Chicago"
+  concurrencyPolicy: Forbid
+  successfulJobsHistoryLimit: 1
+  failedJobsHistoryLimit: 2
+  startingDeadlineSeconds: 600
+  jobTemplate:
+    spec:
+      backoffLimit: 0
+      activeDeadlineSeconds: 21600
+      ttlSecondsAfterFinished: 86400
+      template:
+        metadata:
+          labels:
+            app.kubernetes.io/part-of: backup
+            app.kubernetes.io/name: kopia
+        spec:
+          serviceAccountName: kopia-drill
+          restartPolicy: Never
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 1000
+            runAsGroup: 1000
+            fsGroup: 1000
+            seccompProfile:
+              type: RuntimeDefault
+          initContainers:
+            - name: provision-restore-pvc
+              image: bitnami/kubectl:1.31
+              command:
+                - sh
+                - -c
+                - |
+                  set -eu
+                  STORAGE_CLASS="${STORAGE_CLASS:-longhorn-nfs}"
+                  SIZE="${SIZE:-100Gi}"
+                  kubectl -n backup apply -f - <<YAML
+                  apiVersion: v1
+                  kind: PersistentVolumeClaim
+                  metadata:
+                    name: drill-restore-${PVC_SLUG}
+                    namespace: backup
+                    labels:
+                      backup.zacheryph/role: drill
+                  spec:
+                    accessModes: [ReadWriteOnce]
+                    storageClassName: "$STORAGE_CLASS"
+                    resources:
+                      requests:
+                        storage: "$SIZE"
+                  YAML
+                  for i in $(seq 1 60); do
+                    PHASE=$(kubectl -n backup get pvc drill-restore-${PVC_SLUG} -o jsonpath='{.status.phase}' 2>/dev/null || echo Pending)
+                    [ "$PHASE" = "Bound" ] && exit 0
+                    sleep 5
+                  done
+                  echo "PVC drill-restore-${PVC_SLUG} did not bind in 5 min" >&2
+                  kubectl -n backup describe pvc drill-restore-${PVC_SLUG} >&2 || true
+                  exit 1
+              env:
+                - name: PVC_SLUG
+                  value: "immich-photos-pool"
+          containers:
+            - name: kopia-restore
+              image: kopia/kopia:0.18
+              imagePullPolicy: IfNotPresent
+              securityContext:
+                allowPrivilegeEscalation: false
+                readOnlyRootFilesystem: true
+                capabilities:
+                  drop: ["ALL"]
+              env:
+                - name: KOPIA_PASSWORD
+                  valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_PASSWORD } }
+                - name: KOPIA_NAS_SFTP_USER
+                  valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_NAS_SFTP_USER } }
+                - name: KOPIA_NAS_SFTP_HOST
+                  valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_NAS_SFTP_HOST } }
+                - name: KOPIA_NAS_SFTP_PATH
+                  valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_NAS_SFTP_PATH } }
+                - name: KOPIA_B2_BUCKET
+                  valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_B2_BUCKET } }
+                - name: KOPIA_B2_PATH
+                  valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_B2_PATH } }
+                - name: KOPIA_B2_ENDPOINT
+                  valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: KOPIA_B2_ENDPOINT } }
+                - name: AWS_ACCESS_KEY_ID
+                  valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: AWS_ACCESS_KEY_ID } }
+                - name: AWS_SECRET_ACCESS_KEY
+                  valueFrom: { secretKeyRef: { name: kopia-immich-photos-pool, key: AWS_SECRET_ACCESS_KEY } }
+                - name: RESTORE_FROM
+                  value: "nas"      # Q1/Q3; flip to "b2" for Q2/Q4
+                - name: RESTORE_TARGET
+                  value: "/restore"
+              command: ["/usr/local/bin/restore.sh"]
+              resources:
+                requests: { cpu: 100m, memory: 256Mi }
+                limits:   { cpu: 2,   memory: 4Gi  }
+              volumeMounts:
+                - { name: restore-target, mountPath: /restore }
+                - { name: kopia-scripts,  mountPath: /usr/local/bin, readOnly: true }
+                - { name: kopia-ssh,      mountPath: /var/kopia/ssh, readOnly: true }
+                - { name: kopia-config,   mountPath: /var/kopia/config }
+                - { name: kopia-cache,    mountPath: /var/kopia/cache }
+                - { name: kopia-log,      mountPath: /var/kopia/log }
+          volumes:
+            - name: restore-target
+              persistentVolumeClaim:
+                claimName: drill-restore-immich-photos-pool
+            - name: kopia-scripts
+              configMap: { name: kopia-scripts, defaultMode: 0o755 }
+            - name: kopia-ssh
+              secret:    { secretName: kopia-immich-photos-pool-ssh, defaultMode: 0o600 }
+            - name: kopia-config
+              emptyDir:  { sizeLimit: 256Mi }
+            - name: kopia-cache
+              emptyDir:  { sizeLimit: 2Gi }
+            - name: kopia-log
+              emptyDir:  { sizeLimit: 256Mi }
