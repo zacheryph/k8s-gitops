@@ -1,0 +1,99 @@
+---
+apiVersion: source.toolkit.fluxcd.io/v1beta2
+kind: OCIRepository
+metadata:
+  name: external-dns-adguard
+  namespace: dns
+spec:
+  interval: 12h
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: 1.21.1
+  url: oci://registry.k8s.io/external-dns/charts/external-dns
+---
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: external-dns-adguard
+  namespace: dns
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: external-dns-adguard
+  upgrade:
+    crds: CreateReplace
+  values:
+    provider:
+      name: webhook
+      webhook:
+        image:
+          repository: ghcr.io/muhlba91/external-dns-provider-adguard
+          tag: v11.1.1
+        service:
+          port: 8888
+        livenessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        readinessProbe:
+          httpGet:
+            path: /healthz
+            port: 8080
+          initialDelaySeconds: 10
+          timeoutSeconds: 5
+        env:
+          - name: ADGUARD_URL
+            valueFrom:
+              secretKeyRef:
+                name: adguard-configuration
+                key: url
+          - name: ADGUARD_USER
+            valueFrom:
+              secretKeyRef:
+                name: adguard-configuration
+                key: user
+          - name: ADGUARD_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: adguard-configuration
+                key: password
+          - name: LOG_LEVEL
+            value: info
+          - name: DRY_RUN
+            value: "false"
+    registry: txt
+    txtOwnerId: external-dns-adguard
+    policy: sync
+    interval: 1m
+    logLevel: info
+    sources:
+      - service
+      - ingress
+      - gateway-httproute
+    domainFilters:
+      - example.com
+    resources:
+      requests:
+        cpu: 50m
+        memory: 64Mi
+      limits:
+        memory: 128Mi
+    podSecurityContext:
+      fsGroup: 65534
+      seccompProfile:
+        type: RuntimeDefault
+    securityContext:
+      privileged: false
+      allowPrivilegeEscalation: false
+      readOnlyRootFilesystem: true
+      runAsNonRoot: true
+      runAsUser: 65532
+      runAsGroup: 65532
+      capabilities:
+        drop:
+          - ALL
