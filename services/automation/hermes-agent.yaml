@@ -204,29 +204,6 @@ spec:
       enabled: true
       minAvailable: 1
 
-    # Restrict ingress to the gateway namespace (Envoy Gateway) and
-    # monitoring namespace (Prometheus scrapes). The policy is additive
-    # with any Kyverno-generated network policies in the namespace.
-    networkPolicy:
-      enabled: true
-      policyTypes:
-        - Ingress
-      ingress:
-        - from:
-            - namespaceSelector:
-                matchLabels:
-                  kubernetes.io/metadata.name: gateway
-            - namespaceSelector:
-                matchLabels:
-                  kubernetes.io/metadata.name: monitoring
-          ports:
-            - port: 9119
-              protocol: TCP
-            - port: 8644
-              protocol: TCP
-            - port: 8642
-              protocol: TCP
-
     # ServiceAccount: use the pre-created `hermes-viewer` SA in this
     # namespace (see core/hermes-viewer/) and mount its token so the
     # in-cluster Python kubernetes client can authenticate automatically.
