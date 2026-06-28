@@ -66,7 +66,7 @@ spec:
       - ingress
       - gateway-httproute
     domainFilters:
-      - example.com
+      - ${CLUSTER_DOMAIN}
     resources:
       requests:
         cpu: 50m
