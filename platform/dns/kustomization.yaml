@@ -6,4 +6,5 @@ namespace: dns
 resources:
 - namespace.yaml
 - secrets.yaml
+- helm-repository.yaml
 - external-dns-adguard.yaml
