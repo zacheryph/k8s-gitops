@@ -2,7 +2,7 @@
 apiVersion: source.toolkit.fluxcd.io/v1beta2
 kind: OCIRepository
 metadata:
-  name: external-dns-adguard
+  name: external-dns
   namespace: dns
 spec:
   interval: 12h
@@ -22,7 +22,7 @@ spec:
   interval: 1h
   chartRef:
     kind: OCIRepository
-    name: external-dns-adguard
+    name: external-dns
   upgrade:
     crds: CreateReplace
   values:
