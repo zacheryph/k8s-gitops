@@ -165,6 +165,11 @@ spec:
             - forgejo
           snapshotVolumes: true
           defaultVolumesToFsBackup: false
+          # Take a CSI (Longhorn) snapshot, then move the data off-cluster to
+          # B2 via the node-agent (Kopia). Requires the longhorn-velero
+          # VolumeSnapshotClass (volumesnapshotclass.yaml). Without this the
+          # snapshot would stay in-cluster only and never reach B2.
+          snapshotMoveData: true
           resourcePolicy:
             kind: configmap
             name: velero-volume-policy

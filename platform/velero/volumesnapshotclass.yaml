@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/snapshot.storage.k8s.io/volumesnapshotclass_v1.json
+#
+# VolumeSnapshotClass for the Longhorn CSI driver, labeled so Velero's CSI
+# feature (configuration.features=EnableCSI) selects it automatically when
+# snapshotting Longhorn PVCs. Without this, every CSI snapshot fails with
+# "failed to get VolumeSnapshotClass for provisioner driver.longhorn.io".
+#
+# type: snap  -> take an in-cluster Longhorn snapshot. Velero's snapshot data
+#   movement (snapshotMoveData: true on the snapshotting schedules) then
+#   exposes that snapshot and uploads the volume data to B2 via the node-agent
+#   (Kopia). The transient snapshot is cleaned up afterward.
+# deletionPolicy: Retain -> Velero manages the snapshot lifecycle itself; Retain
+#   avoids the CSI side deleting the underlying snapshot out from under it
+#   (matches Longhorn's documented Velero integration).
+---
+apiVersion: snapshot.storage.k8s.io/v1
+kind: VolumeSnapshotClass
+metadata:
+  name: longhorn-velero
+  labels:
+    velero.io/csi-volumesnapshot-class: "true"
+driver: driver.longhorn.io
+deletionPolicy: Retain
+parameters:
+  type: snap
