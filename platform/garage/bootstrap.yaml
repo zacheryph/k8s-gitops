@@ -123,13 +123,16 @@ spec:
     spec:
       restartPolicy: OnFailure
       securityContext:
-        runAsNonRoot: false
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
         seccompProfile: {type: RuntimeDefault}
       containers:
         - name: bootstrap
           image: python:3.13-alpine@sha256:18ab23c24b308232b4b992e0abd28c86ca1a827fe59d6bad0b80ab8cb1f6f87d
           securityContext:
             allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
             capabilities: {drop: [ALL]}
           env:
             - name: GARAGE_ENDPOINT
