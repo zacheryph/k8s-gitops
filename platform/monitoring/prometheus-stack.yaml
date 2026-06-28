@@ -86,6 +86,12 @@ spec:
         scrapeConfigSelectorNilUsesHelmValues: false
         storageSpec:
           volumeClaimTemplate:
+            metadata:
+              # Prometheus TSDB is large and transient — never back up the
+              # volume data. This label tells Velero to skip the PVC entirely
+              # (the StatefulSet recreates it on restore).
+              labels:
+                velero.io/exclude-from-backup: "true"
             spec:
               storageClassName: longhorn
               accessModes: ["ReadWriteOnce"]
