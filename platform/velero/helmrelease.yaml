@@ -41,12 +41,22 @@ spec:
     # emptyDir, and any PVC without a CSI driver.
     nodeAgent:
       enabled: true
+      resources:
+        requests:
+          cpu: 50m
+          memory: 64Mi
+        limits:
+          cpu: 250m
+          memory: 256Mi
 
-    # Backblaze B2 S3-compatible backend
-    # Credentials come from the velero-s3-credentials Secret (created out-of-band).
-    # The B2 bucket, application key ID, and application key must be created
-    # in the B2 web console before Velero can start. See README § "One-time bootstrap".
+    # Backblaze B2 S3-compatible backend.
+    # Credentials come from the velero-s3-credentials Secret, which is rendered
+    # from cluster-secrets (VELERO_B2_KEY_ID / VELERO_B2_APPLICATION_KEY) — see
+    # secret.yaml and README § "One-time bootstrap".
     configuration:
+      # EnableCSI is still required to turn on CSI snapshot support. The CSI
+      # plugin itself is built into Velero core as of v1.14 (no separate
+      # velero-plugin-for-csi initContainer needed).
       features: EnableCSI
       backupStorageLocation:
         - name: default
@@ -63,7 +73,7 @@ spec:
           config:
             region: ${VELERO_B2_REGION}
 
-    # Credentials are created out-of-band (see README § "One-time bootstrap")
+    # Credentials are rendered from cluster-secrets via secret.yaml
     credentials:
       existingSecret: velero-s3-credentials
 
@@ -82,7 +92,8 @@ spec:
       serviceMonitor:
         enabled: true
 
-    # Plugins (CSI snapshots + AWS S3 backend)
+    # Plugin: AWS S3 backend (B2). CSI snapshot support is built into Velero
+    # core since v1.14 — no separate velero-plugin-for-csi plugin required.
     initContainers:
       - name: velero-plugin-for-aws
         image: velero/velero-plugin-for-aws:v1.13.0
@@ -90,16 +101,12 @@ spec:
         volumeMounts:
           - name: plugins
             mountPath: /target
-      - name: velero-plugin-for-csi
-        image: velero/velero-plugin-for-csi:v0.11.0
-        imagePullPolicy: IfNotPresent
-        volumeMounts:
-          - name: plugins
-            mountPath: /target
 
     # Backup schedules (managed by the chart)
     schedules:
-      # Daily cluster-wide backup at 01:00 (before Kopia's 02:00 PVC backup)
+      # Daily cluster-wide backup at 01:00 — resource manifests only, no volume
+      # snapshots. This is the broad "I deleted a resource" safety net; keeping
+      # it metadata-only avoids snapshotting every PVC in the cluster daily.
       daily-cluster:
         disabled: false
         schedule: "0 1 * * *"
@@ -115,12 +122,15 @@ spec:
             - flux-system
             - velero
             - longhorn-system
-          snapshotVolumes: true
+          snapshotVolumes: false
           defaultVolumesToFsBackup: false
           metadata:
             labels:
               backup-tier: daily
-      # Daily critical-namespaces backup at 00:00 — narrow scope for fast targeted restore
+      # Daily critical-namespaces backup at 00:00 — narrow scope for fast targeted
+      # restore. This one DOES snapshot volumes (Longhorn CSI), but the
+      # velero-volume-policy resourcePolicy skips NFS-backed media volumes
+      # (media-pool, photos-pool) so only app/DB data is captured.
       daily-critical:
         disabled: false
         schedule: "0 0 * * *"
@@ -134,10 +144,14 @@ spec:
             - forgejo
           snapshotVolumes: true
           defaultVolumesToFsBackup: false
+          resourcePolicy:
+            kind: configmap
+            name: velero-volume-policy
           metadata:
             labels:
               backup-tier: daily-critical
-      # Weekly full backup on Sunday 03:00, kept 90 days
+      # Weekly full backup on Sunday 03:00, kept 90 days — resource manifests
+      # only (same rationale as daily-cluster).
       weekly-full:
         disabled: false
         schedule: "0 3 * * 0"
@@ -153,7 +167,7 @@ spec:
             - flux-system
             - velero
             - longhorn-system
-          snapshotVolumes: true
+          snapshotVolumes: false
           defaultVolumesToFsBackup: false
           metadata:
             labels:

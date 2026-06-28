@@ -1,8 +1,10 @@
 # Velero Cluster Backup
 
-Cluster-level backup and restore using Velero, backed by Backblaze B2 (S3-compatible) and Longhorn CSI volume snapshots. Annotation-driven via Kyverno — annotate a PVC or HelmRelease and Kyverno generates the backup schedule.
+Cluster-level backup and restore using Velero, backed by Backblaze B2 (S3-compatible) and Longhorn CSI volume snapshots. Backups are driven by a small set of built-in `Schedule`s defined in the HelmRelease; add more by committing `Schedule` CRs to this directory.
 
-> **Kopia vs Velero:** Kopia (`services/backup/kopia/`) does per-PVC file-level backup to offsite B2. Velero backs up entire cluster resources — Deployments, Services, ConfigMaps, Secrets, PVCs (via CSI snapshots) — and is the right tool for full-namespace or full-cluster restore. They complement each other; neither replaces the other.
+> **Kopia vs Velero:** Kopia (`services/backup/kopia/`) does per-PVC file-level backup to offsite B2. Velero backs up cluster resources — Deployments, Services, ConfigMaps, Secrets, PVC/PV objects, plus Longhorn CSI snapshots for app/DB volumes — and is the right tool for full-namespace or full-cluster restore. They complement each other; neither replaces the other.
+
+> **What Velero does NOT back up here:** the large NFS-backed media libraries (`media-pool` 4Ti, `photos-pool` 8Ti) are deliberately skipped via the `velero-volume-policy` resource policy — that data lives on the NAS and is covered by Kopia, not Velero. CSI snapshots are also on-cluster (Longhorn), not in B2; see [CSI snapshots](#csi-snapshots).
 
 ---
 
@@ -11,7 +13,8 @@ Cluster-level backup and restore using Velero, backed by Backblaze B2 (S3-compat
 - [Architecture](#architecture)
 - [What's deployed](#whats-deployed)
 - [One-time bootstrap](#one-time-bootstrap)
-- [Annotation-driven backup (Kyverno)](#annotation-driven-backup-kyverno)
+- [Adding a backup schedule](#adding-a-backup-schedule)
+- [Excluding resources and volumes](#excluding-resources-and-volumes)
 - [Backup operations](#backup-operations)
   - [View existing backups](#view-existing-backups)
   - [Create a manual backup](#create-a-manual-backup)
@@ -36,14 +39,13 @@ Cluster-level backup and restore using Velero, backed by Backblaze B2 (S3-compat
 ┌──────────────────────────────────────────────────────────────────┐
 │  Cluster                                                          │
 │                                                                   │
-│  Kyverno ClusterPolicy              Velero Deployment             │
-│  ┌────────────────────┐            ┌──────────────────┐           │
-│  │ watches PVCs +     │            │ velero server    │           │
-│  │ HelmReleases for   │ generate   │                  │           │
-│  │ backup.routine.sh/  │───────────▶│  schedules ──────┼──┐        │
-│  │ enabled annotation │  Schedule  │  backups   ──────┼─┐│        │
-│  └────────────────────┘            │  restores  ──────┼┐││        │
-│                                    └──────────────────┘│││        │
+│                                     Velero Deployment             │
+│                                    ┌──────────────────┐           │
+│                                    │ velero server    │           │
+│  HelmRelease schedules ───────────▶│  schedules ──────┼──┐        │
+│  (daily-cluster, daily-critical,   │  backups   ──────┼─┐│        │
+│   weekly-full) + any Schedule CRs  │  restores  ──────┼┐││        │
+│  committed to this dir             └──────────────────┘│││        │
 │                                                         │││        │
 │  Velero Node-Agent (DaemonSet)     Longhorn CSI Driver  │││        │
 │  ┌──────────────────────────┐     ┌────────────────┐    │││        │
@@ -52,6 +54,7 @@ Cluster-level backup and restore using Velero, backed by Backblaze B2 (S3-compat
 │  │  - CSI orchestration     │     │  (point-in-time)│    │││        │
 │  └──────────────────────────┘     └────────────────┘    │││        │
 │                                                         │││        │
+│  resourcePolicy: velero-volume-policy → skip NFS volumes│││        │
 └─────────────────────────────────────────────────────────┼┼┼────────┘
                                                           │││
            ┌──────────────────────────────────────────────┘││
@@ -72,21 +75,18 @@ Cluster-level backup and restore using Velero, backed by Backblaze B2 (S3-compat
 
 **Backend:** Backblaze B2 (S3-compatible). Bucket + application key created in the B2 console.
 
-**Plugins:**
-- `velero-plugin-for-aws` — S3 object store backend (v1.13.0)
-- `velero-plugin-for-csi` — CSI VolumeSnapshot integration (v0.11.0)
+**Plugin:**
+- `velero-plugin-for-aws` — S3 object store backend (v1.13.0). CSI VolumeSnapshot support is built into Velero core (v1.14+), enabled with the `EnableCSI` feature flag — no separate CSI plugin.
 
 **Schedules (built-in, managed by the chart):**
 
-| Schedule | When | Scope | TTL |
-|---|---|---|---|
-| `daily-cluster` | 01:00 daily | All namespaces (excl. system) | 30 days |
-| `daily-critical` | 00:00 daily | immich, minio, home-assistant, forgejo | 30 days |
-| `weekly-full` | Sun 03:00 | All namespaces (excl. system) | 90 days |
+| Schedule | When | Scope | Volumes | TTL |
+|---|---|---|---|---|
+| `daily-cluster` | 01:00 daily | All namespaces (excl. system) | manifests only | 30 days |
+| `daily-critical` | 00:00 daily | immich, minio, home-assistant, forgejo | CSI snapshots (NFS skipped) | 30 days |
+| `weekly-full` | Sun 03:00 | All namespaces (excl. system) | manifests only | 90 days |
 
-**Annotation-driven schedules (Kyverno-generated):**
-
-Annotate any PVC or HelmRelease with `backup.routine.sh/enabled: "true"` and Kyverno generates a `Schedule` in the `velero` namespace. See [Annotation-driven backup](#annotation-driven-backup-kyverno) below.
+The broad sweeps (`daily-cluster`, `weekly-full`) are **manifests only** (`snapshotVolumes: false`) — they protect against "I deleted a resource" without snapshotting every PVC daily. Only `daily-critical` takes Longhorn CSI snapshots, and the `velero-volume-policy` resource policy skips NFS media volumes within it. See [Excluding resources and volumes](#excluding-resources-and-volumes).
 
 ---
 
@@ -97,18 +97,19 @@ Annotate any PVC or HelmRelease with `backup.routine.sh/enabled: "true"` and Kyv
 | `Namespace/velero` | — | Velero's home |
 | `OCIRepository/velero` | velero | Helm chart source (VMware Tanzu) |
 | `HelmRelease/velero` | velero | Velero server + node-agent + schedules |
-| `Secret/velero-s3-credentials` | velero | B2 application key (created out-of-band) |
-| `ClusterPolicy/generate-velero-backup` | — | Kyverno policy: annotation → Schedule |
-| `Schedule/daily-cluster` | velero | Cluster-wide daily backup |
-| `Schedule/daily-critical` | velero | Critical namespaces daily |
-| `Schedule/weekly-full` | velero | Weekly full backup (90d retention) |
-| `Kustomization/platform-velero` | flux-system | Flux pointer |
+| `Secret/velero-s3-credentials` | velero | B2 application key (rendered from cluster-secrets) |
+| `ConfigMap/velero-volume-policy` | velero | Volume policy: skip NFS-backed media volumes |
+| `Schedule/daily-cluster` | velero | Cluster-wide daily backup (manifests) |
+| `Schedule/daily-critical` | velero | Critical namespaces daily (with snapshots) |
+| `Schedule/weekly-full` | velero | Weekly full backup, manifests (90d retention) |
+
+Velero is applied by the `platform` Flux Kustomization (it's listed in `platform/kustomization.yaml`), not a dedicated Flux pointer.
 
 ---
 
 ## One-time bootstrap
 
-After this PR merges and Flux reconciles `platform-velero`:
+After this PR merges:
 
 ### 1. Create the B2 bucket and application key
 
@@ -118,35 +119,33 @@ In the [Backblaze B2 web console](https://secure.backblaze.com):
 2. **Create an Application Key** scoped to that one bucket with `readFiles`, `writeFiles`, `listFiles`, `deleteFiles` — **NOT** the master key. Copy the `keyID` and `applicationKey`.
 3. **Note the endpoint and region.** For US West: endpoint `s3.us-west-004.backblazeb2.com`, region `us-west-004`. Check the bucket's page for the exact endpoint.
 
-### 2. Add B2 config to cluster-secrets
+### 2. Add B2 config + credentials to cluster-secrets
 
-Add these to the `cluster-secrets` Secret in `flux-system` (it's SOPS-encrypted):
+Everything goes into the SOPS-encrypted `cluster-secrets` Secret — no out-of-band `kubectl create secret`. The `velero-s3-credentials` Secret (`secret.yaml`) and the HelmRelease are rendered from these via Flux substitution:
+
+```bash
+sops config/secrets.yaml
+```
+
+Add:
 
 ```yaml
 VELERO_B2_BUCKET: velero-homelab
 VELERO_B2_REGION: us-west-004
 VELERO_B2_ENDPOINT: s3.us-west-004.backblazeb2.com
+VELERO_B2_KEY_ID: <keyID>
+VELERO_B2_APPLICATION_KEY: <applicationKey>
 ```
 
-### 3. Create the S3 credentials Secret
+### 3. Let Flux reconcile
 
 ```bash
-kubectl create secret generic velero-s3-credentials \
-  -n velero \
-  --from-literal=cloud="[default]
-aws_access_key_id=<keyID>
-aws_secret_access_key=<applicationKey>"
-```
-
-### 4. Let Flux reconcile
-
-```bash
-flux reconcile kustomization platform-velero
+flux reconcile kustomization platform --with-source
 # Wait ~30s for the HelmRelease to install Velero
 kubectl -n velero get pods -w
 ```
 
-### 5. Verify
+### 4. Verify
 
 ```bash
 # Velero server is running
@@ -155,11 +154,11 @@ kubectl -n velero get deploy/velero
 # Schedules are created
 velero schedule get
 
+# Volume policy ConfigMap is present
+kubectl -n velero get configmap velero-volume-policy
+
 # Node-agent DaemonSet is running
 kubectl -n velero get ds/node-agent
-
-# Kyverno policy is ready
-kubectl get clusterpolicy generate-velero-backup
 
 # First backup fires (or trigger one manually to test)
 velero backup create test-bootstrap --wait
@@ -167,89 +166,44 @@ velero backup create test-bootstrap --wait
 
 ---
 
-## Annotation-driven backup (Kyverno)
+## Adding a backup schedule
 
-Instead of writing `Schedule` YAML files for each app, annotate the PVC or HelmRelease. Kyverno's `generate-velero-backup` ClusterPolicy watches for the annotation and creates a `Schedule` in the `velero` namespace.
-
-### Annotation reference
-
-| Annotation | Required | Default | Description |
-|---|---|---|---|
-| `backup.routine.sh/enabled` | Yes | — | Set to `"true"` to trigger schedule generation |
-| `backup.routine.sh/schedule` | No | `"0 1 * * *"` | Cron expression for the backup |
-| `backup.routine.sh/ttl` | No | `"720h0m0s"` | How long to keep backups (30 days) |
-
-### PVC-level annotation
-
-Annotate a PVC to back up its namespace. Good for data-heavy workloads where the PVC is the thing you care about.
+The three built-in schedules live in `helmrelease.yaml` under `values.schedules`. For anything more targeted, commit a `Schedule` CR to this directory and add it to `kustomization.yaml` — Flux applies it like any other manifest.
 
 ```yaml
-apiVersion: v1
-kind: PersistentVolumeClaim
+# platform/velero/schedules-<app>.yaml
+---
+apiVersion: velero.io/v1
+kind: Schedule
 metadata:
-  namespace: immich
-  name: photos-pool
-  annotations:
-    backup.routine.sh/enabled: "true"
-    backup.routine.sh/schedule: "0 23 * * *"   # daily at 23:00
-    backup.routine.sh/ttl: "720h0m0s"          # keep 30 days
+  name: my-app
+  namespace: velero
 spec:
-  accessModes: ["ReadWriteOnce"]
-  resources:
-    requests:
-      storage: 8Ti
-  storageClassName: longhorn
+  schedule: "0 2 * * *"
+  template:
+    ttl: 720h0m0s
+    includedNamespaces:
+      - my-namespace
+    snapshotVolumes: true
+    # Reuse the NFS-skip policy if this schedule snapshots volumes
+    resourcePolicy:
+      kind: configmap
+      name: velero-volume-policy
 ```
 
-Kyverno generates: `Schedule/auto-pvc-immich-photos-pool` in the `velero` namespace, backing up the `immich` namespace.
+To scope a backup to one app within a shared namespace, add a `labelSelector` (e.g. `app.kubernetes.io/instance: <release-name>` for bjw-s charts). Note that resources without that label — Flux-generated Secrets, manually-created PVCs — won't be captured, so prefer namespace-scoped schedules unless you specifically need to split a namespace.
 
-### HelmRelease-level annotation
+---
 
-Annotate a HelmRelease to back up only the resources belonging to that specific
-HelmRelease — not the entire namespace. This is important when multiple
-HelmReleases share a namespace (e.g., `monitoring` with `kube-prometheus-stack`
-and `thanos`).
+## Excluding resources and volumes
 
-The generated schedule uses a `labelSelector` with
-`app.kubernetes.io/instance: <HelmRelease-name>` — the standard Helm instance
-label set by most charts. Resources deployed by other HelmReleases in the same
-namespace are excluded. PVCs created by the chart's StatefulSet/Deployment
-typically inherit the instance label and are included; manually-created PVCs
-need the label added manually to be backed up.
+Velero's model is "back up broadly, opt specific things out":
 
-```yaml
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  namespace: monitoring
-  name: kube-prometheus-stack
-  annotations:
-    backup.routine.sh/enabled: "true"
-    backup.routine.sh/schedule: "0 2 * * *"
-    backup.routine.sh/ttl: "2160h0m0s"              # keep 90 days for app config
-spec:
-  # ...
-```
+- **Skip a whole resource** — label it `velero.io/exclude-from-backup: "true"`. Works on any object; it's dropped from every backup.
+- **Skip volume data by rule** — the `velero-volume-policy` ConfigMap (`volume-policy.yaml`) is a Velero resource policy referenced by snapshotting schedules via `template.resourcePolicy`. It currently skips **all NFS-backed volumes**, which is how the large NAS media libraries (`media-pool`, `photos-pool`) stay out of Velero. To skip more, add conditions (e.g. `capacity: "500Gi,"` or `storageClass: [...]`) with `action: {type: skip}`.
+- **Skip a single volume on a pod** — pod annotation `backup.velero.io/backup-volumes-excludes: <volumeName>` (fs-backup path).
 
-Kyverno generates: `Schedule/auto-hr-monitoring-kube-prometheus-stack` in the
-`velero` namespace, backing up only resources labeled with
-`app.kubernetes.io/instance: kube-prometheus-stack` in the `monitoring` namespace.
-
-### Lifecycle
-
-- **Add annotation** → Kyverno creates the `Schedule`. Flux applies it. Velero starts backing up.
-- **Change `schedule` or `ttl`** → Kyverno updates the `Schedule`.
-- **Remove annotation (or set to `"false"`)** → Kyverno deletes the `Schedule`. Existing backups remain until their TTL expires.
-- **Remove the PVC/HelmRelease** → Kyverno deletes the `Schedule` (it's owned by the source resource via `synchronize: true`).
-
-### Multiple annotations per namespace
-
-If a namespace has multiple annotated PVCs/HelmReleases, each generates its own
-`Schedule`. PVC-level schedules back up the whole namespace; HelmRelease-level
-schedules scope to only that release's labeled resources. Overlapping backups
-are low-cost (metadata is KB-MB). Fine for 1-2 per namespace. If you have 5+
-annotated resources in one namespace, use a single annotation instead of one per
-resource.
+Volume data that Velero skips is not backed up by Velero at all — for NFS media that's intentional (the NAS + Kopia own it). Don't rely on Velero for offsite file-level DR of those volumes.
 
 ---
 
@@ -275,11 +229,8 @@ The `velero` CLI reads kubeconfig from `~/.kube/config` by default. Use `--kubec
 # List all backups
 velero backup get
 
-# List all schedules (built-in + Kyverno-generated)
+# List all schedules
 velero schedule get
-
-# Show only Kyverno-generated schedules
-kubectl -n velero get schedule -l backup.routine.sh/generated-by=kyverno
 
 # Show backups for a specific schedule
 velero backup get --selector velero.io/schedule-name=daily-cluster
@@ -320,7 +271,7 @@ velero backup create immich-db-$(date +%Y%m%d-%H%M) \
 ### Create a scheduled backup
 
 ```bash
-# Via Velero CLI (also possible via Kyverno annotation — preferred)
+# Ad-hoc, via the Velero CLI
 velero schedule create home-automation-daily \
   --schedule="0 2 * * *" \
   --include-namespaces home-assistant,zwave-js \
@@ -330,22 +281,7 @@ velero schedule create home-automation-daily \
 velero schedule get home-automation-daily
 ```
 
-For GitOps-managed schedules, add a `Schedule` CR to `platform/velero/schedules/` and append to `kustomization.yaml`. Example:
-
-```yaml
-apiVersion: velero.io/v1
-kind: Schedule
-metadata:
-  name: my-app
-  namespace: velero
-spec:
-  schedule: "0 2 * * *"
-  template:
-    ttl: 720h0m0s
-    includedNamespaces:
-      - my-namespace
-    snapshotVolumes: true
-```
+For GitOps-managed schedules, commit a `Schedule` CR to this directory — see [Adding a backup schedule](#adding-a-backup-schedule).
 
 ### Describe a backup
 
@@ -385,9 +321,10 @@ velero restore create restore-forgejo-config \
   --include-namespaces forgejo \
   --include-resources configmaps
 
-# Restore a specific named resource
+# Restore a specific named resource (use daily-critical for PVC *data* —
+# weekly-full is manifests-only and carries no volume snapshots)
 velero restore create restore-minio-pvc \
-  --from-backup weekly-full \
+  --from-backup daily-critical \
   --include-namespaces minio \
   --include-resources persistentvolumeclaims
 ```
@@ -419,6 +356,8 @@ velero restore create restore-immich --from-backup daily-critical \
 
 A full cluster restore from a `weekly-full` backup. Only do this when rebuilding the cluster from scratch or recovering from catastrophic failure.
 
+> **`weekly-full` restores resource manifests only — not volume data.** It re-creates Deployments, Services, ConfigMaps, Secrets, PVC/PV objects, etc. PVC *data* comes from elsewhere: Longhorn CSI snapshots (only if the cluster disks survived — restore from `daily-critical`), or Kopia's offsite file-level B2 backup (`services/backup/kopia/`) for a true rebuild-from-nothing. NFS media lives on the NAS.
+
 ```bash
 # 1. Install Velero on the fresh cluster, point it at the same B2 bucket
 #    (the bootstrap section above handles this via Flux)
@@ -426,10 +365,9 @@ A full cluster restore from a `weekly-full` backup. Only do this when rebuilding
 # 2. List available backups
 velero backup get
 
-# 3. Restore everything
+# 3. Restore resource manifests from the weekly full
 velero restore create full-restore \
-  --from-backup weekly-full \
-  --restore-volumes=true
+  --from-backup weekly-full
 
 # 4. Check progress
 velero restore describe full-restore
@@ -593,37 +531,17 @@ kubectl -n velero get schedule <schedule-name> -o yaml
 velero backup create --from-schedule <schedule-name> --wait
 ```
 
-### Kyverno policy not generating schedules
+### Volume policy not skipping a volume
 
 ```bash
-# Check the ClusterPolicy is applied
-kubectl get clusterpolicy generate-velero-backup
+# Confirm the ConfigMap exists and has the expected policy
+kubectl -n velero get configmap velero-volume-policy -o yaml
 
-# Check Kyverno logs for generation errors
-kubectl -n kyverno logs -l app.kubernetes.io/name=kyverno | grep generate-velero-backup
+# Confirm the schedule references it
+kubectl -n velero get schedule daily-critical -o jsonpath='{.spec.template.resourcePolicy}'
 
-# Verify the annotation is correct (case-sensitive, quoted "true")
-kubectl -n <namespace> get <kind>/<name> -o jsonpath='{.metadata.annotations}'
-
-# Manual test: create a throwaway PVC with the annotation
-kubectl -n default apply -f - <<EOF
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: test-kyverno
-  annotations:
-    backup.routine.sh/enabled: "true"
-spec:
-  accessModes: ["ReadWriteOnce"]
-  resources:
-    requests:
-      storage: 1Gi
-  storageClassName: longhorn
-EOF
-# Check if the schedule was created
-kubectl -n velero get schedule auto-pvc-default-test-kyverno
-# Clean up
-kubectl -n default delete pvc test-kyverno
+# A skipped volume shows as "skipped" in the backup's volume list
+velero backup describe <backup-name> --details | grep -iA3 "skipped\|resource policy"
 ```
 
 ### TLS / SSL errors (B2 endpoint)
@@ -720,15 +638,18 @@ kubectl delete namespace temp-restore
 # 1. Provision new cluster (k0s, same config)
 # 2. Bootstrap Flux (points at the same GitOps repo)
 # 3. Flux reconciles core → platform → services in order
-# 4. Add B2 config to cluster-secrets, create velero-s3-credentials
-# 5. Velero is deployed, connects to the existing B2 bucket
-# 6. Restore from the latest weekly-full backup
+#    (B2 config + credentials come from SOPS-encrypted cluster-secrets)
+# 4. Velero is deployed, connects to the existing B2 bucket
+# 5. Restore resource manifests from the latest weekly-full backup
 velero restore create full-restore \
-  --from-backup weekly-full \
-  --restore-volumes=true
+  --from-backup weekly-full
+
+# 6. Restore PVC data. On a from-scratch rebuild the on-cluster Longhorn
+#    snapshots are gone, so file data comes from Kopia's offsite B2 backup
+#    (services/backup/kopia/). NFS media is already on the NAS.
 
 # 7. Flux reconciles, overwriting with current git state
-#    (restore provides PVC data + resource baseline; Flux updates config)
+#    (restore provides the resource baseline; Flux updates config)
 flux reconcile kustomization --all
 ```
 
@@ -765,8 +686,8 @@ kubectl get volumesnapshot -A
 - **Velero consumes ~128-512 MB RAM** for the server; the node-agent runs on every node with modest resources (~50m CPU, 64Mi RAM).
 - **Backup size in B2** varies: metadata is small (KB-MB), node-agent filesystem backups can be large (GB). CSI snapshots don't consume B2 space (they live in Longhorn).
 - **B2 costs:** Storage (~$6/TB/month) + download ($0.01/GB). Velero backups are incremental within a schedule, so ongoing storage grows slowly.
-- **Application key scope:** Use a key scoped to the one bucket, not the master key. If the key is compromised, rotate it in the B2 console and update the Secret.
-- **`prune: true` on the Flux Kustomization** means Flux will delete Velero resources if the kustomization is removed from git.
-- **Plugin updates:** When Renovate bumps the chart version, verify plugin compatibility. The chart bundles specific plugin versions set in `initContainers`.
-- **Supplement with Kopia for offsite PVC data:** Velero backs up to B2 (metadata + resource config). Kopia backs up to B2 (file-level PVC data). Together they give you full coverage: Velero = cluster resources + on-cluster CSI snapshots, Kopia = offsite file-level PVC data.
-- **Schedule overlap is fine.** `daily-cluster` at 01:00, `daily-critical` at 00:00, Kyverno-generated schedules at configurable times — they may overlap but each costs only metadata space (KB-MB) in B2 and gives you more restore granularity.
+- **Application key scope:** Use a key scoped to the one bucket, not the master key. If the key is compromised, rotate it in the B2 console and update `VELERO_B2_KEY_ID`/`VELERO_B2_APPLICATION_KEY` in `config/secrets.yaml`.
+- **`prune: false`** follows the repo convention — deleting a file from git does NOT delete the resource from the cluster. Clean up removed Velero resources manually with kubectl.
+- **Plugin updates:** When Renovate bumps the chart version, verify the `velero-plugin-for-aws` version in `initContainers` is still compatible. CSI support tracks the Velero core version, not a separate plugin.
+- **Supplement with Kopia for offsite PVC data:** Velero backs up to B2 (manifests + resource config) and takes on-cluster Longhorn CSI snapshots for app/DB volumes. Kopia backs up file-level PVC data offsite to B2. Together: Velero = cluster resources + on-cluster CSI snapshots, Kopia = offsite file-level PVC data (including the NFS media Velero skips).
+- **Schedule overlap is fine.** `daily-cluster` at 01:00 and `daily-critical` at 00:00 may overlap; the broad sweeps are manifests-only (KB-MB) so the cost is negligible and you get more restore granularity.
