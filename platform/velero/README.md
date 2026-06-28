@@ -12,6 +12,8 @@ Cluster-level backup and restore using Velero, backed by Backblaze B2 (S3-compat
 
 - [Architecture](#architecture)
 - [What's deployed](#whats-deployed)
+- [Web UI](#web-ui)
+- [Grafana dashboard](#grafana-dashboard)
 - [One-time bootstrap](#one-time-bootstrap)
 - [Adding a backup schedule](#adding-a-backup-schedule)
 - [Excluding resources and volumes](#excluding-resources-and-volumes)
@@ -102,8 +104,46 @@ The broad sweeps (`daily-cluster`, `weekly-full`) are **manifests only** (`snaps
 | `Schedule/daily-cluster` | velero | Cluster-wide daily backup (manifests) |
 | `Schedule/daily-critical` | velero | Critical namespaces daily (with snapshots) |
 | `Schedule/weekly-full` | velero | Weekly full backup, manifests (90d retention) |
+| `HelmRelease/velero-ui` | velero | otwld Velero UI web dashboard (`ui.yaml`) |
+| `HelmRepository/otwld` | velero | Chart source for velero-ui |
+| `HTTPRoute/velero-ui` | velero | `velero.${CLUSTER_DOMAIN}`, behind pocket-id OIDC |
+| `GrafanaDashboard/velero` | velero | grafana.com 16829, scrapes the ServiceMonitor metrics |
 
 Velero is applied by the `platform` Flux Kustomization (it's listed in `platform/kustomization.yaml`), not a dedicated Flux pointer.
+
+---
+
+## Web UI
+
+Velero itself has **no built-in web UI** — the `velero` CLI is the official interface. For a browser dashboard we run [otwld/velero-ui](https://github.com/otwld/velero-ui) (`ui.yaml`), a realtime UI that connects to the existing Velero install (it does **not** deploy its own Velero). It lists/creates/deletes backups, restores, and schedules, and shows backup status at a glance. The `velero` CLI remains the source of truth for scripting and disaster recovery.
+
+Reachable at `https://velero.${CLUSTER_DOMAIN}`.
+
+**RBAC scope:** the chart's `rbac.create` mints a ClusterRole limited to `velero.io/*` CRs plus read-only `namespaces`; `rbac.clusterAdministrator: false` keeps the UI's ServiceAccount **off** the `cluster-admin` binding. So the UI can manage Velero objects (including creating/deleting backups and running restores) but has no reach into anything else. To make it strictly read-only, you'd have to disable `rbac.create` and supply your own ClusterRole with only `get/list/watch` on `velero.io`.
+
+**Auth — native pocket-id OIDC:** the app authenticates directly against pocket-id (`OAUTH_*` env, see `ui.yaml`), so login goes through SSO and the logged-in identity maps to the UI's in-app RBAC by **group claim** (`OAUTH_GROUP_CLAIM=groups`). That gives per-user roles instead of one shared login. The route carries **no** gateway-level OIDC label — the app owns the login flow. The built-in `BASIC_AUTH` admin (`VELERO_UI_ADMIN_PASSWORD`) is kept as a **break-glass** login: use it to sign in the first time and configure the group → role policies (see the [Velero UI RBAC docs](https://velero-ui.docs.otwld.com/sso-ldap/rbac)).
+
+### Velero UI bootstrap
+
+1. **Register an OIDC client in pocket-id** with callback URL `https://velero.${CLUSTER_DOMAIN}/login`. Enable the **groups** scope/claim on the client, and create/assign a group (e.g. `velero-admins`) for the people who should administer backups.
+2. **Add to `config/secrets.yaml`** (via `sops config/secrets.yaml`):
+   ```yaml
+   OIDC_VELERO_UI_CLIENT_ID:     <pocket-id client id>
+   OIDC_VELERO_UI_CLIENT_SECRET: <pocket-id client secret>
+   VELERO_UI_ADMIN_PASSWORD:     <break-glass password for the admin login>
+   VELERO_UI_PASSPHRASE:         <random string; signs the app's session JWTs>
+   ```
+   The OIDC endpoint URLs and scopes are non-secret and live in `ui.yaml` (`OAUTH_AUTHORIZATION_URL`/`OAUTH_TOKEN_URL`/`OAUTH_USER_INFO_URL` point at `id.${CLUSTER_DOMAIN}`).
+3. **Reconcile** — `flux reconcile kustomization platform --with-source`, then browse to `https://velero.${CLUSTER_DOMAIN}`.
+4. **Map the group to a role** — sign in once with the break-glass admin, then add an RBAC policy binding the `velero-admins` group (from the OIDC group claim) to an admin role. After that, group members sign in via "Pocket ID" and get the right permissions automatically.
+
+> If OIDC login fails with an invalid-scope error, your pocket-id client doesn't expose the `groups` scope — drop `groups` from `OAUTH_OAUTH_SCOPE` in `ui.yaml` (you lose group-based RBAC but SSO login still works).
+
+---
+
+## Grafana dashboard
+
+The HelmRelease enables Velero metrics + a `ServiceMonitor` (`values.metrics.serviceMonitor`), so Prometheus scrapes the `velero_*` series. `dashboard.yaml` adds the Velero-team-maintained Grafana dashboard ([grafana.com 16829](https://grafana.com/grafana/dashboards/16829-kubernetes-tanzu-velero/)) as a `GrafanaDashboard` CR — backup/restore success rates, CSI snapshots, and node-agent (filesystem) backups. It loads automatically once Flux reconciles; no Grafana clicks needed.
 
 ---
 

@@ -8,3 +8,5 @@ resources:
   - secret.yaml
   - helmrelease.yaml
   - volume-policy.yaml
+  - dashboard.yaml
+  - ui.yaml

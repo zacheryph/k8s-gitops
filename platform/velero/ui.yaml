@@ -1,0 +1,156 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/helmrepository_v1.json
+#
+# otwld Velero UI — a realtime web dashboard for Velero. It connects to the
+# existing Velero install in this namespace (VELERO_NAMESPACE=velero); it does
+# NOT deploy its own Velero. See https://github.com/otwld/velero-ui.
+#
+# Auth: the app authenticates natively against pocket-id via OIDC (OAUTH_* env).
+# Logged-in identity maps to the UI's in-app RBAC by group claim, so you get
+# per-user roles instead of one shared login. The built-in BASIC_AUTH admin is
+# kept as a break-glass login (use it to configure the group → role policies).
+# The route itself carries no gateway OIDC — the app owns the login flow.
+#
+# config/secrets.yaml already provides (via `sops config/secrets.yaml`):
+#   OIDC_VELERO_UI_CLIENT_ID:     <pocket-id client id for velero-ui>
+#   OIDC_VELERO_UI_CLIENT_SECRET: <pocket-id client secret>
+#   VELERO_UI_ADMIN_PASSWORD:     <break-glass password for the admin login>
+#   VELERO_UI_PASSPHRASE:         <random string, signs the app's JWTs>
+#
+# In pocket-id, the velero-ui OIDC client needs:
+#   - callback URL https://velero.${CLUSTER_DOMAIN}/login
+#   - the groups scope/claim enabled (for the RBAC group mapping below)
+---
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: HelmRepository
+metadata:
+  name: otwld
+  namespace: velero
+spec:
+  interval: 12h
+  # otwld publishes only a classic Helm repo, not an OCI artifact.
+  url: https://helm.otwld.com
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+  name: velero-ui-secret
+  namespace: velero
+type: Opaque
+stringData:
+  # Break-glass built-in login (OIDC is the primary path).
+  BASIC_AUTH_USERNAME: admin
+  BASIC_AUTH_PASSWORD: ${VELERO_UI_ADMIN_PASSWORD}
+  # Signs the app's session JWTs.
+  AUTH_SECRET_PASSPHRASE: ${VELERO_UI_PASSPHRASE}
+  # pocket-id OIDC client credentials (consumed as OAUTH_CLIENT_ID/SECRET).
+  OAUTH_CLIENT_ID: ${OIDC_VELERO_UI_CLIENT_ID}
+  OAUTH_CLIENT_SECRET: ${OIDC_VELERO_UI_CLIENT_SECRET}
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: velero-ui
+  namespace: velero
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: velero-ui
+      version: 0.14.0
+      sourceRef:
+        kind: HelmRepository
+        name: otwld
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      retries: 3
+  values:
+    image:
+      repository: otwld/velero-ui
+    replicaCount: 1
+
+    service:
+      type: ClusterIP
+      port: 3000
+
+    # rbac.create makes a ClusterRole scoped to velero.io/* CRs + read-only on
+    # namespaces — exactly what the UI needs to manage backups/restores.
+    # clusterAdministrator: false keeps it OFF the cluster-admin binding, so the
+    # UI's ServiceAccount has zero reach outside Velero objects.
+    rbac:
+      create: true
+      clusterAdministrator: false
+    serviceAccount:
+      create: true
+
+    configuration:
+      logLevel: info
+      general:
+        veleroNamespace: velero
+        grafanaUrl: https://grafana.${CLUSTER_DOMAIN}
+        # We supply the passphrase via envFrom (velero-ui-secret); don't let the
+        # chart mint its own placeholder passphrase Secret.
+        secretPassPhrase:
+          useSecret: false
+
+    # Non-secret OIDC wiring for pocket-id (id.${CLUSTER_DOMAIN}). The client
+    # id/secret come from velero-ui-secret via envFrom below.
+    env:
+      - name: OAUTH_AUTH_ENABLED
+        value: "true"
+      - name: OAUTH_NAME
+        value: Pocket ID
+      - name: OAUTH_AUTHORIZATION_URL
+        value: https://id.${CLUSTER_DOMAIN}/authorize
+      - name: OAUTH_TOKEN_URL
+        value: https://id.${CLUSTER_DOMAIN}/api/oidc/token
+      - name: OAUTH_USER_INFO_URL
+        value: https://id.${CLUSTER_DOMAIN}/api/oidc/userinfo
+      - name: OAUTH_REDIRECT_URI
+        value: https://velero.${CLUSTER_DOMAIN}/login
+      # 'groups' included so pocket-id returns group memberships for RBAC.
+      - name: OAUTH_OAUTH_SCOPE
+        value: openid profile email groups
+      - name: OAUTH_GROUP_CLAIM
+        value: groups
+
+    # Break-glass admin login, JWT passphrase, and OIDC client creds.
+    envFrom:
+      - secretRef:
+          name: velero-ui-secret
+
+    # Ingress is Gateway API in this repo (HTTPRoute below), not the chart's
+    # Ingress resource.
+    ingress:
+      enabled: false
+
+    resources:
+      requests:
+        cpu: 25m
+        memory: 96Mi
+      limits:
+        memory: 256Mi
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: velero-ui
+  namespace: velero
+  # No gateway-level OIDC label: the app authenticates against pocket-id itself
+  # (OAUTH_* env), so SSO is enforced in-app, not by the gateway.
+spec:
+  parentRefs:
+    - name: external
+      namespace: gateway
+  hostnames:
+    - velero.${CLUSTER_DOMAIN}
+  rules:
+    - backendRefs:
+        - name: velero-ui
+          port: 3000
