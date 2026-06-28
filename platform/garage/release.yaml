@@ -85,8 +85,9 @@ spec:
         globalMounts:
           - path: /data
       meta:
-        type: nfs
-        server: ${NAS_ADDRESS}
-        path: /volume1/ObjectStorage/garage/meta
+        type: persistentVolumeClaim
+        accessMode: ReadWriteOnce
+        size: 5Gi
+        storageClass: longhorn
         globalMounts:
           - path: /meta
