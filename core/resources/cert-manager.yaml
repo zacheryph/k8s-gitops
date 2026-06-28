@@ -4,10 +4,10 @@ apiVersion: v1
 kind: Secret
 type: Opaque
 metadata:
-    namespace: cert-manager
-    name: cloudflare-token
+  namespace: cert-manager
+  name: cloudflare-token
 stringData:
-    token: ${CLOUDFLARE_TOKEN}
+  token: ${CERT_MANAGER_CLOUDFLARE_TOKEN}
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cert-manager.io/clusterissuer_v1.json
 apiVersion: cert-manager.io/v1
@@ -22,12 +22,12 @@ spec:
     privateKeySecretRef:
       name: acme-account-key-staging
     solvers:
-    - dns01:
-        cloudflare:
-          email: ${USER_EMAIL}
-          apiTokenSecretRef:
-            name: cloudflare-token
-            key: token
+      - dns01:
+          cloudflare:
+            email: ${USER_EMAIL}
+            apiTokenSecretRef:
+              name: cloudflare-token
+              key: token
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/cert-manager.io/clusterissuer_v1.json
 apiVersion: cert-manager.io/v1
@@ -42,9 +42,9 @@ spec:
     privateKeySecretRef:
       name: acme-account-key
     solvers:
-    - dns01:
-        cloudflare:
-          email: ${USER_EMAIL}
-          apiTokenSecretRef:
-            name: cloudflare-token
-            key: token
+      - dns01:
+          cloudflare:
+            email: ${USER_EMAIL}
+            apiTokenSecretRef:
+              name: cloudflare-token
+              key: token
