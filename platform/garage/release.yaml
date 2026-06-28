@@ -62,7 +62,7 @@ spec:
                 port: *s3-port
       web:
         enabled: true
-        hostnames: ["*.web.${CLUSTER_DOMAIN}"]
+        hostnames: ["*.${WEB_DOMAIN}"]
         parentRefs:
           - name: external
             namespace: gateway

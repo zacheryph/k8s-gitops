@@ -6,4 +6,5 @@ resources:
 - cert-manager.yaml
 - hardware.yaml
 - gateway-certificate.yaml
+- web-domain-certificate.yaml
 - metallb.yaml
