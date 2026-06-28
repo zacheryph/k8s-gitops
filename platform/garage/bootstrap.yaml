@@ -103,7 +103,7 @@ data:
         if result:
             bucket_id = result["id"]
         else:
-            info      = api("GET", f"/v2/GetBucketInfo?alias={name}&globalAlias")
+            info      = api("GET", f"/v2/GetBucketInfo?globalAlias={name}")
             bucket_id = info["id"]
         bucket_ids[name] = bucket_id
 
