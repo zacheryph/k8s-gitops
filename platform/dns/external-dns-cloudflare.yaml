@@ -38,7 +38,8 @@ spec:
       - ingress
       - gateway-httproute
     domainFilters:
-      - ${CLUSTER_EXTERNAL_DOMAIN}
+      - ${CLUSTER_DOMAIN}
+      - ${WEB_DOMAIN}
     resources:
       requests:
         cpu: 50m
