@@ -81,7 +81,21 @@ data:
         })
         imported[key_label] = access_key
 
-    # Create buckets and assign permissions
+    def allow(bucket_id, key_name):
+        ak = imported.get(key_name) or os.environ.get(f"S3_{key_name.upper()}_ACCESS_KEY", "")
+        if not ak:
+            print(f"  Key '{key_name}' not in env, skipping")
+            return
+        print(f"  Allowing {key_name}")
+        api("POST", "/v2/AllowBucketKey", {
+            "bucketId":    bucket_id,
+            "accessKeyId": ak,
+            "permissions": {"read": True, "write": True, "owner": True},
+        })
+
+    # Create buckets, collect IDs, assign per-bucket keys
+    admin_keys = config.get("admin_keys", [])
+    bucket_ids = {}
     for bucket in config["buckets"]:
         name   = bucket["name"]
         print(f"==> Bucket: {name}")
@@ -91,18 +105,16 @@ data:
         else:
             info      = api("GET", f"/v2/GetBucketInfo?alias={name}&globalAlias")
             bucket_id = info["id"]
+        bucket_ids[name] = bucket_id
 
         for key_name in bucket.get("keys", []):
-            ak = imported.get(key_name) or os.environ.get(f"S3_{key_name.upper()}_ACCESS_KEY", "")
-            if not ak:
-                print(f"  Key '{key_name}' not in env, skipping permission")
-                continue
-            print(f"  Allowing {key_name} → {name}")
-            api("POST", "/v2/AllowBucketKey", {
-                "bucketId":    bucket_id,
-                "accessKeyId": ak,
-                "permissions": {"read": True, "write": True, "owner": True},
-            })
+            allow(bucket_id, key_name)
+
+    # Grant admin keys access to every bucket
+    for key_name in admin_keys:
+        for name, bucket_id in bucket_ids.items():
+            print(f"==> Admin key {key_name} → {name}")
+            allow(bucket_id, key_name)
 
     print("==> Bootstrap complete.")
 

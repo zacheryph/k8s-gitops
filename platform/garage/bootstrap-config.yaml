@@ -1,5 +1,6 @@
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
+# admin_keys: keys granted owner access to every bucket automatically
 # Add a bucket:  {"name": "mybucket"}
 # Add key access: {"name": "mybucket", "keys": ["myapp"]}
 # Key names must match a credential added via: scripts/garage-creds add myapp
@@ -10,6 +11,7 @@ metadata:
 data:
   buckets.json: |
     {
+      "admin_keys": [],
       "buckets": [
         {"name": "family"},
         {"name": "public"},
