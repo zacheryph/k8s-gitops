@@ -24,6 +24,12 @@ flux get helmreleases -A
 # Edit the (only) SOPS-encrypted file; PGP keys are in .sops.yaml
 sops config/secrets.yaml
 
+# Manage cluster-secrets keys without hand-editing SOPS (value from stdin if omitted)
+scripts/cluster-secrets set|get|list|remove <KEY>
+
+# Manage garage S3 credentials in platform/garage/s3-keys.yaml
+scripts/garage-creds add|list|show|remove <name>
+
 # Cluster provisioning / upgrades (k0sctl config)
 k0sctl apply --config config/cluster.yaml
 ```
