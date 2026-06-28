@@ -1,15 +1,22 @@
-# ExternalDNS with AdGuard Home
+# ExternalDNS — AdGuard Home (internal) + Cloudflare (public)
 
-ExternalDNS pushes DNS records to an AdGuard Home instance on the LAN
-via the [AdGuard Home webhook provider](https://github.com/muhlba91/external-dns-provider-adguard).
+Two ExternalDNS instances share the same namespace and chart source,
+each targeting a different DNS provider.
 
 ## Components
 
 - **external-dns-adguard** — kubernetes-sigs/external-dns HelmRelease with
   `provider=webhook` and the AdGuard Home provider sidecar. Pushes DNS
-  rewrite rules to AdGuard Home via its API.
+  rewrite rules to AdGuard Home via its API for `${CLUSTER_DOMAIN}` (internal).
 
-## Architecture
+- **external-dns-cloudflare** — kubernetes-sigs/external-dns HelmRelease with
+  `provider=cloudflare`. Pushes proxied DNS records to Cloudflare for
+  `${CLUSTER_EXTERNAL_DOMAIN}` (public). **Opt-in only** — only resources
+  annotated with `dns.routine.sh/external: "true"` get public DNS records.
+
+## AdGuard Home (internal DNS)
+
+### Architecture
 
 ```
 HTTPRoute ──► ExternalDNS-adguard ──► AdGuard Home API
@@ -21,7 +28,7 @@ Service LB ┘                              │
                                     AdGuard Home DNS)
 ```
 
-## Source of truth
+### Source of truth
 
 ExternalDNS creates records when:
 
@@ -33,7 +40,7 @@ ExternalDNS creates records when:
 To exclude a resource, set the annotation
 `external-dns.alpha.kubernetes.io/enabled: "false"`.
 
-## Secrets (one-time out-of-band)
+### Secrets (one-time out-of-band)
 
 Create the AdGuard Home configuration Secret before Flux reconciles:
 
@@ -51,7 +58,7 @@ rewrite rules using the Adblock-style filtering syntax:
 |host.example.com^dnsrewrite=NOERROR;A;10.72.16.X
 ```
 
-## AdGuard Home provider limitations
+### AdGuard Home provider limitations
 
 > [!IMPORTANT]
 > The provider takes **ownership** of **all rules** matching the
@@ -61,7 +68,7 @@ rewrite rules using the Adblock-style filtering syntax:
 > If you need manually-set DNS rules alongside ExternalDNS-managed ones,
 > define them as `DNSEndpoint` CRD objects and enable the `crd` source.
 
-## Verification
+### Verification
 
 Run after merge and secret creation:
 
@@ -110,7 +117,7 @@ sleep 90
 # Rule disappears from AdGuard Home.
 ```
 
-## Troubleshooting
+### Troubleshooting
 
 - **Webhook can't reach AdGuard Home** — verify connectivity:
   ```bash
@@ -133,3 +140,64 @@ sleep 90
 - **AdGuard Home API is HTTP only** — set `url` with `http://`. The
   provider does not skip TLS verification; use a valid certificate or
   HTTP for local-only instances.
+
+## Cloudflare (public DNS)
+
+The Cloudflare instance creates **proxied** A/AAAA/CNAME records for the
+public domain (`${CLUSTER_EXTERNAL_DOMAIN}`). All records are proxied
+through Cloudflare's edge (`--cloudflare-proxied`). The target IP is the
+static NAT external IP set in `cluster-secrets` as `CLOUD_EXTERNAL_IP`.
+
+### Opt-in annotation
+
+By default, ExternalDNS publishes **nothing** to Cloudflare. To publish
+a resource's DNS records, add the annotation:
+
+```yaml
+metadata:
+  annotations:
+    dns.routine.sh/external: "true"
+```
+
+Without this annotation, the resource is ignored by the Cloudflare
+instance. The AdGuard (internal) instance is unaffected — it continues
+to publish all matching resources to the internal domain.
+
+### Credentials
+
+The Cloudflare API token is stored in the `cloudflare-configuration`
+Secret (created from `${CLOUDFLARE_TOKEN}` in `cluster-secrets`).
+The token needs `Zone:Read` and `DNS:Edit` permissions on the target zone.
+
+### Verification
+
+```bash
+# 1. Confirm the pod is healthy
+kubectl -n dns get pods -l app.kubernetes.io/instance=external-dns-cloudflare
+# Expected: external-dns-cloudflare-* (1/1) — Running
+
+# 2. Check logs for successful Cloudflare API calls
+kubectl -n dns logs deploy/external-dns-cloudflare
+# Expected: "All records are already up to date" or records created
+
+# 3. Verify in Cloudflare dashboard
+# Check the DNS tab for the zone — records should appear with
+# the orange cloud (proxied) icon and the external IP as the target.
+
+# 4. From an external client:
+dig +short <hostname>.<public-domain>
+# Expected: Cloudflare proxy IPs (not the NAT IP directly, since proxied)
+```
+
+### Troubleshooting
+
+- **"Invalid request headers" (6003)** — the API token is invalid or
+  doesn't have permission on the zone. Recreate the token with
+  `Zone:Read` + `DNS:Edit` on the target zone.
+
+- **Records show internal IPs instead of external** — verify
+  `--target=${CLOUD_EXTERNAL_IP}` is set and `${CLOUD_EXTERNAL_IP}`
+  is correctly set in `cluster-secrets`.
+
+- **Records not proxied** — verify `--cloudflare-proxied` is in
+  `extraArgs`.
