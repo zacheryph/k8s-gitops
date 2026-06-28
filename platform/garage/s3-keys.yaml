@@ -1,9 +1,42 @@
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
 # Manage credentials with: scripts/garage-creds add <name>
 # Encrypt before committing: sops --encrypt --in-place platform/garage/s3-keys.yaml
 apiVersion: v1
 kind: Secret
 metadata:
-  name: garage-s3-keys
-stringData: {}
+    name: garage-s3-keys
+stringData:
+    S3_LOKI_ACCESS_KEY: ENC[AES256_GCM,data:G9rXrK1zCFvYBYJ8cwuoyUQRWDVMATyp03uqjaBWIkk=,iv:aBLiTIOfg1q2nA2CoAaAhNAik/JyvxPXRAtV0VRZ4dI=,tag:NGFeMo6kVDw7DHTaX0lV+A==,type:str]
+    S3_LOKI_SECRET_KEY: ENC[AES256_GCM,data:7TneaL90NJqyDKSdYL2FveWrTSrUxa8fk83VIWsgzZ0vqBTL/cEmQPNJDAy7B4PWvQmTYgelG8G5/Q0LstXwww==,iv:oGDOLVbNvUXujxs63wTluP4VrBKdY9DGyD85MQXFuAM=,tag:QTuwCgWCg/q4Irtn018+MA==,type:str]
+    S3_FORGEJO_ACCESS_KEY: ENC[AES256_GCM,data:9JCQPks+gKec6gXNXUBHynkgClL0qPRXZIGzsSRehfI=,iv:LFMDd9B38FEYdEKMC5XFFZS237phO/3WxsLYSeEVw2M=,tag:5lGGMfqXZamVIOic4nFKQw==,type:str]
+    S3_FORGEJO_SECRET_KEY: ENC[AES256_GCM,data:rHDJqEe9FgpFsU/sPauOOeFmA0pKJ/71xgD5HoJCj1Sf2vJ3rtcaYEE+ARpgeY3bYueCEPYMvYvgJgkmZV9erA==,iv:QtQoWIA+uJPeTH+6Rlp5tfPYFRhKQnPM2voHQotH2Fg=,tag:MnQX+AqYP8TRTZdgl3syLg==,type:str]
+    S3_FOURTEEN_ACCESS_KEY: ENC[AES256_GCM,data:uQCCBg6qPbrDMtmvkXkt5u9L9CV5BuQMCCrEGrmV5bo=,iv:f+P3MNggRa3ueUeZ18Y/qrYYP/q+QlJbjlIXT8KNtfk=,tag:RHeZeVD1ohzMzKNAOhpA0g==,type:str]
+    S3_FOURTEEN_SECRET_KEY: ENC[AES256_GCM,data:wZEZIcTc7hDKGrKYw9Fl4fqG0h+87cZo1VqoN22rNGryJcSs/tDbhF86oStuBaLYr4VT+bgRrPiHI1FQo13CXA==,iv:S+uygOpoMv2YmwJHpDQ+UER1LMCF9izocD2YAVtAFUA=,tag:o3WaKKMmmDkD5TCZ6ZOvPQ==,type:str]
+sops:
+    encrypted_regex: ^(data|stringData)$
+    lastmodified: "2026-06-28T04:42:27Z"
+    mac: ENC[AES256_GCM,data:OgMaFcdOh4eOVtZSpT6+DWLAFcD4MIWN1FdWUjAAGqj2zSnV0aEHMqyzenSa7n6C9ICUo21YwFH3d8cAoH+5CBREVc58ONFB7JoJR2z9sCVqU6WoOON0n2oq//1ZqTjeks99eCGOMN6co6QewGkMb1gngf8VQ0OPa6/oSNDAZmI=,iv:iKD4enP5xhKkxoCO7N243sA577JSqSGQFem+PI8uJ2I=,tag:JNEykN0Hr1AosWROT10/Wg==,type:str]
+    pgp:
+        - created_at: "2026-06-28T04:42:27Z"
+          enc: |-
+            -----BEGIN PGP MESSAGE-----
+
+            hF4DK2T0oPsKQSoSAQdAYCw/KqCpnCrCFZ2Biz7vYTPW5BJsug0wEYYzfXjP7Ggw
+            oeR5OQklztXxLG0zXFxvCDuIcMcesjlO402IGCvFxwTWaVmkbK42v6PlwiA7lgnz
+            0lwBJ2bWIP5dKNdqbOxhG3NxJWkHFVXNyk8/WCj9uMZP6M8o1GTW+DAvbpR7+xe8
+            G+evevbqsnKsiDfS4VQc4azNlvY/4RVgDLtbQDL6HdKOaF9l0+ijcGyG4HGpfA==
+            =U4Fa
+            -----END PGP MESSAGE-----
+          fp: "0x98C3A69E6747EA68"
+        - created_at: "2026-06-28T04:42:27Z"
+          enc: |-
+            -----BEGIN PGP MESSAGE-----
+
+            hF4DiZ7E0TI8O2gSAQdAJ3YpviConZE5FF4J9PbTgKpnq8bEh/qWtXUWtiuKQRIw
+            IsnP1jOKK1KAJFppthGCb1YkcZ97nq7uTKrGUs4QHM3+k888a7gr/lytJAuUFn46
+            0lwBhv8EEvPbuCJKF9JZlKFXwSasthGHRrc6gWg49+vfBYytBMc99MFMZezYZBre
+            g62Gyr9UK+YzvjQvHjKCR7HbsKtyZiJ1MBhqK3RiiTlabzyHnZXB5TOCZRDuoQ==
+            =vZRV
+            -----END PGP MESSAGE-----
+          fp: "0x4B9C178B49228EFD"
+    version: 3.13.0

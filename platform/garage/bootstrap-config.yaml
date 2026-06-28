@@ -11,7 +11,7 @@ metadata:
 data:
   buckets.json: |
     {
-      "admin_keys": [],
+      "admin_keys": ["fourteen"],
       "buckets": [
         {"name": "family"},
         {"name": "public"},
