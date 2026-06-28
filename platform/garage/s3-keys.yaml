@@ -12,10 +12,12 @@ stringData:
     S3_FORGEJO_SECRET_KEY: ENC[AES256_GCM,data:rHDJqEe9FgpFsU/sPauOOeFmA0pKJ/71xgD5HoJCj1Sf2vJ3rtcaYEE+ARpgeY3bYueCEPYMvYvgJgkmZV9erA==,iv:QtQoWIA+uJPeTH+6Rlp5tfPYFRhKQnPM2voHQotH2Fg=,tag:MnQX+AqYP8TRTZdgl3syLg==,type:str]
     S3_FOURTEEN_ACCESS_KEY: ENC[AES256_GCM,data:uQCCBg6qPbrDMtmvkXkt5u9L9CV5BuQMCCrEGrmV5bo=,iv:f+P3MNggRa3ueUeZ18Y/qrYYP/q+QlJbjlIXT8KNtfk=,tag:RHeZeVD1ohzMzKNAOhpA0g==,type:str]
     S3_FOURTEEN_SECRET_KEY: ENC[AES256_GCM,data:wZEZIcTc7hDKGrKYw9Fl4fqG0h+87cZo1VqoN22rNGryJcSs/tDbhF86oStuBaLYr4VT+bgRrPiHI1FQo13CXA==,iv:S+uygOpoMv2YmwJHpDQ+UER1LMCF9izocD2YAVtAFUA=,tag:o3WaKKMmmDkD5TCZ6ZOvPQ==,type:str]
+    S3_HERMES_ACCESS_KEY: ENC[AES256_GCM,data:2gNfN9Z3Fnu2DLzs51oI3Pqf/YhcSDlh5E8GjAadxU8=,iv:cD6vjX3Sdp3KapQinEC28676g6fC0DziwgVehD5O4Ho=,tag:VvA3sQwaHpfPZqhhNKCffA==,type:str]
+    S3_HERMES_SECRET_KEY: ENC[AES256_GCM,data:l7mzKCVRQIQCXNZeMhscyNhu7yHauxfZHBO9f23wAI7f8on8Xw4M3B/imO1qyHk/HTkgevxX2K45RYyIg3HkxA==,iv:jOqLoONjG/2qv/sq6N4/Xt3SyNMNAVRL+RA9psi9IZA=,tag:dlQzkuew23cS9J+TNNmSYw==,type:str]
 sops:
     encrypted_regex: ^(data|stringData)$
-    lastmodified: "2026-06-28T04:42:27Z"
-    mac: ENC[AES256_GCM,data:OgMaFcdOh4eOVtZSpT6+DWLAFcD4MIWN1FdWUjAAGqj2zSnV0aEHMqyzenSa7n6C9ICUo21YwFH3d8cAoH+5CBREVc58ONFB7JoJR2z9sCVqU6WoOON0n2oq//1ZqTjeks99eCGOMN6co6QewGkMb1gngf8VQ0OPa6/oSNDAZmI=,iv:iKD4enP5xhKkxoCO7N243sA577JSqSGQFem+PI8uJ2I=,tag:JNEykN0Hr1AosWROT10/Wg==,type:str]
+    lastmodified: "2026-06-28T05:15:15Z"
+    mac: ENC[AES256_GCM,data:bYXz18y07K9tg2p6eGD9HvqAQGMtAMwIpnoz3wQ8MUp2uiBfuFRj3PRYjTekjP9yYyw+D87UqwsOBavtUofVQCRYo2oAbCu2W/qN8cCt0WCoN7uvwbJWXVtqNoweoPLRMlAMZpf+4GgvW9vQajXfnBQFJq78XVgKQRB55NQJU8U=,iv:mHPeIrnNhuYZJRJiMbjMUzSwYHEylKgmz3nCLc6GFLk=,tag:TnCwrOIsShP9BqdAEpcHTg==,type:str]
     pgp:
         - created_at: "2026-06-28T04:42:27Z"
           enc: |-

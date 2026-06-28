@@ -13,6 +13,9 @@ data:
     {
       "admin_keys": ["fourteen"],
       "buckets": [
+        {"name": "hermes", "keys": ["hermes"]},
+        {"name": "lab", "keys": ["hermes"]},
+        {"name": "preview", "keys": ["hermes"]},
         {"name": "family"},
         {"name": "public"},
         {"name": "private"},
