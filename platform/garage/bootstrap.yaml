@@ -50,15 +50,15 @@ data:
     node_id = nodes[0]["id"]
     print(f"==> Node: {node_id[:12]}...")
 
-    print("==> Updating layout (500 GiB)...")
-    api("POST", "/v2/UpdateClusterLayout", {
-        "roles": {node_id: {"zone": "default", "capacity": 536870912000, "tags": []}}
-    })
     if status.get("layoutVersion", 0) == 0:
+        print("==> Assigning layout (500 GiB)...")
+        api("POST", "/v2/UpdateClusterLayout", {
+            "roles": [{"id": node_id, "zone": "default", "capacity": 536870912000, "tags": []}]
+        })
         print("==> Applying layout version 1...")
         api("POST", "/v2/ApplyClusterLayout", {"version": 1})
     else:
-        print(f"==> Layout at v{status.get('layoutVersion')}, skipping apply.")
+        print(f"==> Layout at v{status.get('layoutVersion')}, skipping.")
 
     with open("/config/buckets.json") as f:
         config = json.load(f)
