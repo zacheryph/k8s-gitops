@@ -41,6 +41,11 @@ spec:
     # emptyDir, and any PVC without a CSI driver.
     nodeAgent:
       enabled: true
+      # k0s puts the kubelet root under /var/lib/k0s/kubelet, not the default
+      # /var/lib/kubelet. Without these the node-agent aborts on startup:
+      # "unexpected directory structure for host-pods volume".
+      podVolumePath: /var/lib/k0s/kubelet/pods
+      pluginVolumePath: /var/lib/k0s/kubelet/plugins
       resources:
         requests:
           cpu: 50m
