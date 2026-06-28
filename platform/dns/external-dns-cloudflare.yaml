@@ -28,6 +28,7 @@ spec:
       - --annotation-filter=dns.routine.sh/external=true
       - --cloudflare-proxied
       - --default-targets=${CLOUD_EXTERNAL_IP}
+      - --force-default-targets
     registry: txt
     txtOwnerId: external-dns-cloudflare
     policy: sync
