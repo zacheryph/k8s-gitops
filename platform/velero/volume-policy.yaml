@@ -1,0 +1,25 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
+#
+# Velero Volume Policy (resource policy). Referenced by snapshotting schedules
+# via spec.template.resourcePolicy. It tells Velero to SKIP volume data for
+# NFS-backed volumes — these are the large NAS-hosted media libraries
+# (media-pool 4Ti, photos-pool 8Ti) which Velero should never try to back up.
+# The NAS owns that data; Kopia (services/backup/kopia/) handles offsite file
+# DR for it. Longhorn (CSI) app/DB volumes still get snapshotted normally.
+#
+# To exclude a single resource entirely (not just its volume data), label it
+# with `velero.io/exclude-from-backup: "true"` instead.
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: velero-volume-policy
+  namespace: velero
+data:
+  policies.yaml: |
+    version: v1
+    volumePolicies:
+      - conditions:
+          nfs: {}
+        action:
+          type: skip
