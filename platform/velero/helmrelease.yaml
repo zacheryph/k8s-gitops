@@ -72,6 +72,12 @@ spec:
             region: ${VELERO_B2_REGION}
             s3Url: https://${VELERO_B2_ENDPOINT}
             s3ForcePathStyle: "true"
+            # Backblaze B2 rejects the AWS SDK's default flexible-checksum
+            # headers (x-amz-sdk-checksum-algorithm) with
+            # "InvalidArgument / XAmzContentSHA256Mismatch". Empty string
+            # disables checksum so PutObject succeeds. See velero-plugin-for-aws
+            # README § S3-compatible storage.
+            checksumAlgorithm: ""
       volumeSnapshotLocation:
         - name: default
           provider: aws
@@ -100,8 +106,18 @@ spec:
     # Plugin: AWS S3 backend (B2). CSI snapshot support is built into Velero
     # core since v1.14 — no separate velero-plugin-for-csi plugin required.
     initContainers:
+      # NOTE: pinned to the unreleased `main` build, NOT a tagged release.
+      # Releases up to and including v1.14.2 unconditionally set PutObject's
+      # Tagging field (`Tagging: aws.String(o.tagging)`), so even with no
+      # tagging configured the AWS SDK emits an empty `x-amz-tagging:` header.
+      # Backblaze B2 rejects ANY x-amz-tagging header with HTTP 400
+      # "InvalidArgument: Unsupported header 'x-amz-tagging'", which fails every
+      # backup at the final velero-backup.json upload. The fix (only set Tagging
+      # when non-empty) is merged to main but not yet released. Revert to a
+      # pinned vX.Y.Z release once a release > v1.14.2 ships the fix.
+      # Renovate ignores this floating tag — bump the digest by hand.
       - name: velero-plugin-for-aws
-        image: velero/velero-plugin-for-aws:v1.14.2@sha256:0751144c1c8e52d52c48717fbd13ad5a3061e612ae4d7ad744a946cd5b139d1a
+        image: velero/velero-plugin-for-aws:main@sha256:a77f07a0ad6974d802653d4d1f3ed67db46f59649f29a6b5d29328624010c6a5
         imagePullPolicy: IfNotPresent
         volumeMounts:
           - name: plugins
