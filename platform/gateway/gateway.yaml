@@ -70,3 +70,5 @@ spec:
         certificateRefs:
           - kind: Secret
             name: default-wildcard-tls
+          - kind: Secret
+            name: web-domain-tls

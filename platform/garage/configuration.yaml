@@ -22,7 +22,7 @@ data:
 
     [s3_web]
     bind_addr = "[::]:3902"
-    root_domain = ".web.${CLUSTER_DOMAIN}"
+    root_domain = ".${WEB_DOMAIN}"
     index = "index.html"
 
     [admin]
