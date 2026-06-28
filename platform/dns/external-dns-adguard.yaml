@@ -67,6 +67,7 @@ spec:
       - gateway-httproute
     domainFilters:
       - ${CLUSTER_DOMAIN}
+      - ${WEB_DOMAIN}
     resources:
       requests:
         cpu: 50m
