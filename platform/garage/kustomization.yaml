@@ -4,7 +4,10 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 namespace: garage
 resources:
+  - bootstrap-config.yaml
+  - bootstrap.yaml
   - configuration.yaml
   - namespace.yaml
   - release.yaml
+  - s3-keys.yaml
   - webui.yaml

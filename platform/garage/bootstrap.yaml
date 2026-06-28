@@ -1,0 +1,146 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/v1/job.json
+# Idempotent bootstrap: layout assignment, bucket creation, key import, permissions.
+# Reads bucket config from garage-bootstrap-config ConfigMap.
+# Reads S3 credentials from garage-s3-keys Secret (managed via scripts/garage-creds).
+# TTL causes Flux to recreate it each reconcile cycle; all operations are safe to re-run.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: garage-bootstrap
+spec:
+  ttlSecondsAfterFinished: 3600
+  backoffLimit: 6
+  template:
+    spec:
+      restartPolicy: OnFailure
+      securityContext:
+        runAsNonRoot: false
+        seccompProfile: {type: RuntimeDefault}
+      containers:
+        - name: bootstrap
+          image: python:3.13-alpine@sha256:18ab23c24b308232b4b992e0abd28c86ca1a827fe59d6bad0b80ab8cb1f6f87d
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities: {drop: [ALL]}
+          env:
+            - name: GARAGE_ENDPOINT
+              value: http://garage.garage.svc.cluster.local:3903
+            - name: PYTHONDONTWRITEBYTECODE
+              value: "1"
+            - name: PYTHONUNBUFFERED
+              value: "1"
+          envFrom:
+            - secretRef:
+                name: garage-secret
+            - secretRef:
+                name: garage-s3-keys
+          command: [python3, -c]
+          args:
+            - |
+              import json, os, sys, time
+              from urllib.request import Request, urlopen
+              from urllib.error import HTTPError
+
+              ENDPOINT = os.environ["GARAGE_ENDPOINT"]
+              TOKEN    = os.environ["GARAGE_ADMIN_TOKEN"]
+
+              def api(method, path, data=None):
+                  body = json.dumps(data).encode() if data is not None else None
+                  req = Request(
+                      f"{ENDPOINT}{path}",
+                      data=body,
+                      method=method,
+                      headers={
+                          "Authorization": f"Bearer {TOKEN}",
+                          "Content-Type": "application/json",
+                      },
+                  )
+                  try:
+                      with urlopen(req) as r:
+                          raw = r.read()
+                          return json.loads(raw) if raw else {}
+                  except HTTPError as e:
+                      body = e.read().decode()
+                      if e.code == 409:
+                          return None  # resource already exists, fine
+                      print(f"API {e.code} {method} {path}: {body}", file=sys.stderr)
+                      raise
+
+              print("==> Waiting for garage admin API...")
+              while True:
+                  try:
+                      api("GET", "/v2/GetClusterStatus")
+                      break
+                  except Exception:
+                      time.sleep(5)
+
+              status  = api("GET", "/v2/GetClusterStatus")
+              nodes   = status.get("nodes", [])
+              if not nodes:
+                  sys.exit(f"No nodes in cluster status: {status}")
+              node_id = nodes[0]["id"]
+              print(f"==> Node: {node_id[:12]}...")
+
+              print("==> Updating layout (500 GiB)...")
+              api("POST", "/v2/UpdateClusterLayout", {
+                  "roles": {node_id: {"zone": "default", "capacity": 536870912000, "tags": []}}
+              })
+              if status.get("layoutVersion", 0) == 0:
+                  print("==> Applying layout version 1...")
+                  api("POST", "/v2/ApplyClusterLayout", {"version": 1})
+              else:
+                  print(f"==> Layout at v{status.get('layoutVersion')}, skipping apply.")
+
+              with open("/config/buckets.json") as f:
+                  config = json.load(f)
+
+              # Import every S3_*_ACCESS_KEY env var as a garage key
+              imported = {}
+              for var, access_key in os.environ.items():
+                  if not (var.startswith("S3_") and var.endswith("_ACCESS_KEY") and access_key):
+                      continue
+                  key_label  = var[3:-11].lower()  # S3_FORGEJO_ACCESS_KEY → forgejo
+                  secret_key = os.environ.get(f"S3_{key_label.upper()}_SECRET_KEY", "")
+                  if not secret_key:
+                      print(f"  No secret key for {key_label}, skipping")
+                      continue
+                  print(f"==> Importing key: {key_label}")
+                  api("POST", "/v2/ImportKey", {
+                      "name":            key_label,
+                      "accessKeyId":     access_key,
+                      "secretAccessKey": secret_key,
+                  })
+                  imported[key_label] = access_key
+
+              # Create buckets and assign permissions
+              for bucket in config["buckets"]:
+                  name   = bucket["name"]
+                  print(f"==> Bucket: {name}")
+                  result = api("POST", "/v2/CreateBucket", {"globalAlias": name})
+                  if result:
+                      bucket_id = result["id"]
+                  else:
+                      info      = api("GET", f"/v2/GetBucketInfo?alias={name}&globalAlias")
+                      bucket_id = info["id"]
+
+                  for key_name in bucket.get("keys", []):
+                      ak = imported.get(key_name) or os.environ.get(f"S3_{key_name.upper()}_ACCESS_KEY", "")
+                      if not ak:
+                          print(f"  Key '{key_name}' not in env, skipping permission")
+                          continue
+                      print(f"  Allowing {key_name} → {name}")
+                      api("POST", "/v2/AllowBucketKey", {
+                          "bucketId":    bucket_id,
+                          "accessKeyId": ak,
+                          "permissions": {"read": True, "write": True, "owner": True},
+                      })
+
+              print("==> Bootstrap complete.")
+          volumeMounts:
+            - name: config
+              mountPath: /config
+      volumes:
+        - name: config
+          configMap:
+            name: garage-bootstrap-config

@@ -1,0 +1,9 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+# Manage credentials with: scripts/garage-creds add <name>
+# Encrypt before committing: sops --encrypt --in-place platform/garage/s3-keys.yaml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: garage-s3-keys
+stringData: {}

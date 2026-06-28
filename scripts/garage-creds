@@ -1,0 +1,80 @@
+#!/usr/bin/env bash
+# Manage S3 credentials in platform/garage/s3-keys.yaml (SOPS-encrypted).
+# Credentials are auto-imported into garage by the garage-bootstrap Job on next reconcile.
+#
+# Usage:
+#   garage-creds add <name> [access-key] [secret-key]   # generates keys if omitted
+#   garage-creds list                                    # show configured key names
+#   garage-creds show <name>                             # decrypt and print a key pair
+#   garage-creds remove <name>                           # open editor to delete lines
+#   garage-creds edit                                    # open full file in $EDITOR
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+S3_KEYS="$REPO_ROOT/platform/garage/s3-keys.yaml"
+
+_ensure_encrypted() {
+  if ! grep -q 'sops:' "$S3_KEYS" 2>/dev/null; then
+    echo "==> Encrypting $S3_KEYS with SOPS..."
+    sops --encrypt --in-place "$S3_KEYS"
+  fi
+}
+
+cmd_add() {
+  local name="${1:?Usage: garage-creds add <name> [access-key] [secret-key]}"
+  local name_upper; name_upper=$(echo "$name" | tr '[:lower:]' '[:upper:]')
+  local ak="${2:-$(openssl rand -hex 16)}"
+  local sk="${3:-$(openssl rand -hex 32)}"
+
+  _ensure_encrypted
+
+  sops --set "[\"stringData\"][\"S3_${name_upper}_ACCESS_KEY\"] \"${ak}\"" "$S3_KEYS"
+  sops --set "[\"stringData\"][\"S3_${name_upper}_SECRET_KEY\"] \"${sk}\"" "$S3_KEYS"
+
+  echo "==> Added credentials for '${name}'"
+  echo "    Access Key: ${ak}"
+  echo "    Secret Key: ${sk}"
+  echo ""
+  echo "Next steps:"
+  echo "  1. Add '${name}' to platform/garage/bootstrap-config.yaml if a bucket is needed"
+  echo "  2. git add platform/garage/s3-keys.yaml platform/garage/bootstrap-config.yaml"
+  echo "  3. git commit && git push"
+}
+
+cmd_list() {
+  if ! grep -q 'sops:' "$S3_KEYS" 2>/dev/null; then
+    echo "(no credentials configured — file is not yet encrypted)"
+    return
+  fi
+  sops --decrypt "$S3_KEYS" \
+    | grep -E '^\s+S3_.*_ACCESS_KEY:' \
+    | sed 's/.*S3_//;s/_ACCESS_KEY:.*//' \
+    | tr '[:upper:]' '[:lower:]'
+}
+
+cmd_show() {
+  local name="${1:?Usage: garage-creds show <name>}"
+  local name_upper; name_upper=$(echo "$name" | tr '[:lower:]' '[:upper:]')
+  sops --decrypt "$S3_KEYS" \
+    | grep -E "S3_${name_upper}_(ACCESS|SECRET)_KEY:" \
+    | sed 's/^[[:space:]]*//'
+}
+
+cmd_remove() {
+  local name="${1:?Usage: garage-creds remove <name>}"
+  local name_upper; name_upper=$(echo "$name" | tr '[:lower:]' '[:upper:]')
+  echo "==> Opening editor — delete the S3_${name_upper}_ACCESS_KEY and S3_${name_upper}_SECRET_KEY lines."
+  sops "$S3_KEYS"
+}
+
+case "${1:-}" in
+  add)    shift; cmd_add "$@" ;;
+  list)   cmd_list ;;
+  show)   shift; cmd_show "$@" ;;
+  remove) shift; cmd_remove "$@" ;;
+  edit)   sops "$S3_KEYS" ;;
+  *)
+    sed -n '2,8p' "${BASH_SOURCE[0]}" | sed 's/^# //'
+    exit 1
+    ;;
+esac

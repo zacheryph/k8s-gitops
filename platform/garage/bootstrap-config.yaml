@@ -1,0 +1,21 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/configmap.json
+# Add a bucket:  {"name": "mybucket"}
+# Add key access: {"name": "mybucket", "keys": ["myapp"]}
+# Key names must match a credential added via: scripts/garage-creds add myapp
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: garage-bootstrap-config
+data:
+  buckets.json: |
+    {
+      "buckets": [
+        {"name": "family"},
+        {"name": "public"},
+        {"name": "private"},
+        {"name": "forgejo", "keys": ["forgejo"]},
+        {"name": "loki",    "keys": ["loki"]},
+        {"name": "backups"}
+      ]
+    }
