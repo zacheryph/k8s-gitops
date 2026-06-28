@@ -9,4 +9,3 @@ resources:
   - gateway
   - monitoring
   - security
-  - minio.yaml
