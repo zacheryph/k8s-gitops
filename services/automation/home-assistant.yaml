@@ -54,6 +54,8 @@ spec:
       app:
         enabled: true
         kind: HTTPRoute
+        annotations:
+          dns.routine.sh/external: "true"
         hostnames: [ "home-assistant.${CLUSTER_DOMAIN}" ]
         parentRefs:
           - name: external

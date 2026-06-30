@@ -67,6 +67,8 @@ apiVersion: gateway.networking.k8s.io/v1
 kind: HTTPRoute
 metadata:
   name: grafana
+  annotations:
+    dns.routine.sh/external: "true"
 spec:
   hostnames: ["grafana.${CLUSTER_DOMAIN}"]
   parentRefs:

@@ -97,6 +97,8 @@ spec:
             port: *metrics
     route:
       main:
+        annotations:
+          dns.routine.sh/external: "true"
         hostnames:
           - "id.${CLUSTER_DOMAIN}"
         parentRefs:

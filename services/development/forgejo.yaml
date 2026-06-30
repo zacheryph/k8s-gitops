@@ -100,6 +100,8 @@ spec:
           STORAGE_TYPE: local
     httpRoute:
       enabled: true
+      annotations:
+        dns.routine.sh/external: "true"
       hostnames: [ "git.${CLUSTER_DOMAIN}" ]
       parentRefs:
         - name: external

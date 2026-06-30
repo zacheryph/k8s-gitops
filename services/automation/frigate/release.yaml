@@ -96,6 +96,8 @@ spec:
       app:
         enabled: true
         kind: HTTPRoute
+        annotations:
+          dns.routine.sh/external: "true"
         hostnames: [ "frigate.${CLUSTER_DOMAIN}" ]
         parentRefs:
           - name: external

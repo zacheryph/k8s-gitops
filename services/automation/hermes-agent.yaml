@@ -136,6 +136,8 @@ spec:
         kind: HTTPRoute
         metadata:
           name: hermes-agent
+          annotations:
+            dns.routine.sh/external: "true"
         spec:
           parentRefs:
             - name: external
@@ -155,6 +157,8 @@ spec:
         kind: HTTPRoute
         metadata:
           name: hermes-agent-webhook
+          annotations:
+            dns.routine.sh/external: "true"
         spec:
           parentRefs:
             - name: external

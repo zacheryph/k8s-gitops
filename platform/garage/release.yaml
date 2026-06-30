@@ -52,6 +52,8 @@ spec:
             port: 3903
     route:
       app:
+        annotations:
+          dns.routine.sh/external: "true"
         hostnames: ["s3.${CLUSTER_DOMAIN}"]
         parentRefs:
           - name: external

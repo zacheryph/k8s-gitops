@@ -49,6 +49,8 @@ spec:
       app:
         enabled: true
         kind: HTTPRoute
+        annotations:
+          dns.routine.sh/external: "true"
         hostnames: [ "warden.${CLUSTER_DOMAIN}" ]
         parentRefs:
           - name: external
