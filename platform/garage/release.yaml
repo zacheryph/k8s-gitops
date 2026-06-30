@@ -52,7 +52,7 @@ spec:
             port: 3903
     route:
       app:
-        hostnames: ["s3.${CLUSTER_DOMAIN}", "*.s3.${CLUSTER_DOMAIN}"]
+        hostnames: ["s3.${CLUSTER_DOMAIN}"]
         parentRefs:
           - name: external
             namespace: gateway

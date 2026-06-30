@@ -15,8 +15,6 @@ spec:
   dnsNames:
     - "${CLUSTER_DOMAIN}"
     - "*.${CLUSTER_DOMAIN}"
-    - "*.s3.${CLUSTER_DOMAIN}"
-    - "*.web.${CLUSTER_DOMAIN}"
   issuerRef:
     kind: ClusterIssuer
     name: letsencrypt
