@@ -1,53 +1,69 @@
-<img src="https://camo.githubusercontent.com/5b298bf6b0596795602bd771c5bddbb963e83e0f/68747470733a2f2f692e696d6775722e636f6d2f7031527a586a512e706e67" align="left" width="144px" height="144px"/>
+# k8s-gitops
 
-#### Homelab K8s-Gitops
-> GitOps state for my cluster using flux v2
+Flux v2 GitOps state for a 3-node k0s homelab cluster. Push to `main` and Flux applies it — no CI/CD pipeline, no manual `kubectl apply`.
 
-[![Discord](https://img.shields.io/badge/discord-chat-7289DA.svg?maxAge=60&style=flat-square)](https://discord.gg/DNCynrJ)
-[![k3s](https://img.shields.io/badge/k3s-v1.21.0-orange?style=flat-square)](https://k3s.io/)
-[![GitHub issues](https://img.shields.io/github/issues/zacheryph/k8s-gitops?style=flat-square)](https://github.com/zacheryph/k8s-gitops/issues)
-[![GitHub last commit](https://img.shields.io/github/last-commit/zacheryph/k8s-gitops?color=purple&style=flat-square)](https://github.com/zacheryph/k8s-gitops/commits/master)
+## Architecture
 
-<br/>
+```
+bootstrap/          Flux bootstrapping + one Kustomization per layer
+├── flux-system/    Flux controllers + GitRepository pointing at this repo
+├── core.yaml       → core/
+├── platform.yaml   → platform/  (dependsOn: core)
+└── services-*.yaml → services/  (dependsOn: platform)
+```
 
-## Overview
+**Layers apply in order with explicit `dependsOn` chains:**
 
-## Secret Management
+1. **`core/`** — Cluster infrastructure: cert-manager, Longhorn (storage), MetalLB (load balancing), Kyverno (policy), k8tz, reloader, Crossplane, external-snapshotter, plus operators (CloudNativePG, Dragonfly, Grafana operator, Strimzi Kafka) and a read-only ServiceAccount for cluster introspection.
 
-All secret management is handled via SOPS and Flux variable expansion.
+2. **`platform/`** — Shared services: PostgreSQL 18 (CNPG), Kafka (Strimzi), Garage (S3-compatible object storage), Envoy Gateway + Gateway API, Prometheus/Grafana/Loki/Promtail monitoring stack, Pocket ID (OIDC), Velero (backup), ExternalDNS (AdGuard Home + Cloudflare), Crossplane providers.
 
-## Hardware
+3. **`services/<group>/`** — Application workloads, one Flux Kustomization per group:
+   - `automation/` — Home Assistant, Frigate NVR, Z-Wave JS, Hermes Agent, Signal CLI
+   - `development/` — Forgejo (self-hosted Git)
+   - `general/` — Vaultwarden, Actual Budget
+   - `immich/` — Immich photo management
+   - `media/` — Plex, Sonarr, Radarr, SABnzbd, ErsatzTV
 
-Cluster is 3 built 1u servers with the following hardware.
+All layers use `prune: false` — deleting a file from git does **not** delete the resource from the cluster. Clean up removed resources manually.
 
-* Inwin 1W-RF100S Chassis
-* ASRock Rack E3C246D2I
-* Intel Core i3-9100
-* 16GB Memory
-* 128GB M.2 2242 SSD (OS)
-* 2x 6TB HGST Ultrastar (longhorn)
+## Secrets
 
-## Cluster
+Managed with [SOPS](https://github.com/getsops/sops) (PGP encryption) and Flux variable substitution:
 
-Below is the layout of the cluster resource files and what
-is contained. they are listed in the order they get loaded.
+- **`config/secrets.yaml`** — SOPS-encrypted `cluster-secrets` Secret containing `${VARIABLES}` substituted at apply time (domain names, IPs, credentials, API keys).
+- **`platform/garage/s3-keys.yaml`** — SOPS-encrypted S3 credentials for Garage.
+- **`scripts/cluster-secrets`** — Helper for managing `cluster-secrets` keys without hand-editing SOPS.
+- **`scripts/garage-creds`** — Helper for managing Garage S3 credentials.
 
-* base - _"flux bootstrap"_
-  * flux-system - flux gitops controllers & configuration
-* crds - custom resource definitions
-* namespaces - self explainatory
-* operators - operators that handle/manage resources
-* core - underlying infrastructure services
-  * cert-manager - handles tls certificates
-  * hardware - node feature discovery
-  * kasten - k10 backup system
-  * metallb - bgp load balancers
-  * rook-ceph - PVC storage
-* apps
-  * dev - development tools
-  * home - home automation
-  * media - media management
-  * network - networking related tools
-  * services - general services
-  * system-ingress - ingress related resources
-  * system-monitor - grafana/prometheus/loki stack
+Manifests reference variables as literal `${CLUSTER_DOMAIN}`, `${LOAD_BALANCER_*}`, `${POSTGRES_ADDRESS}`, etc. Flux resolves them from `cluster-secrets` at apply time.
+
+## Conventions
+
+- **One file per app** — Everything for a workload lives in a single YAML file: PVC, HelmRelease, and any extras. Add it to the directory's `kustomization.yaml`.
+- **bjw-s `app-template` chart** — Most apps use the community [app-template](https://github.com/bjw-s/helm-charts) via `chartRef` to a shared `OCIRepository`. Follow an existing service file for the shape: `controllers` → `containers` → `service` → `route` → `persistence`.
+- **Gateway API for ingress** — `route:` blocks (or standalone HTTPRoutes) with Gateway API parents, not the legacy Ingress resource.
+- **Image tags pinned to digests** — [Renovate](https://docs.renovatebot.com/) manages version bumps via `.github/renovate.json5`. Don't hand-edit image versions.
+- **Conventional commits** — `feat(<area>): description` / `fix(<area>): description` / `chore(deps): description`.
+- **YAML language server comments** — Every file starts with `# yaml-language-server: $schema=...` for editor support.
+
+## Operations
+
+```sh
+# Validate a kustomize layer renders
+kubectl kustomize core/
+
+# Force Flux to reconcile immediately
+flux reconcile kustomization <name> --with-source
+
+# Debug stuck releases
+flux get kustomizations
+flux get helmreleases -A
+
+# Edit SOPS-encrypted secrets
+sops config/secrets.yaml
+```
+
+## Cluster Provisioning
+
+Node OS configuration lives in `config/ubuntu/` (sysctl, kernel modules) and is applied with `config/ubuntu/apply.sh`. Cluster provisioning uses k0sctl with `config/cluster.yaml`.
