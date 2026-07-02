@@ -1,0 +1,117 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+---
+# Alerts for etcd server-side health. Companion to the kubeEtcd
+# ServiceMonitor that the kube-prometheus-stack chart auto-renders
+# when `kubeEtcd.endpoints` is set (see prometheus-stack.yaml). The
+# chart's default rules include `KubeEtcdInsufficientMembers` and a
+# few others — they start firing once metrics exist. This file adds
+# alerts for the specific failure modes that motivated this whole
+# effort: the slow-disk / WAL fsync / leader-flapping class of
+# issues, and the etcd DB growth signal.
+#
+# All queries assume `job=~".*kube-etcd.*"` (or just `job="kube-etcd"`)
+# to scope to etcd server metrics specifically, not the apiserver's
+# client-side etcd metrics (which are under `job="apiserver"`).
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kube-etcd-alerts
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: kube-etcd
+    app.kubernetes.io/part-of: monitoring
+    app.kubernetes.io/component: alerts
+spec:
+  groups:
+    - name: kube-etcd.server
+      interval: 1m
+      rules:
+        # WAL fsync latency is the most direct signal of disk
+        # pressure on the etcd data dir. Sustained >50ms p99 means
+        # the disk is too slow to keep up with etcd's write rate —
+        # this is exactly the class of issue that produced the
+        # 14-day 5xx leak on k0s-inwin-01 (see
+        # monitors/kube-apiserver.yaml for context). At 50ms+, etcd
+        # starts to fall behind, leader elections can stall, and
+        # apiservers see lease PUT p50 climb.
+        - alert: KubeEtcdHighFsyncLatency
+          expr: |
+            histogram_quantile(0.99,
+              sum by (instance) (
+                rate(etcd_disk_wal_fsync_duration_seconds_bucket{job=~".*kube-etcd.*"}[5m])
+              )
+            ) > 0.05
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "etcd WAL fsync p99 > 50ms on {{ $labels.instance }}"
+            description: |
+              Sustained WAL fsync latency above 50ms indicates disk
+              pressure on the etcd data dir of {{ $labels.instance }}.
+              SSH to the node and check `iostat -xz 1 5` (no `-d <dev>`
+              filter — see the diagnostic for the apiserver-side
+              sibling alert for the iostat-vs-Prometheus discrepancy
+              pattern that comes up here too).
+
+        # Leadership changes in a healthy HA etcd cluster are
+        # rare. Even a single change in 15 minutes is a strong
+        # signal of instability — the leader step-down + new
+        # election window produces apiserver latency spikes and
+        # lease churn.
+        - alert: KubeEtcdLeaderChanges
+          expr: increase(etcd_server_leader_changes_seen_total{job=~".*kube-etcd.*"}[15m]) > 0
+          for: 0m
+          labels:
+            severity: warning
+          annotations:
+            summary: "etcd leadership changed on {{ $labels.instance }}"
+            description: |
+              etcd leadership changed at least once in the last 15
+              minutes on {{ $labels.instance }}. In a stable HA
+              cluster this should be near-zero (only on planned
+              maintenance). Investigate: check etcd logs, disk I/O
+              on all controllers, and network connectivity between
+              the controllers (peer port 2380). The same node often
+              shows the high fsync latency alert above concurrently.
+
+        # DB size growth: >100MB/h for 6h is a slow-leak signal.
+        # Common causes: a controller in a hot loop creating and
+        # deleting ConfigMaps/Secrets, a CRD with a finalizer leak,
+        # or a misbehaving GC. Single-shot growth of this magnitude
+        # is rare; if it happens, the right move is to find the
+        # diff in `apiserver_storage_objects` and audit the
+        # top-increasing resource kinds.
+        - alert: KubeEtcdGrowing
+          expr: |
+            increase(etcd_mvcc_db_total_size_in_bytes{job=~".*kube-etcd.*"}[1h]) > 100 * 1024 * 1024
+          for: 6h
+          labels:
+            severity: info
+          annotations:
+            summary: "etcd DB grew by >100MB in 1h on {{ $labels.instance }}"
+            description: |
+              etcd DB on {{ $labels.instance }} grew by more than
+              100MB in the last hour and the trend has held for 6h.
+              Investigate recent controller activity: scan for
+              ConfigMap/Secret churn via
+              `apiserver_storage_objects{resource=~"configmaps|secrets"}`.
+
+        # The chart's defaults already cover "no leader" via
+        # KubeEtcdNoLeader, but a 0/3 quorum check is a useful
+        # explicit alert when the SM is fresh and the chart rules
+        # aren't yet reconciled.
+        - alert: KubeEtcdInsufficientMembers
+          expr: |
+            sum(up{job=~".*kube-etcd.*"} == 1) < 2
+          for: 3m
+          labels:
+            severity: critical
+          annotations:
+            summary: "etcd has fewer than 2 members up"
+            description: |
+              Only {{ $value }} etcd member(s) are reporting
+              metrics. With <2 members the cluster cannot achieve
+              quorum and all writes will fail. Check the etcd
+              listeners on the down nodes and the network path
+              between controllers.

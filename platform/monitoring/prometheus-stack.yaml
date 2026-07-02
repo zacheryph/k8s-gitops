@@ -84,6 +84,16 @@ spec:
         podMonitorSelectorNilUsesHelmValues: false
         probeSelectorNilUsesHelmValues: false
         scrapeConfigSelectorNilUsesHelmValues: false
+        # Mount the k0s etcd client credentials Secret (CA + cert
+        # + key, from k0s-etcd-client-secret.yaml) into the prometheus
+        # pod so the chart's kubeEtcd ServiceMonitor (configured
+        # above with `caFile:`/`certFile:`/`keyFile:`) can use them
+        # for the mTLS handshake to the etcd peer port (2380). The
+        # mount path is /etc/prometheus/secrets/kube-etcd-client/.
+        additionalSecretMounts:
+          - name: kube-etcd-client
+            mountPath: /etc/prometheus/secrets/kube-etcd-client
+            readOnly: true
         storageSpec:
           volumeClaimTemplate:
             metadata:
@@ -104,8 +114,51 @@ spec:
       enabled: true
     kubeDns:
       enabled: false
+    # kubeEtcd: in k0s, etcd is part of the k0s controller process,
+    # not a Pod, so the chart's pod-selector Service has 0 endpoints
+    # by default. We use the chart's chart-native `endpoints` mechanism
+    # (a value that's been supported for exactly this "etcd not a pod"
+    # case since v23+): pass a list of controller IPs and the chart
+    # renders a headless Service + matching Endpoints + ServiceMonitor
+    # in kube-system, with TLS config driven by the values below.
+    #
+    # Port note (k0s-specific): k0s binds the etcd client listener
+    # (2379) to 127.0.0.1 only by default, which is unreachable from
+    # pod CIDR. The peer listener (2380) IS reachable from pods, and
+    # etcd serves /metrics on the peer port when the client port is
+    # loopback-only. The peer port requires mutual TLS — the client
+    # must present a cert signed by the etcd CA. We scrape 2380
+    # with the cert+key+CA from the kube-etcd-client Secret
+    # (see k0s-etcd-client-secret.yaml) mounted into the prometheus
+    # pod via the `additionalSecretMounts` on prometheusSpec below.
+    #
+    # Pre-requisite check: confirm from inside the cluster that
+    # 2380 is open and 2379 is refused. The `insecureSkipVerify`
+    # below is set true because k0s's etcd peer cert SAN list also
+    # doesn't include the controller node IPs — subject pin is
+    # unsafe across cert rotations.
     kubeEtcd:
       enabled: true
+      # k0s controller InternalIPs. If the cluster ever adds/replaces
+      # a controller, update this list and the `apiServerAddresses`
+      # in the k0s controller config.
+      endpoints:
+        - 10.72.13.11  # k0s-inwin-01
+        - 10.72.13.12  # k0s-inwin-02
+        - 10.72.13.13  # k0s-inwin-03
+      # Peer port (2380) — see "Port note" above.
+      service:
+        port: 2380
+        targetPort: 2380
+      serviceMonitor:
+        scheme: https
+        insecureSkipVerify: true  # see comment above re k0s cert SANs
+        caFile: /etc/prometheus/secrets/kube-etcd-client/ca.crt
+        certFile: /etc/prometheus/secrets/kube-etcd-client/etcd-client.crt
+        keyFile: /etc/prometheus/secrets/kube-etcd-client/etcd-client.key
+        # port name must match what the chart's auto-rendered Service
+        # port is named (it uses this same value as the port name).
+        port: https
     kubeProxy:
       enabled: true
     kubeStateMetrics:
