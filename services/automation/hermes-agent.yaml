@@ -105,8 +105,6 @@ spec:
       SLACK_APP_TOKEN: ${HERMES_SLACK_APP_TOKEN}
       API_SERVER_KEY: ${HERMES_API_SERVER_KEY}
       WEBHOOK_SECRET: ${HERMES_WEBHOOK_SECRET}
-      #SIGNAL_HTTP_URL: http://signal-cli-rest-api:8080
-      #SIGNAL_ACCOUNT: ${HERMES_SIGNAL_ACCOUNT}
 
     persistence:
       enabled: true
@@ -254,7 +252,7 @@ spec:
             if [ ! -x /opt/obsidian-headless/bin/ob ]; then
               mkdir -p /opt/obsidian-headless
               npm install --prefix /opt/obsidian-headless --global \
-                "obsidian-headless@${OBSIDIAN_HEADLESS_VERSION}"
+                "obsidian-headless"
             fi
             # Bind the local vault path to the remote Obsidian vault.
             # `ob sync-setup` is idempotent — re-running with the same args
@@ -323,7 +321,7 @@ spec:
             if [ ! -x /opt/obsidian-headless/bin/ob ]; then
               mkdir -p /opt/obsidian-headless
               npm install --prefix /opt/obsidian-headless --global \
-                "obsidian-headless@${OBSIDIAN_HEADLESS_VERSION}"
+                "obsidian-headless"
             fi
             # Supervisor loop — restart on any non-zero exit. k8s
             # restartPolicy handles pod-level restarts; this handles
