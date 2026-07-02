@@ -1,4 +1,12 @@
 ---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: obsidian-auth-token
+type: Opaque
+stringData:
+  auth_token: ${HERMES_OBSIDIAN_AUTH_TOKEN}
+---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/gitrepository_v1.json
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: GitRepository
@@ -187,7 +195,7 @@ spec:
           port: api-server
         initialDelaySeconds: 10
         periodSeconds: 5
-        failureThreshold: 30   # up to 150s for cold start
+        failureThreshold: 30 # up to 150s for cold start
       liveness:
         httpGet:
           path: /health
