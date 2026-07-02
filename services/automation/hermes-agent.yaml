@@ -97,6 +97,7 @@ spec:
       SLACK_ALLOWED_USERS: ${HERMES_SLACK_ALLOWED_USERS}
       SIGNAL_ALLOWED_USERS: ${HERMES_SIGNAL_ALLOWED_USERS}
       HERMES_YOLO_MODE: "1"
+      HERMES_WRITE_SAFE_ROOT: /opt/data:/tmp
 
     # Secrets rendered into a Kubernetes Secret by the chart
     secrets:
