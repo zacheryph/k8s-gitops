@@ -258,7 +258,7 @@ spec:
             # `ob sync-setup` is idempotent — re-running with the same args
             # is a no-op, so the || true keeps this resilient.
             /opt/obsidian-headless/bin/ob sync-setup \
-              --vault "${HERMES_OBSIDIAN_VAULT_NAME}" \
+              --vault "$${HERMES_OBSIDIAN_VAULT_NAME}" \
               --path /opt/data/Obsidian \
               --device-name hermes-server \
               || true
@@ -332,7 +332,7 @@ spec:
               /opt/obsidian-headless/bin/ob sync \
                 --path /opt/data/Obsidian --continuous \
                 2>&1 | tee -a /var/lib/obsidian/sync.log
-              echo "[$(date -Iseconds)] ob sync exited rc=${PIPESTATUS[0]}, restarting in 5s" \
+              echo "[$(date -Iseconds)] ob sync exited rc=$${PIPESTATUS[0]}, restarting in 5s" \
                 | tee -a /var/lib/obsidian/sync.log
               sleep 5
             done
