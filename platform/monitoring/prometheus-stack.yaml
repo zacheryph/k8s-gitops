@@ -104,6 +104,10 @@ spec:
         podMonitorSelectorNilUsesHelmValues: false
         probeSelectorNilUsesHelmValues: false
         scrapeConfigSelectorNilUsesHelmValues: false
+        # Cap TSDB size so Prometheus self-manages retention; the PVC is
+        # sized with ~15% headroom above this to absorb WAL overhead and
+        # compaction spikes without hitting ENOSPC.
+        retentionSize: 55Gi
         storageSpec:
           volumeClaimTemplate:
             metadata:
@@ -117,7 +121,7 @@ spec:
               accessModes: ["ReadWriteOnce"]
               resources:
                 requests:
-                  storage: 16Gi
+                  storage: 64Gi
 
     # monitoring sources
     coreDns:
