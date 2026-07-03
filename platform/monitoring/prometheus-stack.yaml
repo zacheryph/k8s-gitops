@@ -107,7 +107,7 @@ spec:
         # Cap TSDB size so Prometheus self-manages retention; the PVC is
         # sized with ~15% headroom above this to absorb WAL overhead and
         # compaction spikes without hitting ENOSPC.
-        retentionSize: 55Gi
+        retentionSize: 55GiB
         storageSpec:
           volumeClaimTemplate:
             metadata:
