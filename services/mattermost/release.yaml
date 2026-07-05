@@ -41,16 +41,25 @@ spec:
     persistence:
       data:
         enabled: true
-        size: 10Gi
+        size: 16Gi
         accessMode: ReadWriteOnce
       plugins:
         enabled: true
-        size: 1Gi
+        size: 2Gi
         accessMode: ReadWriteOnce
 
     config:
       MM_SERVICESETTINGS_SITEURL: https://chat.${CLUSTER_DOMAIN}
       MM_PLUGINSETTINGS_CLIENTDIRECTORY: "./client/plugins"
+
+    containerSecurityContext:
+      allowPrivilegeEscalation: false
+      capabilities:
+        drop: [ALL]
+      readOnlyRootFilesystem: false
+      runAsNonRoot: true
+      seccompProfile:
+        type: RuntimeDefault
 
     resources:
       requests:
