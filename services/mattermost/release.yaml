@@ -30,7 +30,7 @@ spec:
       enabled: true
       externalDriverType: postgres
       externalConnectionString: >-
-        postgres://mattermost:${MATTERMOST_DB_PASSWORD}@${POSTGRES_ADDRESS}/mattermost?sslmode=disable&connect_timeout=10
+        mattermost:${MATTERMOST_DB_PASSWORD}@${POSTGRES_ADDRESS}/mattermost?sslmode=disable&connect_timeout=10
 
     service:
       type: ClusterIP
@@ -54,6 +54,9 @@ spec:
       MM_SERVICESETTINGS_SITEURL: https://chat.${CLUSTER_DOMAIN}
       MM_PLUGINSETTINGS_CLIENTDIRECTORY: "./client/plugins"
 
+    deploymentStrategy:
+      type: Recreate
+
     securityContext:
       fsGroup: 2000
       fsGroupChangePolicy: OnRootMismatch
@@ -64,7 +67,7 @@ spec:
       allowPrivilegeEscalation: false
       capabilities:
         drop: [ALL]
-      readOnlyRootFilesystem: false
+      readOnlyRootFilesystem: true
       runAsNonRoot: true
       seccompProfile:
         type: RuntimeDefault
