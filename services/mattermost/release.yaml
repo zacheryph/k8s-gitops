@@ -15,11 +15,13 @@ metadata:
   name: mattermost
 spec:
   interval: 1h
-  chartRef:
-    kind: HelmRepository
-    name: mattermost
-    chart: mattermost-team-edition
-    version: 6.6.102
+  chart:
+    spec:
+      chart: mattermost-team-edition
+      version: 6.6.102
+      sourceRef:
+        kind: HelmRepository
+        name: mattermost
   values:
     mysql:
       enabled: false
