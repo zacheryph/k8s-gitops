@@ -67,7 +67,7 @@ spec:
       allowPrivilegeEscalation: false
       capabilities:
         drop: [ALL]
-      readOnlyRootFilesystem: true
+      readOnlyRootFilesystem: false
       runAsNonRoot: true
       seccompProfile:
         type: RuntimeDefault
