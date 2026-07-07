@@ -117,7 +117,7 @@ spec:
       # pinned vX.Y.Z release once a release > v1.14.2 ships the fix.
       # Renovate ignores this floating tag — bump the digest by hand.
       - name: velero-plugin-for-aws
-        image: velero/velero-plugin-for-aws:main@sha256:a77f07a0ad6974d802653d4d1f3ed67db46f59649f29a6b5d29328624010c6a5
+        image: velero/velero-plugin-for-aws:main@sha256:11656c4114e6d84a2caab6639d70b33607107cb03daff87aecb13cb2829069a3
         imagePullPolicy: IfNotPresent
         volumeMounts:
           - name: plugins
