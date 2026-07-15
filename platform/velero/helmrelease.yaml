@@ -123,14 +123,47 @@ spec:
           - name: plugins
             mountPath: /target
 
-    # Backup schedules (managed by the chart)
+    # Backup schedules (managed by the chart).
+    #
+    # Two daily schedules + one weekly:
+    #   daily-infra — stateless infrastructure (manifests only)
+    #   daily       — everything non-system, with CSI snapshots → B2
+    #   weekly      — everything non-system, 90d retention, no snapshots
+    #
+    # New namespaces are auto-included in daily/weekly via wildcard + exclusions.
+    # The only list to maintain is daily-infra (10 namespaces, changes rarely).
     schedules:
-      # Daily cluster-wide backup at 01:00 — resource manifests only, no volume
-      # snapshots. This is the broad "I deleted a resource" safety net; keeping
-      # it metadata-only avoids snapshotting every PVC in the cluster daily.
-      daily-cluster:
+      # Infrastructure namespaces — cluster-level services that are Flux-managed
+      # and stateless. Resource manifests only; no PVC data worth snapshotting.
+      daily-infra:
         disabled: false
         schedule: "0 1 * * *"
+        useOwnerReferencesInBackup: true
+        template:
+          ttl: 720h0m0s           # 30 days
+          includedNamespaces:
+            - cert-manager
+            - crossplane
+            - dns
+            - gateway
+            - hardware-system
+            - k0s-autopilot
+            - kyverno
+            - metallb-system
+            - operators-system
+            - security
+          snapshotVolumes: false
+          defaultVolumesToFsBackup: false
+          metadata:
+            labels:
+              backup-tier: daily-infra
+      # Everything non-system, with CSI snapshots + data movement to B2.
+      # New namespaces are auto-included via wildcard — nothing to update.
+      # The velero-volume-policy ConfigMap skips NFS-backed volumes (media-pool,
+      # photos-pool) so only Longhorn CSI PVCs get snapshotted.
+      daily:
+        disabled: false
+        schedule: "0 0 * * *"
         useOwnerReferencesInBackup: true
         template:
           ttl: 720h0m0s           # 30 days
@@ -143,26 +176,6 @@ spec:
             - flux-system
             - velero
             - longhorn-system
-          snapshotVolumes: false
-          defaultVolumesToFsBackup: false
-          metadata:
-            labels:
-              backup-tier: daily
-      # Daily critical-namespaces backup at 00:00 — narrow scope for fast targeted
-      # restore. This one DOES snapshot volumes (Longhorn CSI), but the
-      # velero-volume-policy resourcePolicy skips NFS-backed media volumes
-      # (media-pool, photos-pool) so only app/DB data is captured.
-      daily-critical:
-        disabled: false
-        schedule: "0 0 * * *"
-        useOwnerReferencesInBackup: true
-        template:
-          ttl: 720h0m0s
-          includedNamespaces:
-            - immich
-            - minio
-            - home-assistant
-            - forgejo
           snapshotVolumes: true
           defaultVolumesToFsBackup: false
           # Take a CSI (Longhorn) snapshot, then move the data off-cluster to
@@ -175,10 +188,10 @@ spec:
             name: velero-volume-policy
           metadata:
             labels:
-              backup-tier: daily-critical
-      # Weekly full backup on Sunday 03:00, kept 90 days — resource manifests
-      # only (same rationale as daily-cluster).
-      weekly-full:
+              backup-tier: daily
+      # Weekly catch-all for extended retention — same scope as daily, no
+      # snapshots, kept 90 days.
+      weekly:
         disabled: false
         schedule: "0 3 * * 0"
         useOwnerReferencesInBackup: true
