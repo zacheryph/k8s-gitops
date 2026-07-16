@@ -9,5 +9,6 @@ resources:
   - helmrelease.yaml
   - volumesnapshotclass.yaml
   - volume-policy.yaml
+  - data-mover-config.yaml
   - dashboard.yaml
   - ui.yaml

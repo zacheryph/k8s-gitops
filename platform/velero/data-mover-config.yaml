@@ -1,0 +1,33 @@
+# Node selection config for the Velero CSI data mover.
+#
+# Without this, data mover pods are scheduled to random nodes.  With
+# Longhorn, the restored PVC's volume may already be attached to a
+# specific node (the node where the Longhorn replica/engine landed),
+# so a data mover pod on a DIFFERENT node fails with:
+#
+#   AttachVolume.Attach failed: volume … is not ready for workloads
+#
+# The loadAffinity ConfigMap constrains data mover pod scheduling.
+# Specifying the Longhorn storageClass ties the scheduling decision
+# to the StorageClass's topology (WaitForFirstConsumer), so the data
+# mover pod lands on the same node Longhorn expects.
+#
+# Ref: https://velero.io/docs/main/data-movement-node-selection/
+# Ref: https://github.com/velero-io/velero/issues/9343
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: velero-data-mover-config
+  namespace: velero
+data:
+  loadAffinity: |
+    [
+      {
+        "storageClass": [
+          {
+            "name": "longhorn"
+          }
+        ]
+      }
+    ]
