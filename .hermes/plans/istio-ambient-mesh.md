@@ -730,3 +730,242 @@ If ambient mode conflicts with existing components:
 - cni chart values: https://github.com/istio/istio/blob/1.30.2/manifests/charts/istio-cni/values.yaml
 - Sibling task: Cilium + Hubble (t_e6b0051f) — currently blocked
 - Parent task: Istio ambient mode PR (t_1b5073c4)
+
+---
+
+## Validation Results
+
+> Validation performed by review task `t_f1daa97e` against implementation branch
+> `wt/t_df8d8142` (PR #3438, commits 33c04139 + a69075ab). No cluster deployment
+> was performed — this is a manifest-level compatibility review, per task scope.
+
+### 1. Implementation Correctness — PASS
+
+**HelmRelease chart references — PASS.** All four HelmReleases reference
+chart `version: "1.30.2"` from a single `HelmRepository` named `istio`
+(`core/istio/helm-repository.yaml`) pointing at
+`https://istio-release.storage.googleapis.com/charts`. Verified against the
+live Helm repo index (`/tmp/istio-index.yaml`, HTTP 200, 634 KB): all four
+charts — `base`, `istiod`, `cni`, `ztunnel` — exist as separate entries at
+version `1.30.2` with `appVersion: 1.30.2`. The chart names in the
+HelmReleases (`base`, `istiod`, `cni`, `ztunnel`) exactly match the index
+entry names. No OCI artifacts are used (the plan's Open Question #1 resolved
+this — OCI tags were not semver; HelmRepository is the correct source).
+
+**Chart dependency ordering — PASS.** The `dependsOn` chain is correct and
+matches the documented prerequisite graph:
+`istio-base` → `istiod` (dependsOn istio-base) → `istio-cni` (dependsOn
+istiod) → `ztunnel` (dependsOn istio-cni). All `dependsOn` reference
+`namespace: istio-system`, matching the HelmRelease namespaces.
+
+**ztunnel DaemonSet tolerations — PASS (defaults are correct).** The task
+asked to verify "ztunnel tolerations match all 3 nodes." The implementation
+does NOT set explicit `tolerations` in `ztunnel.yaml` values — this is
+correct, because the ztunnel chart's `_internal_defaults` ship tolerations
+that tolerate **all taints**:
+
+```yaml
+# ztunnel chart default tolerations (from _internal_defaults)
+tolerations:
+  - effect: NoSchedule
+    operator: Exists
+  - key: CriticalAddonsOnly
+    operator: Exists
+  - effect: NoExecute
+    operator: Exists
+```
+
+The `operator: Exists` with `effect: NoSchedule`/`NoExecute` matches any
+taint key. The 3 k0s nodes are `control-plane` (controller+worker, no
+taints per the plan's cluster probe), so ztunnel will schedule on all 3
+nodes regardless. The `istio-cni` chart has identical default tolerations.
+**No toleration override needed.** (Confirmed by inspecting the chart
+templates: `daemonset.yaml` renders tolerations via
+`{{- with .Values.tolerations }}` and the default values populate that key.)
+
+**Namespace labels — PASS.** `core/istio/namespace-labels.yaml` is a Kyverno
+`ClusterPolicy` (`istio-ambient-namespace-labels`) with `background: true`
+and `generateExisting: true` that mutates namespaces `automation`, `media`,
+`development` to add `istio.io/dataplane-mode: ambient`. This is the
+GitOps-native approach described in plan Task 8 (alternative). The policy
+matches on `kind: Namespace` with explicit `names:` list — no risk of
+labeling unintended namespaces. Verified no existing manifests carry
+`istio.io/dataplane-mode` or `istio.io/rev` labels (grep returned nothing
+outside `core/istio/`), so no label conflicts.
+
+**istiod `taint.enabled: false` — PASS (correct, minor comment imprecision).**
+The implementation sets `taint.enabled: false` with a comment about k0s
+nodes being control-plane. The actual purpose of `taint.enabled` is the
+istiod "untaint controller" (`PILOT_ENABLE_NODE_UNTAINT_CONTROLLERS`) which
+removes a node taint once istio-cni is ready — it is NOT about tolerating
+control-plane taints. Setting it `false` is correct because we are not using
+Istio's node-tainting workflow. The setting value is right; the comment's
+reasoning is slightly off but does not affect behavior.
+
+**YAML validity — PASS.** All 8 files in `core/istio/` parse cleanly
+(PyYAML `safe_load_all`, 0 errors, 8 documents). `kustomization.yaml`
+references 7 resource files, all present on disk. `core/istio` is listed in
+`core/kustomization.yaml` resources (line 15), so Flux's `core` Kustomization
+will pick it up.
+
+### 2. Component Compatibility
+
+| Component | Status | Notes |
+|-----------|--------|-------|
+| Cilium (future) | **PASS** | No eBPF conflict — see below |
+| Envoy Gateway | **PASS** | No port conflict, no GatewayClass collision |
+| cert-manager | **PASS** | DNS-01 via Cloudflare, mesh-safe |
+| ExternalDNS | **PASS** | Cluster-level service, unmeshed `dns` namespace |
+| monitoring (Prometheus) | **PASS** | `monitoring` namespace unmeshed; ztunnel metrics scrapeable |
+| HTTPRoutes | **PASS** | All routes target Envoy Gateway, not intercepted by Istio |
+
+**Cilium eBPF interaction — PASS (no conflict).** The task asked to document
+the ztunnel eBPF vs Cilium eBPF interaction. **Finding: ztunnel does NOT
+use eBPF.** Ambient mode traffic redirection uses (1) a chained CNI plugin
+for pod detection and (2) iptables/nftables rules **inside the pod's network
+namespace** for traffic capture — not node-level eBPF programs. Cilium's eBPF
+programs operate at the host/node level (kube-proxy replacement, L4 LB,
+NetworkPolicy, service routing). The two operate at different network layers
+and are designed to coexist (Istio docs state the in-pod redirection model
+"enables ambient mode to work alongside any Kubernetes CNI plugin").
+
+Additionally, Cilium itself documents and supports chained CNI plugins for
+Istio ambient coexistence. The `istio-cni` `chained: true` setting appends to
+the primary CNI config file (whether kube-router's or Cilium's
+`05-cilium.conflist`) rather than replacing it. **No Cilium manifests exist
+in `main` today** (the Cilium migration task `t_e6b0051f` is blocked), so
+ambient will deploy against kube-router now and remain compatible with a
+future Cilium migration.
+
+**Envoy Gateway port conflicts — PASS (no conflict).** Verified ztunnel's
+actual port usage by inspecting the chart's `daemonset.yaml` and
+`networkpolicy.yaml` templates:
+- ztunnel declares only `containerPort: 15020` (metrics) and `15021` (health
+  readiness) on the pod. These are container ports, not host ports.
+- Ports `15008` (HBONE), `15006` (inbound), `15001` (outbound) are
+  **pod-netns-level listening sockets** created by ztunnel *inside each
+  meshed pod's network namespace* (the "inpod" redirection model) — they are
+  NOT host-level ports and cannot conflict with Envoy Gateway.
+- Envoy Gateway's data plane (EnvoyProxy) listens on the `external` Gateway's
+  listeners (`:80` HTTP, `:443` HTTPS) exposed via a LoadBalancer Service.
+  No overlap with any ztunnel port.
+
+**Envoy Gateway GatewayClass — PASS (no collision).** Envoy Gateway uses
+`GatewayClass: envoy` (controller `gateway.envoyproxy.io/gatewayclass-controller`).
+The implementation does **not** install the `istio/gateway` chart, so Istio's
+Gateway API controller (`GatewayClass: istio`, controller
+`istio.io/gateway-controller`) is never deployed. No GatewayClass collision.
+ztunnel is Rust (not Envoy); waypoints (Envoy) are separate pods in meshed
+namespaces, not shared with Envoy Gateway's data plane.
+
+**cert-manager — PASS (DNS-01 is mesh-safe).** Both `ClusterIssuer`s
+(`letsencrypt` prod + `letsencrypt-staging` in `core/resources/cert-manager.yaml`)
+use `dns01.cloudflare.apiTokenSecretRef`. DNS-01 challenges are resolved via
+the Cloudflare API (out-of-band TXT records), not inbound HTTP traffic.
+Ambient mesh redirection only affects pod-to-pod traffic in meshed
+namespaces; cert-manager runs in the unmeshed `cert-manager` namespace and
+makes only outbound DNS API calls. **HTTP-01 would break under mesh** (the
+solver pod receives inbound HTTP) — but this cluster does not use HTTP-01. No
+cert-manager changes needed.
+
+**ExternalDNS — PASS.** ExternalDNS (cloudflare + adguard) runs in the
+unmeshed `dns` namespace and watches Kubernetes `Service`/`Ingress`/
+`gateway-httproute` resources via the API server. It makes only outbound
+Cloudflare/AdGuard API calls. No pod-to-pod mesh traffic involved.
+Unaffected.
+
+**monitoring (Prometheus/Grafana) — PASS.** The `monitoring` namespace is
+**not** in the Phase 1 mesh opt-in list (`automation`, `media`,
+`development`), so Prometheus itself is unmeshed. Prometheus discovers scrape
+targets via `ServiceMonitor`/`PodMonitor` resources (kube-prometheus-stack
+sets `serviceMonitorSelectorNilUsesHelmValues: false`, selecting all
+ServiceMonitors). The built-in ServiceMonitors target cluster-system
+components (coredns, kube-apiserver, kubelet, node-exporter) in unmeshed
+namespaces.
+- ztunnel metrics: the implementation adds `prometheus.io/scrape: "true"` +
+  `prometheus.io/port: "15020"` annotations to the ztunnel pods. ztunnel is
+  in the unmeshed `istio-system` namespace, so Prometheus scrapes it directly
+  via pod IP:15020 without traversing the mesh. (Note: kube-prometheus-stack
+  does not enable annotation-based scraping by default, so the annotation
+  alone may not be sufficient — a dedicated ServiceMonitor for ztunnel would
+  be needed for actual collection. This is a monitoring-coverage gap, not a
+  conflict.)
+- Prometheus scraping of meshed app pods: in Phase 1, Prometheus scrapes app
+  pods in `automation`/`media`/`development` only if ServiceMonitors exist for
+  them. Only `flux-system` PodMonitor and `monitoring`-scoped monitors were
+  found — no ServiceMonitors targeting the meshed app namespaces. So no
+  scrape-through-ztunnel concern in Phase 1. If ServiceMonitors are added
+  later for meshed apps, ztunnel accepts plaintext inbound, so scrapes will
+  still succeed (though without a peer mTLS identity).
+
+**HTTPRoutes — PASS (not intercepted by Istio).** All 11 HTTPRoutes in the
+meshed namespaces (`automation`: frigate, hermes-agent x2, home-assistant,
+zwave-js; `media`: plex, radarr, sabnzbd, sonarr, sonarr-anime; `development`:
+forgejo) reference `parentRefs: [{name: external, namespace: gateway}]` —
+Envoy Gateway's `external` Gateway. Ambient mesh does not intercept
+HTTPRoutes that route through an external gateway; it only intercepts
+pod-to-pod east-west traffic between meshed workloads. Ingress traffic
+(external → Envoy Gateway → pod) arrives as plaintext at the pod and is
+accepted by ztunnel in PERMISSIVE mode. No route changes needed; no
+`istio.io/rev` annotations required on HTTPRoutes.
+
+### 3. Resource Overhead Estimates
+
+Based on the implementation's resource requests (reduced from chart defaults)
+and Istio's documented ambient-mode sizing:
+
+| Component | Per-unit request | Units | Cluster total | Notes |
+|-----------|------------------|-------|---------------|-------|
+| **ztunnel** | 200m CPU / 256Mi mem | 3 (DaemonSet, 1/node) | **600m CPU / 768Mi mem** | Reduced from default 512Mi; a 3-node / ~60-pod cluster will use far less than the 200k-pod ceiling the defaults target. Actual usage likely <100Mi/node. |
+| **istiod** | 250m CPU / 1024Mi mem | 1 (Deployment, HPA 1-2) | **250m CPU / 1024Mi mem** (baseline) | Reduced from default 500m/2048Mi. HPA scales to 2 replicas under load (500m/2048Mi peak). |
+| **istio-cni** | 100m CPU / 100Mi mem | 3 (DaemonSet, 1/node) | **300m CPU / 300Mi mem** | Node agent; lightweight. |
+| **istio-base** | — (CRDs only) | — | 0 runtime | No pods; just CRDs + cluster roles. |
+| **Phase 1 total** | — | — | **~1.15 CPU / ~2.07 GiB mem** | Across all 3 nodes. |
+
+**Waypoint proxy overhead — N/A in Phase 1.** Phase 1 uses NO waypoints
+(L4 mTLS only). If Phase 2 adds waypoints for L7 namespaces, each waypoint is
+an Envoy deployment (~100m CPU / 128Mi mem per replica, 1-2 replicas per
+namespace). Not incurred now.
+
+**Risk assessment:** The ~1.15 CPU / 2 GiB total overhead is modest for a
+3-node cluster. The main concern is ztunnel's per-node footprint on
+control-plane+worker nodes that also run workload — but at ~60 pods the
+actual ztunnel memory will be well under the 256Mi request. Monitor node
+resource usage post-deploy (plan Risk R5).
+
+### 4. Conflicts Found
+
+**None.** No component in the existing stack shows a conflict with the Istio
+ambient implementation. Every component is either unmeshed (cert-manager,
+ExternalDNS, monitoring, gateway, all system namespaces) or compatible by
+design (Envoy Gateway uses a different GatewayClass; HTTPRoutes target Envoy
+Gateway; Cilium operates at a different network layer).
+
+**Minor non-blocking observations (not conflicts):**
+1. **ztunnel metrics scraping gap:** The `prometheus.io/scrape` annotation on
+   ztunnel pods may not be picked up by kube-prometheus-stack (which uses
+   ServiceMonitors, not annotation-based discovery). For actual metrics
+   collection, a `ServiceMonitor` for ztunnel should be added in a
+   follow-up. This does not block the PR — it only means ztunnel metrics
+   won't appear in Grafana until a ServiceMonitor is added.
+2. **k0s CNI overwrite risk (plan R1):** k0s manages the CNI config. If k0s
+   regenerates `/etc/cni/net.d/`, the istio-cni chained plugin entry may be
+   lost. The istio-cni agent has a reconciliation loop that re-inserts itself,
+   but this should be verified during post-merge cluster validation (plan
+   Task 9, deferred to someone with cluster write access).
+3. **`prune: false` means manual cleanup:** Per repo conventions, removing
+   the Istio manifests from git will NOT remove them from the cluster. The
+   rollback plan (section 6) documents manual `kubectl delete` steps.
+
+### 5. Recommendation
+
+**The PR is safe to proceed toward merge as a draft/experimental change.**
+All existing-stack components pass compatibility review with no conflicts.
+The implementation is correctly structured: valid chart versions, correct
+dependency ordering, proper tolerations (chart defaults), proper namespace
+labeling via Kyverno, and accurate separation from Envoy Gateway.
+
+The remaining validation (plan Task 9 — Flux reconciliation, pod health,
+mTLS verification) requires cluster write access and is correctly deferred.
+This review confirms there are no manifest-level blockers to proceeding with
+that live validation.
