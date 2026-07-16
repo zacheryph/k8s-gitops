@@ -46,6 +46,13 @@ spec:
       # "unexpected directory structure for host-pods volume".
       podVolumePath: /var/lib/k0s/kubelet/pods
       pluginVolumePath: /var/lib/k0s/kubelet/plugins
+      # Tell the node-agent about the data-mover-config ConfigMap so the CSI
+      # data mover respects Longhorn's WaitForFirstConsumer topology when
+      # scheduling backup/restore pods.  Without this the data mover pod may
+      # land on a node where the Longhorn volume isn't attached.
+      # Ref: https://velero.io/docs/main/data-movement-node-selection/
+      extraArgs:
+        - --node-agent-configmap=velero-data-mover-config
       resources:
         requests:
           cpu: 50m
