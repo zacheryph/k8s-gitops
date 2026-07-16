@@ -735,9 +735,11 @@ If ambient mode conflicts with existing components:
 
 ## Validation Results
 
-> Validation performed by review task `t_f1daa97e` against implementation branch
-> `wt/t_df8d8142` (PR #3438, commits 33c04139 + a69075ab). No cluster deployment
-> was performed — this is a manifest-level compatibility review, per task scope.
+> **FINAL** — Validation performed by review task `t_f1daa97e` against the
+> implementation (commits 33c04139 + a69075ab). No cluster deployment was
+> performed — this is a manifest-level compatibility review, per task scope.
+> Results have been consolidated onto branch `feature/istio-ambient-mesh` and
+> submitted as draft PR #3441 against `main`.
 
 ### 1. Implementation Correctness — PASS
 
@@ -969,3 +971,32 @@ The remaining validation (plan Task 9 — Flux reconciliation, pod health,
 mTLS verification) requires cluster write access and is correctly deferred.
 This review confirms there are no manifest-level blockers to proceeding with
 that live validation.
+
+
+---
+
+## Draft PR Status
+
+- **Branch:** `feature/istio-ambient-mesh`
+- **PR:** #3441 — https://github.com/zacheryph/k8s-gitops/pull/3441
+- **Target:** `main` (draft — exploratory, not for merging)
+- **Depends on (soft):** Cilium migration PRs #3437, #3439, #3440 (t_e6b0051f).
+  Ambient mode is CNI-agnostic and works with kube-router today; the Cilium
+  PRs are referenced as the planned future CNI but are **not a hard
+  dependency** — ambient deploys cleanly against the current stack.
+
+### Next steps to move from draft to merge-ready
+
+1. **Live cluster validation (plan Task 9)** — requires cluster write access:
+   `flux reconcile kustomization core --with-source`, verify istio pods /
+   ztunnel DaemonSet / namespace labels, confirm mTLS via `istioctl x zkc`.
+2. **Add a ztunnel ServiceMonitor** — the `prometheus.io/scrape` annotation
+   alone is not picked up by kube-prometheus-stack (uses ServiceMonitors, not
+   annotation discovery). A dedicated ServiceMonitor in `core/istio/` is
+   needed for ztunnel metrics to appear in Grafana.
+3. **Switch mTLS to STRICT** after live validation confirms PERMISSIVE mode
+   works without breaking meshed workloads (plan decision).
+4. **Verify k0s CNI reconciliation** — confirm istio-cni re-inserts itself
+   if k0s regenerates `/etc/cni/net.d/` (plan risk R1).
+5. **Rebase onto `main`** after the Cilium migration PRs merge (if they land
+   first), then re-run manifest validation against the new CNI stack.
