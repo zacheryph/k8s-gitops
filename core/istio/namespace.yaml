@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/namespace.json
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: istio-system
+  labels:
+    # istio-cni and ztunnel DaemonSets require privileged PSA
+    # (NET_ADMIN capability + hostPath mounts for /opt/cni/bin, /etc/cni/net.d).
+    # Matches the pattern used by metallb-system and velero namespaces.
+    pod-security.kubernetes.io/enforce: privileged
+    pod-security.kubernetes.io/audit: privileged
+    pod-security.kubernetes.io/warn: privileged
