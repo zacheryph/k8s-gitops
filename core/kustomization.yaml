@@ -8,10 +8,12 @@ resources:
 - operators
 - repositories
 - cert-manager.yaml
+- cilium.yaml
 - crossplane.yaml
 - external-snapshotter.yaml
 - hardware.yaml
 - hermes-viewer
+- hubble-ui-route.yaml
 - k8tz.yaml
 - kyverno.yaml
 - longhorn.yaml
