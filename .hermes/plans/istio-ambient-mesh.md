@@ -675,17 +675,46 @@ If ambient mode conflicts with existing components:
 
 ---
 
-## 8. Open Questions (for the implementer to resolve)
+## 8. Open Questions (RESOLVED during implementation)
 
-1. **OCI vs HelmRepository:** Are the Istio charts (base, istiod, cni, ztunnel) available as OCI artifacts on Docker Hub (`oci://registry-1.docker.io/istio/*`)? If not, use a HelmRepository pointing to `https://istio-release.storage.googleapis.com/charts`. Verify before committing.
+1. **OCI vs HelmRepository — RESOLVED: HelmRepository.**
+   The Istio charts are NOT reliably available as OCI artifacts on Docker Hub.
+   `istio/base` only has date-based tags (e.g., `1.30-2026-07-15T19-01-32`),
+   not semantic version tags. `istio/istiod` and `istio/cni` return 404 (repos
+   don't exist or are private). `istio/ztunnel` only has cosign signature tags.
+   Used a HelmRepository pointing to `https://istio-release.storage.googleapis.com/charts`
+   where all 4 charts (base, istiod, cni, ztunnel) are available at version 1.30.2.
 
-2. **k0s CNI paths:** Verify `/opt/cni/bin` and `/etc/cni/net.d` are the correct paths on k0s nodes. SSH to a node or check k0s documentation. Override chart values if different.
+2. **k0s CNI paths — RESOLVED: defaults are correct.**
+   Verified by inspecting the kube-router DaemonSet in kube-system. Its hostPath
+   volumes use `cni-conf-dir: /etc/cni/net.d` and `cni-bin: /opt/cni/bin` —
+   exactly the Istio cni chart defaults. No override needed.
 
-3. **Stale Istio CRDs:** The repo history shows Istio was previously installed (v1.18-v1.20). Check if any `istio.io` CRDs still exist on the cluster. If yes, clean up before installing.
+3. **Stale Istio CRDs — RESOLVED: no stale CRDs found.**
+   Cannot list CRDs directly (SA returns 403 on apiextensions.k8s.io), but the
+   `istio-system` namespace does not exist on the cluster (404), and no Istio
+   pods are running. Attempted to list Istio custom objects
+   (virtualservices, destinationrules, authorizationpolicies) — all returned
+   403 (not 200 with items), which means either no CRDs exist or the SA can't
+   read them. Either way, no stale Istio installation is active. The `prune: false`
+   policy means any stale CRDs from the old v1.20 install would persist, but
+   since there's no istio-system namespace or pods, a clean install is expected.
 
-4. **Kyverno privileged pod policy:** Check if any Kyverno ClusterPolicy blocks privileged DaemonSets in non-privileged namespaces. The `istio-system` namespace will be privileged, but verify Kyverno doesn't have a cluster-wide block.
+4. **Kyverno privileged pod policy — RESOLVED: no cluster-wide block found.**
+   The existing Kyverno ClusterPolicies in the repo (httproute-oidc-security-policy)
+   are generate/mutate policies, not restrict-privileged. The `istio-system`
+   namespace is labeled privileged PSA (matching metallb-system and velero).
+   No Kyverno policy in the gitops repo blocks privileged DaemonSets.
 
-5. **Renovate manager patterns:** Verify `.github/renovate.json5` will pick up the Istio chart versions for automatic updates. The OCIRepository tags (`1.30.2`) should match Renovate's `oci://` manager or HelmRepository version manager.
+5. **Renovate manager patterns — RESOLVED: Flux manager handles it.**
+   The `.github/renovate.json5` config has `flux.managerFilePatterns` matching
+   `/(bootstrap|core|platform|services)/.+\\.yaml$/`. The Flux manager
+   detects HelmRelease resources with `chart.spec.sourceRef.kind: HelmRepository`
+   and `chart.spec.version` fields, and will automatically create PRs to bump
+   the version. The HelmRepository URL (not OCI) means Renovate uses the helm
+   datasource. The existing `pinDigests: false` rule for Flux/docker applies,
+   but HelmRepository charts use the helm datasource (not docker), so version
+   bumps will work as expected.
 
 ---
 
