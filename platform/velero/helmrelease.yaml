@@ -149,7 +149,6 @@ spec:
             - hardware-system
             - k0s-autopilot
             - kyverno
-            - metallb-system
             - operators-system
             - security
           snapshotVolumes: false

@@ -27,6 +27,9 @@ spec:
         user: root
         port: 22
   k0s:
+    # NOTE: pinned to v1.35.3+k0s.0 here but the cluster currently runs
+    # v1.36.2. Update this field separately to align the k0sctl spec
+    # with the live cluster version. Tracked as a follow-up.
     version: v1.35.3+k0s.0
     config:
       apiVersion: k0s.k0sproject.io/v1beta1
@@ -35,10 +38,11 @@ spec:
         name: k0s-inwin
       spec:
         network:
+          # Custom CNI provider — Cilium is installed via GitOps (core/cilium.yaml)
+          # and manages the CNI, kube-proxy replacement, and service load balancing.
+          provider: custom
           kubeProxy:
-            mode: ipvs
-            ipvs:
-              strictARP: true
-          nodeLocalLoadBalancing:
-            enabled: true
-            type: EnvoyProxy
+            disabled: true
+          # nodeLocalLoadBalancing was previously enabled (type: EnvoyProxy)
+          # and is intentionally removed: Cilium handles service load balancing
+          # via kube-proxy replacement, so k0s-managed Envoy NLLB would conflict.
