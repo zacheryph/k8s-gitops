@@ -12,9 +12,35 @@ spec:
   values:
     serviceMonitor:
       enabled: true
+    extraPorts:
+      syslog:
+        name: tcp-syslog
+        containerPort: 1514
+        service:
+          port: 1514
+          type: LoadBalancer
+          externalTrafficPolicy: Local
+          loadBalancerIP: ${LOAD_BALANCER_SYSLOG}
     config:
       clients:
         - url: http://loki:3100/loki/api/v1/push
+      snippets:
+        extraScrapeConfigs: |
+          - job_name: syslog
+            syslog:
+              listen_address: 0.0.0.0:1514
+              labels:
+                job: syslog
+            relabel_configs:
+              - source_labels:
+                  - __syslog_message_hostname
+                target_label: hostname
+              - source_labels:
+                  - __syslog_message_app_name
+                target_label: app
+              - source_labels:
+                  - __syslog_message_severity
+                target_label: level
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
 apiVersion: monitoring.coreos.com/v1
