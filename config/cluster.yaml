@@ -4,6 +4,22 @@ kind: Cluster
 metadata:
   name: k0s-inwin
 spec:
+  k0s:
+    version: v1.36.2+k0s.0
+    config:
+      apiVersion: k0s.k0sproject.io/v1beta1
+      kind: ClusterConfig
+      metadata:
+        name: k0s-inwin
+      spec:
+        network:
+          kubeProxy:
+            mode: ipvs
+            ipvs:
+              strictARP: true
+          nodeLocalLoadBalancing:
+            enabled: true
+            type: EnvoyProxy
   hosts:
     - hostname: k0s-inwin-01
       role: controller+worker
@@ -26,19 +42,3 @@ spec:
         address: 10.72.13.13
         user: root
         port: 22
-  k0s:
-    version: v1.35.3+k0s.0
-    config:
-      apiVersion: k0s.k0sproject.io/v1beta1
-      kind: ClusterConfig
-      metadata:
-        name: k0s-inwin
-      spec:
-        network:
-          kubeProxy:
-            mode: ipvs
-            ipvs:
-              strictARP: true
-          nodeLocalLoadBalancing:
-            enabled: true
-            type: EnvoyProxy
