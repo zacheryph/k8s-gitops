@@ -18,10 +18,6 @@ spec:
             image:
               repository: quantumentangledandy/neolink
               tag: latest@sha256:4eebf499c20f8de740d8c32163f665e41fd0f342be3b1174828b3b8bd7def59d
-            args:
-              - "rtsp"
-              - "--config"
-              - "/etc/neolink.toml"
             resources:
               requests:
                 cpu: 100m
