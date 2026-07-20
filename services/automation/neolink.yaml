@@ -51,6 +51,7 @@ data:
 
     [[cameras]]
     name = "reolink-e1"
+    push_notifications = false
     username = "${CAMERA_REOLINK_E1_USERNAME}"
     password = "${CAMERA_REOLINK_E1_PASSWORD}"
     address = "${CAMERA_REOLINK_E1_ADDRESS}"
