@@ -7,6 +7,7 @@ resources:
   - frigate
   - namespace.yaml
   - home-assistant.yaml
+  - neolink.yaml
   - zwave-js.yaml
   #- signal-cli-rest-api.yaml
   - hermes-agent.yaml
