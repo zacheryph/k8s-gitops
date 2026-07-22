@@ -1,0 +1,13 @@
+# yaml-language-server: $schema=https://json.schemastore.org/taskfile.json
+version: "3"
+
+tasks:
+  kubeconfig:
+    desc: Fetch the cluster kubeconfig via k0sctl and merge it into ~/.kube/config as context "k0s-cluster"
+    cmds:
+      - k0sctl kubeconfig -n k0s-cluster --config config/cluster.yaml > /tmp/k0s-kubeconfig.yaml
+      - KUBECONFIG=/tmp/k0s-kubeconfig.yaml:$HOME/.kube/config kubectl config view --flatten > /tmp/k0s-kubeconfig.merged.yaml
+      - mv /tmp/k0s-kubeconfig.merged.yaml $HOME/.kube/config
+      - chmod 600 $HOME/.kube/config
+      - kubectl config use-context k0s-cluster --kubeconfig $HOME/.kube/config
+      - rm -f /tmp/k0s-kubeconfig.yaml
