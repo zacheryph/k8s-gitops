@@ -10,5 +10,6 @@ resources:
 - loki.yaml
 - namespace.yaml
 - oci-repositories.yaml
+- opnsense-exporter.yaml
 - prometheus-stack.yaml
 - promtail.yaml
