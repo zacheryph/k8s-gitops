@@ -9,3 +9,4 @@ resources:
   - longhorn.yaml
   - metallb.yaml
   - monitoring.yaml
+  - opnsense.yaml

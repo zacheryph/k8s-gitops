@@ -1,0 +1,124 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: opnsense-exporter
+  namespace: monitoring
+stringData:
+  host: ${OPNSENSE_HOST}
+  protocol: "https"
+  api-key: ${OPNSENSE_API_KEY}
+  api-secret: ${OPNSENSE_API_SECRET}
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/deployment.json
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opnsense-exporter
+  namespace: monitoring
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: opnsense-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: opnsense-exporter
+    spec:
+      containers:
+        - name: opnsense-exporter
+          image: ghcr.io/athennamind/opnsense-exporter:0.0.16
+          args:
+            - "--log.level=info"
+            - "--log.format=json"
+            - "--opnsense.insecure=true"
+          env:
+            - name: OPNSENSE_EXPORTER_INSTANCE_LABEL
+              value: "opnsense"
+            - name: OPNSENSE_EXPORTER_OPS_API
+              valueFrom:
+                secretKeyRef:
+                  name: opnsense-exporter
+                  key: host
+            - name: OPNSENSE_EXPORTER_OPS_PROTOCOL
+              valueFrom:
+                secretKeyRef:
+                  name: opnsense-exporter
+                  key: protocol
+            - name: OPS_API_KEY_FILE
+              value: /etc/opnsense-exporter/creds/api-key
+            - name: OPS_API_SECRET_FILE
+              value: /etc/opnsense-exporter/creds/api-secret
+          volumeMounts:
+            - name: creds
+              mountPath: /etc/opnsense-exporter/creds
+              readOnly: true
+          ports:
+            - name: http
+              containerPort: 8080
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop: ["ALL"]
+            readOnlyRootFilesystem: true
+            runAsNonRoot: true
+            runAsUser: 65534
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+          resources:
+            requests:
+              cpu: 100m
+              memory: 64Mi
+            limits:
+              cpu: 500m
+              memory: 128Mi
+      volumes:
+        - name: creds
+          secret:
+            secretName: opnsense-exporter
+            items:
+              - key: api-key
+                path: api-key
+              - key: api-secret
+                path: api-secret
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/service.json
+apiVersion: v1
+kind: Service
+metadata:
+  name: opnsense-exporter
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: opnsense-exporter
+spec:
+  selector:
+    app.kubernetes.io/name: opnsense-exporter
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/servicemonitor_v1.json
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: opnsense-exporter
+  namespace: monitoring
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: opnsense-exporter
+  endpoints:
+    - port: http
+      interval: 60s
+      scrapeTimeout: 10s
+      path: /metrics
