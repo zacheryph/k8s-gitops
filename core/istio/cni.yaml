@@ -1,0 +1,48 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istio-cni
+  namespace: istio-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: cni
+      sourceRef:
+        kind: HelmRepository
+        name: istio
+        namespace: istio-system
+      version: "1.30.2"
+  dependsOn:
+    - name: istiod
+      namespace: istio-system
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  values:
+    # profile: ambient sets ambient.enabled: true (the in-pod traffic
+    # redirection model — chained CNI plugin + iptables in pod netns,
+    # NOT eBPF, so it coexists with kube-router now and Cilium later).
+    profile: ambient
+    # Chained CNI plugin — appends to the existing kube-router CNI config
+    # in /etc/cni/net.d rather than replacing it. This is the safe
+    # coexistence mode.
+    chained: true
+    # CNI paths verified on k0s nodes via the kube-router DaemonSet
+    # hostPath volumes (both use the chart defaults).
+    cniBinDir: /opt/cni/bin
+    cniConfDir: /etc/cni/net.d
+    # Ambient-specific config
+    ambient:
+      # DNS redirection — redirects pod DNS to ztunnel for policy enforcement.
+      dnsCapture: true
+      # Retry detection if a pod is created before the CNI agent is ready.
+      enableAmbientDetectionRetry: true
+    # Resources — defaults are appropriate for a 3-node cluster.
+    resources:
+      requests:
+        cpu: 100m
+        memory: 100Mi
