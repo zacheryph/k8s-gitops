@@ -128,6 +128,38 @@ spec:
       enabled: true
     kubeDns:
       enabled: false
+    # kubeEtcd.enabled=true deploys a chart-default ServiceMonitor that
+    # selects `app.kubernetes.io/name: kube-etcd`, but the chart's
+    # auto-created Service has no matching pods in k0s (k0s runs etcd
+    # as part of the k0s controller process, listening on each
+    # controller's local interface — not as a Pod, and not exposed as
+    # a normal in-cluster Service). The default ServiceMonitor
+    # therefore has 0 targets and exposes no etcd server-side metrics.
+    #
+    # What we *do* have, today, is client-side etcd request duration:
+    # the apiserver exposes its own client-go etcd client metrics on
+    # its /metrics endpoint, which is scraped by the
+    # `kubeApiServer.enabled: true` job below (job label: `apiserver`).
+    # That's how queries like
+    # `apiserver_request_total{...resource="leases"...}` get their
+    # data, and it's the dataset the kube-apiserver-errors PrometheusRule
+    # in `platform/monitoring/monitors/kube-apiserver.yaml` alerts on.
+    #
+    # To get etcd *server-side* metrics (etcd_disk_wal_fsync_duration_seconds,
+    # etcd_server_leader_changes_seen_total, etcd_server_is_leader,
+    # etcd_mvcc_db_total_size_in_bytes, etc.) a k0s-specific config
+    # is needed:
+    #   1. A headless Service + Endpoints pointing at the k0s
+    #      controller nodes' etcd listener (10.72.13.11/12/13:2379).
+    #   2. A custom ServiceMonitor that scrapes those endpoints with
+    #      TLS to the k0s-generated etcd CA (read from
+    #      /var/lib/k0s/etcd/ca.crt on a controller and seeded into
+    #      a Secret).
+    #   3. Disable the chart's default ServiceMonitor
+    #      (`kubeEtcd.serviceMonitor.enabled: false`) so it doesn't
+    #      fight the new one.
+    # Tracked as a follow-up; the kube-apiserver-errors rule covers
+    # the user-visible signal in the meantime.
     kubeEtcd:
       enabled: true
     kubeProxy:
