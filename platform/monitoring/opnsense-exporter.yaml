@@ -34,7 +34,7 @@ spec:
           args:
             - "--log.level=info"
             - "--log.format=json"
-            - "--opnsense.insecure=true"
+            - "--opnsense.insecure"
           env:
             - name: OPNSENSE_EXPORTER_INSTANCE_LABEL
               value: "opnsense"
