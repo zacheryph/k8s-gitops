@@ -1,0 +1,145 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/namespace.json
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kube-system
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/ocirepository_v1.json
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  interval: 12h
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: 1.19.5
+  url: oci://ghcr.io/cilium/charts/cilium
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: cilium
+  namespace: kube-system
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: cilium
+  interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    crds: CreateReplace
+  values:
+    # -- eBPF kube-proxy replacement (replaces k0s kube-proxy IPVS)
+    kubeProxyReplacement: true
+    kubeProxyReplacementHealthzBindAddr: "0.0.0.0:10256"
+
+    # -- eBPF dataplane masquerade (replaces iptables/IPVS masquerading)
+    enableIPv4Masquerade: true
+    bpf:
+      masquerade: true
+
+    # -- BGP control plane (replaces MetalLB BGP speaker)
+    bgpControlPlane:
+      enabled: true
+      statusReport:
+        enabled: true
+
+    # -- Gateway API (replaces Envoy Gateway)
+    gatewayAPI:
+      enabled: true
+      gatewayClass:
+        create: "true"
+      externalTrafficPolicy: Local
+      secretsNamespace:
+        create: true
+        name: cilium-secrets
+        sync: true
+
+    # -- Hubble observability + Relay + UI
+    hubble:
+      enabled: true
+      relay:
+        enabled: true
+        prometheus:
+          enabled: true
+          serviceMonitor:
+            enabled: true
+            trustCRDsExist: true
+      ui:
+        enabled: true
+      metrics:
+        enabled:
+          - dns
+          - drop
+          - tcp
+          - flow
+          - icmp
+      # -- Disable Hubble flow export to file (events.log) — metrics/Relay UI suffice
+      export:
+        static:
+          enabled: false
+
+    # -- Prometheus metrics for Cilium agent + operator
+    prometheus:
+      enabled: true
+      serviceMonitor:
+        enabled: true
+        trustCRDsExist: true
+
+    operator:
+      prometheus:
+        enabled: true
+        serviceMonitor:
+          enabled: true
+          trustCRDsExist: true
+
+    # -- L2 announcements disabled — using BGP for LB IP advertisement
+    l2announcements:
+      enabled: false
+
+    # -- IPAM: cluster-pool mode matching k0s pod CIDR (10.244.0.0/16, /24 per node)
+    ipam:
+      mode: cluster-pool
+      operator:
+        clusterPoolIPv4PodCIDRList:
+          - 10.244.0.0/16
+        clusterPoolIPv4MaskSize: 24
+
+    # -- Security context — Cilium needs privileged capabilities for eBPF
+    securityContext:
+      capabilities:
+        ciliumAgent:
+          - CHOWN
+          - KILL
+          - NET_ADMIN
+          - NET_RAW
+          - IPC_LOCK
+          - SYS_ADMIN
+          - SYS_RESOURCE
+          - DAC_OVERRIDE
+          - FOWNER
+          - SETGID
+          - SETUID
+          - SYSLOG
+        mountCgroup:
+          - SYS_ADMIN
+        applySysctlOverwrites:
+          - SYS_ADMIN
+        cleanCiliumState:
+          - NET_ADMIN
+          - SYS_ADMIN
+          - SYS_RESOURCE
+
+    # -- Run on all nodes (control plane + worker)
+    nodeSelector:
+      kubernetes.io/os: linux
+    tolerations:
+      - operator: Exists

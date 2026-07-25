@@ -7,5 +7,4 @@ resources:
   - flux-system.yaml
   - kyverno.yaml
   - longhorn.yaml
-  - metallb.yaml
   - monitoring.yaml
