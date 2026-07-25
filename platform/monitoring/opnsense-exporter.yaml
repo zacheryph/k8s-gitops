@@ -30,7 +30,7 @@ spec:
     spec:
       containers:
         - name: opnsense-exporter
-          image: ghcr.io/athennamind/opnsense-exporter:0.0.16
+          image: ghcr.io/athennamind/opnsense-exporter:0.0.16@sha256:64469206eb955b6c87ec2737cd4884b0bec01b518408cf1ac6d5c153f6c0cf1f
           args:
             - "--log.level=info"
             - "--log.format=json"
