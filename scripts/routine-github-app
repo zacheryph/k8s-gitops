@@ -1,0 +1,174 @@
+#!/usr/bin/env bash
+# Manage Routine GitHub App credentials.
+#
+# Two credential stores are involved:
+#   1. config/secrets.yaml (SOPS-encrypted, via sops --set)
+#      → GITHUB_ROUTINE_APP_ID (single-line, public — sops --set handles this fine)
+#
+#   2. config/routine-github-app-key.secret.yaml (SOPS-encrypted standalone Secret)
+#      → The PEM private key, stored as a YAML block scalar so multi-line
+#        newlines are preserved. sops --set cannot handle multi-line values
+#        (it requires valid JSON), so this file is created as plain YAML then
+#        encrypted in-place.
+#
+# Installation IDs are discovered dynamically via the GitHub API
+# (GET /repos/{owner}/{repo}/installation) — no need to store them.
+#
+# Usage:
+#   routine-github-app setup                   # interactive: App ID + PEM path
+#   routine-github-app show                    # decrypt and print current values
+#   routine-github-app update-key <pem-file>   # rotate the private key
+#   routine-github-app remove                  # remove all Routine keys
+set -euo pipefail
+
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SECRETS="$REPO_ROOT/config/secrets.yaml"
+PEM_SECRET="$REPO_ROOT/config/routine-github-app-key.secret.yaml"
+
+_ensure_encrypted() {
+  if ! grep -q 'sops:' "$SECRETS" 2>/dev/null; then
+    echo "==> Encrypting $SECRETS with SOPS..."
+    sops --encrypt --in-place "$SECRETS"
+  fi
+}
+
+_write_pem_secret() {
+  local pem_path="$1"
+  local pem_file="$PEM_SECRET"
+
+  # Create a plain YAML Secret with the PEM as a block scalar.
+  # SOPS will encrypt the stringData section in-place.
+  cat > "$pem_file" <<'YAML_HEADER'
+apiVersion: v1
+kind: Secret
+metadata:
+  name: routine-github-app-key
+  namespace: automation
+type: Opaque
+stringData:
+  private-key: |
+YAML_HEADER
+
+  # Indent every line of the PEM by 4 spaces (YAML block scalar continuation)
+  sed 's/^/    /' "$pem_path" >> "$pem_file"
+
+  echo "==> Encrypting $pem_file with SOPS..."
+  sops --encrypt --in-place "$pem_file"
+  echo "==> Encrypted."
+}
+
+cmd_setup() {
+  echo "=== Routine GitHub App Setup ==="
+  echo ""
+
+  # App ID (public identifier — single line, safe for sops --set)
+  read -r -p "App ID: " app_id
+  if [[ -z "$app_id" ]]; then
+    echo "ERROR: App ID is required" >&2
+    exit 1
+  fi
+
+  # Private key PEM file (multi-line — stored as standalone SOPS Secret)
+  read -r -p "Path to private key .pem file: " pem_path
+  if [[ ! -f "$pem_path" ]]; then
+    echo "ERROR: $pem_path not found" >&2
+    exit 1
+  fi
+
+  # Store App ID in cluster-secrets
+  _ensure_encrypted
+  echo ""
+  echo "==> Storing App ID in $SECRETS..."
+  sops --set '["stringData"]["GITHUB_ROUTINE_APP_ID"] "'"$app_id"'"' "$SECRETS"
+
+  # Store PEM in standalone SOPS-encrypted Secret
+  echo "==> Storing private key in $PEM_SECRET..."
+  _write_pem_secret "$pem_path"
+
+  echo ""
+  echo "==> Done."
+  echo ""
+  echo "Files created/updated:"
+  echo "  config/secrets.yaml                             — GITHUB_ROUTINE_APP_ID"
+  echo "  config/routine-github-app-key.secret.yaml       — private key PEM"
+  echo ""
+  echo "Installation IDs are discovered dynamically via the GitHub API"
+  echo "(GET /repos/{owner}/{repo}/installation) — no need to store them."
+  echo ""
+  echo "Next steps:"
+  echo "  1. git add config/secrets.yaml config/routine-github-app-key.secret.yaml"
+  echo "  2. git commit -m 'chore(secrets): add Routine GitHub App credentials'"
+  echo "  3. git push"
+  echo "  4. Flux will reconcile — Hermes picks up the new secret on restart"
+}
+
+cmd_show() {
+  echo "=== Routine GitHub App Credentials ==="
+  echo ""
+
+  if grep -q 'sops:' "$SECRETS" 2>/dev/null; then
+    app_id=$(sops --decrypt --extract '["stringData"]["GITHUB_ROUTINE_APP_ID"]' "$SECRETS" 2>/dev/null || echo "(not set)")
+    echo "App ID: $app_id"
+  else
+    echo "App ID: (config/secrets.yaml not encrypted yet)"
+  fi
+  echo ""
+
+  if [[ -f "$PEM_SECRET" ]]; then
+    echo "Private key (first/last 3 lines):"
+    sops --decrypt "$PEM_SECRET" 2>/dev/null | sed -n '/private-key: |/,$ p' | tail -n +2 | head -3
+    echo "..."
+    sops --decrypt "$PEM_SECRET" 2>/dev/null | sed -n '/private-key: |/,$ p' | tail -n +2 | tail -3
+  else
+    echo "Private key: (not yet created — run 'routine-github-app setup')"
+  fi
+}
+
+cmd_update_key() {
+  local pem_path="${1:?Usage: routine-github-app update-key <pem-file>}"
+  if [[ ! -f "$pem_path" ]]; then
+    echo "ERROR: $pem_path not found" >&2
+    exit 1
+  fi
+
+  echo "==> Updating private key in $PEM_SECRET..."
+  _write_pem_secret "$pem_path"
+
+  echo "==> Private key updated."
+  echo ""
+  echo "Next steps:"
+  echo "  1. git add config/routine-github-app-key.secret.yaml"
+  echo "  2. git commit -m 'chore(secrets): rotate Routine GitHub App private key'"
+  echo "  3. git push"
+}
+
+cmd_remove() {
+  # Remove App ID from cluster-secrets
+  if grep -q 'sops:' "$SECRETS" 2>/dev/null; then
+    sops unset --idempotent "$SECRETS" '["stringData"]["GITHUB_ROUTINE_APP_ID"]' 2>/dev/null || true
+    echo "==> Removed GITHUB_ROUTINE_APP_ID from config/secrets.yaml"
+  fi
+
+  # Remove PEM secret file
+  if [[ -f "$PEM_SECRET" ]]; then
+    rm "$PEM_SECRET"
+    echo "==> Removed config/routine-github-app-key.secret.yaml"
+  fi
+
+  echo ""
+  echo "Next steps:"
+  echo "  1. git add config/secrets.yaml config/routine-github-app-key.secret.yaml"
+  echo "  2. git commit -m 'chore(secrets): remove Routine GitHub App credentials'"
+  echo "  3. git push"
+}
+
+case "${1:-}" in
+  setup)      cmd_setup ;;
+  show)       cmd_show ;;
+  update-key) shift; cmd_update_key "$@" ;;
+  remove)     cmd_remove ;;
+  *)
+    sed -n '2,20p' "${BASH_SOURCE[0]}" | sed 's/^# //'
+    exit 1
+    ;;
+esac

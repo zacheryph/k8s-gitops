@@ -98,6 +98,7 @@ spec:
       SIGNAL_ALLOWED_USERS: ${HERMES_SIGNAL_ALLOWED_USERS}
       HERMES_YOLO_MODE: "1"
       HERMES_WRITE_SAFE_ROOT: /opt/data:/tmp
+      GITHUB_ROUTINE_APP_ID: ${GITHUB_ROUTINE_APP_ID}
 
     # Secrets rendered into a Kubernetes Secret by the chart
     secrets:
@@ -106,6 +107,12 @@ spec:
       SLACK_APP_TOKEN: ${HERMES_SLACK_APP_TOKEN}
       API_SERVER_KEY: ${HERMES_API_SERVER_KEY}
       WEBHOOK_SECRET: ${HERMES_WEBHOOK_SECRET}
+
+    # Mount Routine GitHub App private key at /etc/routine-github-app/key.pem
+    extraVolumeMounts:
+      - name: routine-github-app-key
+        mountPath: /etc/routine-github-app
+        readOnly: true
 
     persistence:
       enabled: true
@@ -239,3 +246,7 @@ spec:
           defaultMode: 0o600
       - name: obsidian-config
         emptyDir: {}
+      - name: routine-github-app-key
+        secret:
+          secretName: routine-github-app-key
+          defaultMode: 0o600
