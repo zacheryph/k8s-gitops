@@ -18,4 +18,4 @@ spec:
       memory: 2Gi
   storage:
     storageClass: longhorn
-    size: 4Gi
+    size: 10Gi
