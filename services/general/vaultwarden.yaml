@@ -19,6 +19,10 @@ spec:
     namespace: flux-system
 
   values:
+    defaultPodOptions:
+      securityContext:
+        seccompProfile:
+          type: Unconfined
     controllers:
       app:
         containers:
