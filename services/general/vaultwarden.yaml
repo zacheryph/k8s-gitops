@@ -21,6 +21,17 @@ spec:
   values:
     controllers:
       app:
+        pod:
+          affinity:
+            nodeAffinity:
+              preferredDuringSchedulingIgnoredDuringExecution:
+                - weight: 100
+                  preference:
+                    matchExpressions:
+                      - key: kubernetes.io/hostname
+                        operator: NotIn
+                        values:
+                          - k0s-inwin-02
         containers:
           app:
             image:
