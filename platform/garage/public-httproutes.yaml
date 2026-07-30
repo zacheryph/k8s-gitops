@@ -1,0 +1,18 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.ok8.sh/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: garage-public-web
+  namespace: garage
+  annotations:
+    dns.routine.sh/external: "true"
+spec:
+  parentRefs:
+    - name: external
+      namespace: gateway
+  hostnames:
+    - "public.${WEB_DOMAIN}"
+  rules:
+    - backendRefs:
+        - name: garage
+          port: 3902

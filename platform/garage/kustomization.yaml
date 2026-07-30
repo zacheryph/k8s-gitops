@@ -8,6 +8,7 @@ resources:
   - bootstrap.yaml
   - configuration.yaml
   - namespace.yaml
+  - public-httproutes.yaml
   - release.yaml
   - s3-keys.yaml
   - webui.yaml
