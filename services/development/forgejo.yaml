@@ -81,6 +81,8 @@ spec:
           PROVIDER: memory
           COOKIE_SECURE: true
           SAME_SITE: strict
+        service:
+          DISABLE_REGISTRATION: true
         server:
           DOMAIN: git.${CLUSTER_DOMAIN}
           ROOT_URL: https://git.${CLUSTER_DOMAIN}
