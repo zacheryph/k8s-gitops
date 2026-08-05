@@ -1,0 +1,49 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istiod
+  namespace: istio-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: istiod
+      sourceRef:
+        kind: HelmRepository
+        name: istio
+        namespace: istio-system
+      version: "1.30.2"
+  dependsOn:
+    - name: istio-base
+      namespace: istio-system
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  values:
+    # profile: ambient loads files/profile-ambient.yaml which sets:
+    #   pilot.env.PILOT_ENABLE_AMBIENT: "true"
+    #   cni.ambient.enabled: true
+    #   meshConfig.defaultConfig.proxyMetadata.ISTIO_META_ENABLE_HBONE: "true"
+    profile: ambient
+    # Control plane resources — reduced from defaults (500m/2048Mi) for a
+    # 3-node homelab with ~60 pods.
+    pilot:
+      resources:
+        requests:
+          cpu: 250m
+          memory: 1024Mi
+    # HPA for istiod
+    autoscaleEnabled: true
+    autoscaleMin: 1
+    autoscaleMax: 2
+    # Do not taint nodes (k0s nodes are control-plane; untainting would block).
+    taint:
+      enabled: false
+    # Mesh config: PERMISSIVE mTLS for Phase 1 safety (allows plaintext fallback).
+    # Switch to STRICT after validating all meshed traffic works.
+    meshConfig:
+      defaultConfig:
+        holdApplicationUntilProxyStarts: true
