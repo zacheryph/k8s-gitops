@@ -13,3 +13,4 @@ resources:
 - opnsense-exporter.yaml
 - prometheus-stack.yaml
 - promtail.yaml
+- smartctl-exporter.yaml
