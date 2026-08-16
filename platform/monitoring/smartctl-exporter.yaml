@@ -1,0 +1,50 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: smartctl-exporter
+spec:
+  chartRef:
+    kind: OCIRepository
+    name: prometheus-smartctl-exporter
+  interval: 1h
+  values:
+    image:
+      repository: quay.io/prometheuscommunity/smartctl-exporter
+      tag: v0.14.0@sha256:cfe22c36d7d2fac48ebf619707305acb65eb0fb670656eb80f356e606d782bc1
+      pullPolicy: IfNotPresent
+
+    common:
+      config:
+        bind_to: "0.0.0.0:9633"
+        url_path: /metrics
+        smartctl_location: /usr/sbin/smartctl
+        collect_not_more_than_period: 120s
+
+    serviceMonitor:
+      enabled: true
+      interval: 60s
+      scrapeTimeout: 30s
+      attachMetadata:
+        node: true
+
+    prometheusRules:
+      enabled: true
+
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        cpu: 100m
+        memory: 128Mi
+
+    updateStrategy:
+      type: RollingUpdate
+      rollingUpdate:
+        maxUnavailable: 1
+
+    service:
+      type: ClusterIP
+      port: 9633
