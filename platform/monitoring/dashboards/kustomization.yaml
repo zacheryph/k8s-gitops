@@ -10,3 +10,4 @@ resources:
   - metallb.yaml
   - monitoring.yaml
   - opnsense.yaml
+  - smartctl-exporter.yaml
