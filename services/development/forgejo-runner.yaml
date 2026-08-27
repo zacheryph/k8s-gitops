@@ -1,0 +1,85 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/namespace.json
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: forgejo-runner
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo-runner
+  namespace: forgejo-runner
+spec:
+  interval: 30m
+  chartRef:
+    kind: OCIRepository
+    name: forgejo-runner
+    namespace: flux-system
+  values:
+    forgejo:
+      url: http://forgejo-http.development.svc.cluster.local:3000
+      existingSecret: forgejo-runner-registration
+
+    image:
+      repository: registry.erwanleboucher.dev/eleboucher/runner
+      tag: 12.13.0
+
+    runnerConfig: |
+      cache:
+        enabled: true
+        dir: /data/cache
+        port: 8088
+        proxy_port: 8089
+      container:
+        docker_host: "-"
+        workdir_parent: shared/workdir
+      host:
+        workdir_parent: /data/act
+      log:
+        level: info
+      plugins:
+        k8s:
+          address: "unix:///plugin/forgejo-runner-k8s.sock"
+          options:
+            namespace: forgejo-runner
+            poll_timeout: 10m
+            labels: "app.kubernetes.io/name=forgejo-runner-instance,app.kubernetes.io/instance=env-${ENV_ID}"
+            resources: |
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 2Gi
+      runner:
+        capacity: 2
+        labels:
+          - ubuntu-latest:k8s:/config/podspec-default.yaml
+          - default:k8s:/config/podspec-default.yaml
+        timeout: 3h
+        shutdown_timeout: 3m
+
+    podSpecs:
+      podspec-default.yaml: |-
+        containers:
+          - name: main
+            image: ghcr.io/bjw-s-labs/forgejo-runner:ubuntu-24.04@sha256:fea96a5b525857bee41cc132cf95df67191b73cdd681569ada3000111420397e
+            imagePullPolicy: IfNotPresent
+            env:
+              - name: DEBIAN_FRONTEND
+                value: noninteractive
+            resources:
+              requests:
+                cpu: 100m
+                memory: 256Mi
+              limits:
+                memory: 2Gi
+        restartPolicy: Never
+
+    resources:
+      requests:
+        cpu: 50m
+        memory: 256Mi
+      limits:
+        memory: 1Gi
