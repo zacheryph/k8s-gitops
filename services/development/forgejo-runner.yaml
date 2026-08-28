@@ -57,10 +57,16 @@ spec:
         labels:
           - ubuntu-latest:k8s:/config/podspec-default.yaml
           - default:k8s:/config/podspec-default.yaml
+
           # Image builds: job runs inside a privileged buildah image
           # (overlay storage + user namespaces need it on k0s). Opt in
           # per-workflow with runs-on: buildah.
           - buildah:k8s:/config/podspec-buildah.yaml
+
+          # Image builds (unprivileged): kaniko executor debug image. Opt in
+          # per-workflow with runs-on: kaniko. No daemon, no host privileges —
+          # build via /kaniko/executor --dockerfile ... --destination ...
+          - kaniko:k8s:/config/podspec-kaniko.yaml
         timeout: 3h
         shutdown_timeout: 3m
 
@@ -91,6 +97,23 @@ spec:
             env:
               - name: BUILDAH_ISOLATION
                 value: chroot
+            resources:
+              requests:
+                cpu: 250m
+                memory: 512Mi
+              limits:
+                memory: 4Gi
+        restartPolicy: Never
+
+      podspec-kaniko.yaml: |-
+        containers:
+          - name: main
+            image: gcr.io/kaniko-project/executor:v1.24.0-debug@sha256:2562c4fe551399514277ffff7dcca9a3b1628c4ea38cb017d7286dc6ea52f4cd
+            imagePullPolicy: IfNotPresent
+            command: ["/busybox/sleep", "infinity"]
+            env:
+              - name: DOCKER_CONFIG
+                value: /kaniko/.docker
             resources:
               requests:
                 cpu: 250m
