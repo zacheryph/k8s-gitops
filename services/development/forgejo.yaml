@@ -41,7 +41,7 @@ spec:
   values:
     image:
       repository: code.forgejo.org/forgejo/forgejo
-      tag: 15.0.7-rootless@sha256:1131f4c646d6115577b7cb9ccfe8cd2c289bb54a1e1ed42400be0e22916af924
+      tag: 16.0.3-rootless@sha256:214f4ae63ee78be1e445e58573c88dc7215e72091210852e0df94eaac1a25685
 
     valkey-cluster:
       enabled: false
