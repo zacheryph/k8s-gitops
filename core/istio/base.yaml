@@ -1,0 +1,36 @@
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: istio-base
+  namespace: istio-system
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: base
+      sourceRef:
+        kind: HelmRepository
+        name: istio
+        namespace: istio-system
+      version: "1.30.2"
+  install:
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  # base chart provides Istio CRDs (VirtualService, DestinationRule,
+  # AuthorizationPolicy, etc.) and cluster roles. It does NOT install
+  # Gateway API CRDs — those are already managed by Envoy Gateway.
+  #
+  # Envoy Gateway / Istio separation (no conflict):
+  #   - Envoy Gateway uses GatewayClass "envoy" (controller
+  #     gateway.envoyproxy.io/gatewayclass-controller).
+  #   - We do NOT install the istio/gateway chart, so Istio's Gateway API
+  #     controller is never deployed — no GatewayClass collision.
+  #   - ztunnel is Rust (not Envoy); waypoints (Envoy) are separate pods in
+  #     meshed namespaces, not shared with Envoy Gateway data plane.
+  #   - Existing HTTPRoutes reference parentRefs to Envoy Gateway's "external"
+  #     Gateway and do NOT need istio.io/rev annotations — they stay on
+  #     Envoy Gateway for ingress, not Istio.
+  values: {}
