@@ -42,7 +42,7 @@ spec:
   values:
     image:
       repository: nousresearch/hermes-agent
-      tag: "v2026.8.27@sha256:e0df6adebddf29b91112aefc999d4aaf6846c9eb544faca5672a16a13590ff79"
+      tag: "v2026.9.7@sha256:63bfb6d732f49a55d453e801057273785cc61e0f6ee43db3fa2f2a79846301b7"
 
     bootstrap:
       overwrite: false
