@@ -20,6 +20,19 @@ spec:
           nodeLocalLoadBalancing:
             enabled: true
             type: EnvoyProxy
+        storage:
+          etcd:
+            # Expose etcd's metrics on a dedicated plaintext HTTP listener so
+            # Prometheus can scrape server-side etcd metrics without an mTLS
+            # client secret. This is etcd's documented best practice for
+            # monitoring (keeps scrapes off the client 2379 / peer 2380 ports).
+            #
+            # Requires one `k0sctl apply` (rolling controller restart, one node
+            # at a time — 3-member quorum holds with 2). Prometheus-side, the
+            # matching scrape config is in platform/monitoring/prometheus-stack.yaml.
+            extraArgs:
+              # k0s etcd.extraArgs is a map of key-values (k0s docs: spec.storage.etcd.extraArgs)
+              listen-metrics-urls: http://0.0.0.0:2381
   hosts:
     - hostname: k0s-inwin-01
       role: controller+worker
