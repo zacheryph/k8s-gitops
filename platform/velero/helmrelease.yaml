@@ -132,14 +132,74 @@ spec:
 
     # Backup schedules (managed by the chart).
     #
-    # Two daily schedules + one weekly:
-    #   daily-infra — stateless infrastructure (manifests only)
-    #   daily       — everything non-system, with CSI snapshots → B2
-    #   weekly      — everything non-system, 90d retention, no snapshots
+    # Three daily schedules + one weekly:
+    #   daily          — everything non-system, Kopia filesystem backup
+    #                    (incremental, deltas only) → B2
+    #   daily-critical — database namespaces, CSI snapshots + data movement
+    #                    → B2 (crash-consistent block backups for the small
+    #                    set of volumes that need them)
+    #   daily-infra    — stateless infrastructure (manifests only)
+    #   weekly         — everything non-system, 90d retention, no snapshots
     #
     # New namespaces are auto-included in daily/weekly via wildcard + exclusions.
-    # The only list to maintain is daily-infra (10 namespaces, changes rarely).
+    # The only lists to maintain are daily-infra and daily-critical.
+    #
+    # Why daily uses fsBackup instead of CSI snapshotMoveData: the CSI path
+    # creates a trampoline PVC per volume (full Longhorn reclone) and serial
+    # uploads that run for hours, saturating node disk I/O (measured 8s write
+    # latencies, load 80+) and starving other workloads on the node. Kopia
+    # fsBackup reads only dirty files after the first run and typically
+    # finishes in minutes.
     schedules:
+      # Databases and other block-level-critical volumes. CSI snapshot + data
+      # movement gives crash-consistent block backups; kept to a small,
+      # explicit list so the reclone I/O storm stays bounded.
+      daily-critical:
+        disabled: false
+        schedule: "0 0 * * *"
+        useOwnerReferencesInBackup: true
+        template:
+          ttl: 720h0m0s           # 30 days
+          includedNamespaces:
+            - database
+          snapshotVolumes: true
+          defaultVolumesToFsBackup: false
+          snapshotMoveData: true
+          resourcePolicy:
+            kind: configmap
+            name: velero-volume-policy
+          metadata:
+            labels:
+              backup-tier: daily-critical
+      # Everything non-system via Kopia filesystem backup (incremental).
+      # New namespaces are auto-included via wildcard — nothing to update.
+      # The velero-volume-policy ConfigMap skips NFS-backed volumes (media-pool,
+      # nvr-pool, photos-pool) so only Longhorn-backed PVCs get backed up.
+      daily:
+        disabled: false
+        schedule: "30 0 * * *"    # staggered after daily-critical
+        useOwnerReferencesInBackup: true
+        template:
+          ttl: 720h0m0s           # 30 days
+          includedNamespaces:
+            - "*"
+          excludedNamespaces:
+            - kube-system
+            - kube-public
+            - kube-node-lease
+            - flux-system
+            - velero
+            - longhorn-system
+            # CSI snapshot path lives in daily-critical; exclude here to
+            # avoid double-backing the database volumes.
+            - database
+          snapshotVolumes: false
+          # Node-agent Kopia incremental backup of PVC filesystems → B2.
+          # Only changed files upload after the first run.
+          defaultVolumesToFsBackup: true
+          metadata:
+            labels:
+              backup-tier: daily
       # Infrastructure namespaces — cluster-level services that are Flux-managed
       # and stateless. Resource manifests only; no PVC data worth snapshotting.
       daily-infra:
@@ -164,38 +224,6 @@ spec:
           metadata:
             labels:
               backup-tier: daily-infra
-      # Everything non-system, with CSI snapshots + data movement to B2.
-      # New namespaces are auto-included via wildcard — nothing to update.
-      # The velero-volume-policy ConfigMap skips NFS-backed volumes (media-pool,
-      # photos-pool) so only Longhorn CSI PVCs get snapshotted.
-      daily:
-        disabled: false
-        schedule: "0 0 * * *"
-        useOwnerReferencesInBackup: true
-        template:
-          ttl: 720h0m0s           # 30 days
-          includedNamespaces:
-            - "*"
-          excludedNamespaces:
-            - kube-system
-            - kube-public
-            - kube-node-lease
-            - flux-system
-            - velero
-            - longhorn-system
-          snapshotVolumes: true
-          defaultVolumesToFsBackup: false
-          # Take a CSI (Longhorn) snapshot, then move the data off-cluster to
-          # B2 via the node-agent (Kopia). Requires the longhorn-velero
-          # VolumeSnapshotClass (volumesnapshotclass.yaml). Without this the
-          # snapshot would stay in-cluster only and never reach B2.
-          snapshotMoveData: true
-          resourcePolicy:
-            kind: configmap
-            name: velero-volume-policy
-          metadata:
-            labels:
-              backup-tier: daily
       # Weekly catch-all for extended retention — same scope as daily, no
       # snapshots, kept 90 days.
       weekly:
