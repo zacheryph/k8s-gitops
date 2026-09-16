@@ -1,0 +1,163 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/persistentvolumeclaim.json
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: zeroclaw-data
+  namespace: automation
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 8Gi
+  storageClassName: longhorn
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+  name: zeroclaw-oidc-credentials
+  namespace: automation
+type: Opaque
+stringData:
+  client-id: ${OIDC_ZEROCLAW_CLIENT_ID}
+  client-secret: ${OIDC_ZEROCLAW_CLIENT_SECRET}
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/v1/networkpolicy.json
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: zeroclaw
+  namespace: automation
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: zeroclaw
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: gateway
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: proxy
+              app.kubernetes.io/managed-by: envoy-gateway
+              app.kubernetes.io/name: envoy
+      ports:
+        - protocol: TCP
+          port: 42617
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: zeroclaw
+  namespace: automation
+spec:
+  interval: 1h
+  install:
+    remediation:
+      retries: 3
+  upgrade:
+    cleanupOnFail: true
+    remediation:
+      strategy: rollback
+      retries: 3
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+  values:
+    defaultPodOptions:
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        fsGroup: 65534
+        fsGroupChangePolicy: OnRootMismatch
+        seccompProfile:
+          type: RuntimeDefault
+    controllers:
+      app:
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: ghcr.io/zeroclaw-labs/zeroclaw
+              tag: v0.8.5@sha256:ba9c76b9287c125ec9cc9a8270654f2c0efbd610eef3e00eece3cd11f6c083e0
+            args: ["daemon"]
+            env:
+              HOME: /zeroclaw-data
+              ZEROCLAW_DATA_DIR: /zeroclaw-data/data
+              ZEROCLAW_gateway__host: 0.0.0.0
+              # Pocket ID plus this release's NetworkPolicy are the two enforced
+              # access boundaries. Pairing would make browser-first onboarding
+              # depend on extracting a one-time code from the running Pod.
+              ZEROCLAW_gateway__require_pairing: "false"
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: &port 42617
+                  periodSeconds: 5
+                  timeoutSeconds: 5
+                  failureThreshold: 30
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  tcpSocket:
+                    port: *port
+                  periodSeconds: 30
+                  timeoutSeconds: 5
+                  failureThreshold: 3
+            securityContext:
+              allowPrivilegeEscalation: false
+              readOnlyRootFilesystem: true
+              capabilities:
+                drop: ["ALL"]
+            resources:
+              requests:
+                cpu: 250m
+                memory: 128Mi
+              limits:
+                cpu: "2"
+                memory: 512Mi
+    service:
+      app:
+        controller: app
+        ports:
+          http:
+            port: *port
+    route:
+      app:
+        enabled: true
+        kind: HTTPRoute
+        annotations:
+          dns.routine.sh/external: "true"
+        hostnames: ["zeroclaw.${CLUSTER_DOMAIN}"]
+        parentRefs:
+          - name: external
+            namespace: gateway
+        labels:
+          cluster.routine.sh/oidc-credentials: zeroclaw-oidc-credentials
+    persistence:
+      data:
+        existingClaim: zeroclaw-data
+        globalMounts:
+          - path: /zeroclaw-data
