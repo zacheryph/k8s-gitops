@@ -1,0 +1,72 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/namespace.json
+---
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: purko-system
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/ocirepository_v1.json
+apiVersion: source.toolkit.fluxcd.io/v1
+kind: OCIRepository
+metadata:
+  name: purko
+  namespace: operators-system
+spec:
+  interval: 12h
+  layerSelector:
+    mediaType: application/vnd.cncf.helm.chart.content.v1.tar+gzip
+    operation: copy
+  ref:
+    tag: 0.2.1
+  url: oci://ghcr.io/purko-io/purko
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/helm.toolkit.fluxcd.io/helmrelease_v2.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: purko
+  namespace: operators-system
+spec:
+  interval: 1h
+  targetNamespace: purko-system
+  chartRef:
+    kind: OCIRepository
+    name: purko
+  install:
+    createNamespace: false
+    crds: CreateReplace
+  upgrade:
+    crds: CreateReplace
+  postRenderers:
+  - kustomize:
+      patches:
+      # The chart unconditionally renders namespaces. Flux owns purko-system.
+      - target:
+          kind: Namespace
+        patch: |
+          apiVersion: v1
+          kind: Namespace
+          metadata:
+            name: remove-chart-namespaces
+          $patch: delete
+      # Do not create chart-default MCP configuration during installation.
+      - target:
+          kind: ConfigMap
+          name: mcp-servers
+        patch: |
+          apiVersion: v1
+          kind: ConfigMap
+          metadata:
+            name: mcp-servers
+          $patch: delete
+  values:
+    namespace: purko-system
+    dashboard:
+      enabled: false
+    operator:
+      history:
+        enabled: false
+    starterAgents:
+      enabled: false
+    presets: []
+    triggerRules: []
