@@ -114,16 +114,12 @@ spec:
   apiFormat: openai
   model: deepseek/deepseek-v4-flash-0731
   models:
-    - name: tencent/hy4-preview
-    - name: deepseek/deepseek-v4-flash-0731
-    - name: z-ai/glm-5.3-flash
     - name: deepseek/deepseek-v4.1-flash
-    - name: xiaomi/mimo-v2.5
-    - name: tencent/hy3
     - name: google/gemini-3.8-flash
-    - name: qwen/qwen3.8-max-0902
+    - name: z-ai/glm-5.3-flash
     - name: x-ai/grok-4.6
-    - name: qwen/qwen3.8-27b
+    - name: moonshotai/kimi-k3
+    - name: xiaomi/mimo-v2.5
   credentials:
     secretRef: openrouter-api-key
     secretKey: api-key
