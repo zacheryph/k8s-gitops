@@ -154,8 +154,8 @@ spec:
         parentRefs:
           - name: external
             namespace: gateway
-        labels:
-          cluster.routine.sh/oidc-credentials: zeroclaw-oidc-credentials
+        # labels:
+        #   cluster.routine.sh/oidc-credentials: zeroclaw-oidc-credentials
     persistence:
       data:
         existingClaim: zeroclaw-data
