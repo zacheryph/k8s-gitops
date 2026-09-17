@@ -1,10 +1,3 @@
-# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/namespace.json
----
-apiVersion: v1
-kind: Namespace
-metadata:
-  name: purko-system
----
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/source.toolkit.fluxcd.io/ocirepository_v1.json
 apiVersion: source.toolkit.fluxcd.io/v1
 kind: OCIRepository
@@ -37,28 +30,6 @@ spec:
     crds: CreateReplace
   upgrade:
     crds: CreateReplace
-  postRenderers:
-  - kustomize:
-      patches:
-      # The chart unconditionally renders namespaces. Flux owns purko-system.
-      - target:
-          kind: Namespace
-        patch: |
-          apiVersion: v1
-          kind: Namespace
-          metadata:
-            name: remove-chart-namespaces
-          $patch: delete
-      # Do not create chart-default MCP configuration during installation.
-      - target:
-          kind: ConfigMap
-          name: mcp-servers
-        patch: |
-          apiVersion: v1
-          kind: ConfigMap
-          metadata:
-            name: mcp-servers
-          $patch: delete
   values:
     namespace: purko-system
     dashboard:
