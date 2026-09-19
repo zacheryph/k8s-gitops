@@ -117,7 +117,7 @@ spec:
     persistence:
       enabled: true
       storageClass: longhorn
-      size: 16Gi
+      size: 32Gi
 
     apiServer:
       enabled: true
