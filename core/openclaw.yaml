@@ -31,6 +31,13 @@ spec:
   upgrade:
     crds: CreateReplace
   values:
+    # Namespace-scoped manager RBAC — a cluster-wide watch would let the
+    # operator read every Secret in the cluster.
+    watchNamespaces:
+      - automation
+    rbac:
+      # No OpenClaw CRD powers for the stock admin/edit/view roles.
+      aggregateToDefaultRoles: false
     metrics:
       serviceMonitor:
         enabled: true

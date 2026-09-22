@@ -57,6 +57,22 @@ spec:
       commands:
         ownerAllowFrom:
           - slack:${OPENCLAW_OWNER_SLACK_ID}
+  # Gateway proxy (nginx) — digest-pinned.
+  gateway:
+    image:
+      tag: "1.27-alpine"
+      digest: sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
+  security:
+    networkPolicy:
+      # No same-namespace ingress to the gateway/canvas ports; the Slack path
+      # is outbound-only. To expose the Control UI later, admit peers via
+      # allowedIngressNamespaces/allowedIngressCIDRs (plus an HTTPRoute).
+      allowSameNamespaceIngress: false
+  observability:
+    metrics:
+      # Bootstrap scope: drops the unauthenticated metrics port and the OTel
+      # sidecar. Re-enable with networking.metricsIngress.from: AllowedPeers.
+      enabled: false
   storage:
     persistence:
       enabled: true
