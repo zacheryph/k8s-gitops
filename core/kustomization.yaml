@@ -19,4 +19,5 @@ resources:
 - kyverno.yaml
 - longhorn.yaml
 - metallb.yaml
+- openclaw.yaml
 - reloader.yaml
