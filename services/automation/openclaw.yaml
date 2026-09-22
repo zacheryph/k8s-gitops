@@ -1,0 +1,63 @@
+---
+# Credentials are Flux-substituted from the cluster-secrets SOPS values.
+# Set them with: scripts/cluster-secrets set <KEY>
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openclaw-api-keys
+type: Opaque
+stringData:
+  ANTHROPIC_API_KEY: ${OPENCLAW_ANTHROPIC_API_KEY}
+  SLACK_BOT_TOKEN: ${OPENCLAW_SLACK_BOT_TOKEN}
+  SLACK_APP_TOKEN: ${OPENCLAW_SLACK_APP_TOKEN}
+---
+apiVersion: openclaw.rocks/v1alpha1
+kind: OpenClawInstance
+metadata:
+  name: openclaw
+spec:
+  # Pinned app image (operator defaults to :latest). Bump tag+digest together.
+  image:
+    repository: ghcr.io/openclaw/openclaw
+    tag: "2026.9.5"
+    digest: sha256:ea298b62be8955d3ef750e2004a610dd90c3a30e5f9886e5d654d78a0c573218
+  envFrom:
+    - secretRef:
+        name: openclaw-api-keys
+  config:
+    # overwrite = strict GitOps: the CR is the source of truth on every restart.
+    mergeMode: overwrite
+    raw:
+      agents:
+        defaults:
+          model: anthropic/claude-sonnet-4-6
+      # Slack via Socket Mode (outbound WSS only). Tokens are referenced from
+      # the env vars supplied by the openclaw-api-keys Secret above.
+      channels:
+        slack:
+          enabled: true
+          mode: socket
+          appToken:
+            source: env
+            provider: default
+            id: SLACK_APP_TOKEN
+          botToken:
+            source: env
+            provider: default
+            id: SLACK_BOT_TOKEN
+          slashCommand:
+            enabled: true
+            name: openclaw
+          # Respond only to the owner: DMs are allowlisted to a single sender
+          # and no group channels are admitted.
+          dmPolicy: allowlist
+          allowFrom:
+            - slack:${OPENCLAW_OWNER_SLACK_ID}
+          groupPolicy: allowlist
+      commands:
+        ownerAllowFrom:
+          - slack:${OPENCLAW_OWNER_SLACK_ID}
+  storage:
+    persistence:
+      enabled: true
+      size: 10Gi

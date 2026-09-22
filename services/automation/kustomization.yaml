@@ -12,3 +12,4 @@ resources:
   #- signal-cli-rest-api.yaml
   - hermes-agent.yaml
   - zeroclaw.yaml
+  - openclaw.yaml
