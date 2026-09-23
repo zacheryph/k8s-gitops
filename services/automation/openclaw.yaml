@@ -54,9 +54,15 @@ spec:
         defaults:
           # OpenRouter provider (OPENROUTER_API_KEY from the Secret above).
           model:
-            primary: openrouter/anthropic/claude-sonnet-4.6
+            primary: openrouter/xiaomi/mimo-v2.6-pro
           models:
-            openrouter/anthropic/claude-sonnet-4.6: {}
+            openrouter/openai/gpt-6-luna: {}
+            openrouter/xiaomi/mimo-v2.6-pro: {}
+            openrouter/xiaomi/mimo-v2.6-flash: {}
+            openrouter/typesafe/jev-1.13: {}
+            openrouter/qwen/qwen3.8-omni-flash: {}
+            openrouter/z-ai/glm-5.3: {}
+            openrouter/z-ai/glm-5.3-flash: {}
       # Slack via Socket Mode (outbound WSS only). Tokens are referenced from
       # the env vars supplied by the openclaw-api-keys Secret (1Password, via
       # the ExternalSecret above).
