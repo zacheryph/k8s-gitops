@@ -26,6 +26,13 @@ spec:
     - secretKey: SLACK_APP_TOKEN
       remoteRef:
         key: openclaw/slack_app_token
+    # Gateway shared secret (auth mode: token) for the Control UI and the
+    # native desktop/mobile apps. Generate with
+    # `openclaw doctor --generate-gateway-token` (or any long random string)
+    # and store in 1Password item "openclaw", field "gateway_token".
+    - secretKey: OPENCLAW_GATEWAY_TOKEN
+      remoteRef:
+        key: openclaw/gateway_token
 ---
 apiVersion: openclaw.rocks/v1alpha1
 kind: OpenClawInstance
@@ -52,6 +59,7 @@ spec:
       - channels
       - commands
       - plugins
+      - hooks
     raw:
       agents:
         defaults:
@@ -103,6 +111,23 @@ spec:
         entries:
           slack:
             enabled: true
+      gateway:
+        controlUi:
+          # Required for non-loopback deployments: the browser Control UI is
+          # loaded from a public hostname.
+          allowedOrigins:
+            - https://openclaw.${CLUSTER_DOMAIN}
+      hooks:
+        # Inbound webhooks (POST /hooks/...). The hook token is the only auth
+        # external senders get — keep it distinct from the gateway token (the
+        # openclaw security audit flags reuse). hooks.token has no
+        # SecretRef/env source upstream, so it is substituted from
+        # cluster-secrets (SOPS). Set OPENCLAW_HOOKS_TOKEN before merging.
+        enabled: true
+        token: "${OPENCLAW_HOOKS_TOKEN}"
+        path: "/hooks"
+        allowedAgentIds:
+          - main
   # The instance edits itself: install skills, patch config, add env vars, and
   # seed workspace files via OpenClawSelfConfig. The operator validates every
   # request against this allowlist (empty allowlist = nothing allowed; protected
@@ -116,7 +141,7 @@ spec:
       - config
       - envVars
       - workspaceFiles
-  # Gateway proxy (nginx) — digest-pinned.
+  # Gateway proxy (nginx) — digest-pinned. Raw TCP proxy, no auth of its own.
   gateway:
     image:
       tag: "1.27-alpine"
@@ -124,9 +149,12 @@ spec:
   security:
     networkPolicy:
       # No same-namespace ingress to the gateway/canvas ports; the Slack path
-      # is outbound-only. To expose the Control UI later, admit peers via
-      # allowedIngressNamespaces/allowedIngressCIDRs (plus an HTTPRoute).
+      # is outbound-only. External traffic (Control UI, native apps, webhooks)
+      # arrives only via Envoy in the gateway namespace, through the HTTPRoute
+      # below.
       allowSameNamespaceIngress: false
+      allowedIngressNamespaces:
+        - gateway
   observability:
     metrics:
       # Bootstrap scope: drops the unauthenticated metrics port and the OTel
@@ -136,3 +164,31 @@ spec:
     persistence:
       enabled: true
       size: 10Gi
+---
+# Public exposure for inbound webhooks, the native desktop/mobile apps, and the
+# browser Control UI.
+#
+# Deliberately NOT labeled cluster.routine.sh/oidc-credentials: the
+# Kyverno-generated Envoy OIDC SecurityPolicy is browser-redirect auth and would
+# 302 both WebSocket upgrades from the native apps and webhook POSTs from
+# external senders. Access is enforced by OpenClaw itself instead — gateway
+# token + per-device pairing (apps, Control UI) and the dedicated hooks token
+# (webhooks). The canvas/preview port stays unrouted.
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: openclaw
+  namespace: automation
+  annotations:
+    dns.routine.sh/external: "true"
+spec:
+  parentRefs:
+    - name: external
+      namespace: gateway
+  hostnames:
+    - "openclaw.${CLUSTER_DOMAIN}"
+  rules:
+    - backendRefs:
+        - name: openclaw
+          port: 18789
