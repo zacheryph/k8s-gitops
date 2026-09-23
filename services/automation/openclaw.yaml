@@ -44,11 +44,14 @@ spec:
     # merge = operator config deep-merges with the PVC config on restart, so the
     # instance's self-edits survive pod restarts. forcePaths re-imposes the
     # owner-only access policy from the CR on every restart, so self-edits can
-    # never open DMs, group channels, or owner commands up.
+    # never open DMs, group channels, or owner commands up, or hand out
+    # plugin trust (external plugins run in-process as trusted code and can
+    # be self-installed via the gateway's plugins API).
     mergeMode: merge
     forcePaths:
       - channels
       - commands
+      - plugins
     raw:
       agents:
         defaults:
@@ -90,6 +93,16 @@ spec:
       commands:
         ownerAllowFrom:
           - slack:${OPENCLAW_OWNER_SLACK_ID}
+      # Slack ships as an external plugin: channels.slack configures it, but it
+      # stays inert until the plugin is explicitly trusted. The gateway's
+      # runtime auto-enable is ephemeral (never written to config), so pin the
+      # trust here. `plugins` is in forcePaths above, so the instance cannot
+      # self-grant trust to plugins it installs.
+      plugins:
+        enabled: true
+        entries:
+          slack:
+            enabled: true
   # The instance edits itself: install skills, patch config, add env vars, and
   # seed workspace files via OpenClawSelfConfig. The operator validates every
   # request against this allowlist (empty allowlist = nothing allowed; protected
