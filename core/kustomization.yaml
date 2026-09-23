@@ -11,6 +11,7 @@ resources:
 - repositories
 - cert-manager.yaml
 - crossplane.yaml
+- external-secrets.yaml
 - external-snapshotter.yaml
 - hardware.yaml
 - hermes-viewer
