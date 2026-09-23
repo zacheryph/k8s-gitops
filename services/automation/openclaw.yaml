@@ -1,16 +1,31 @@
 ---
-# Credentials are Flux-substituted from the cluster-secrets SOPS values.
-# Set them with: scripts/cluster-secrets set <KEY>
-apiVersion: v1
-kind: Secret
+# Credentials synced from 1Password (item "openclaw") via External Secrets
+# Operator and the onepassword ClusterSecretStore. The secretKey names are the
+# env var names referenced by the OpenClaw config below.
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/external-secrets.io/externalsecret_v1.json
+apiVersion: external-secrets.io/v1
+kind: ExternalSecret
 metadata:
   name: openclaw-api-keys
-type: Opaque
-stringData:
-  # Model provider: OpenRouter (one key, models referenced as openrouter/<provider>/<model>)
-  OPENROUTER_API_KEY: ${OPENCLAW_OPENROUTER_API_KEY}
-  SLACK_BOT_TOKEN: ${OPENCLAW_SLACK_BOT_TOKEN}
-  SLACK_APP_TOKEN: ${OPENCLAW_SLACK_APP_TOKEN}
+spec:
+  refreshInterval: 1h
+  secretStoreRef:
+    kind: ClusterSecretStore
+    name: onepassword
+  target:
+    name: openclaw-api-keys
+    creationPolicy: Owner
+  data:
+    # Model provider: OpenRouter (one key, models referenced as openrouter/<provider>/<model>)
+    - secretKey: OPENROUTER_API_KEY
+      remoteRef:
+        key: openclaw/openrouter_api_key
+    - secretKey: SLACK_BOT_TOKEN
+      remoteRef:
+        key: openclaw/slack_bot_token
+    - secretKey: SLACK_APP_TOKEN
+      remoteRef:
+        key: openclaw/slack_app_token
 ---
 apiVersion: openclaw.rocks/v1alpha1
 kind: OpenClawInstance
@@ -43,7 +58,8 @@ spec:
           models:
             openrouter/anthropic/claude-sonnet-4.6: {}
       # Slack via Socket Mode (outbound WSS only). Tokens are referenced from
-      # the env vars supplied by the openclaw-api-keys Secret above.
+      # the env vars supplied by the openclaw-api-keys Secret (1Password, via
+      # the ExternalSecret above).
       channels:
         slack:
           enabled: true
