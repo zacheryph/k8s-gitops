@@ -65,7 +65,7 @@ spec:
         defaults:
           # OpenRouter provider (OPENROUTER_API_KEY from the Secret above).
           model:
-            primary: openrouter/xiaomi/mimo-v2.6-pro
+            primary: openrouter/openai/gpt-6-luna
           models:
             openrouter/openai/gpt-6-luna: {}
             openrouter/xiaomi/mimo-v2.6-pro: {}
