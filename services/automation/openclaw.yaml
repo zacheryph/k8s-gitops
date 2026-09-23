@@ -7,7 +7,8 @@ metadata:
   name: openclaw-api-keys
 type: Opaque
 stringData:
-  ANTHROPIC_API_KEY: ${OPENCLAW_ANTHROPIC_API_KEY}
+  # Model provider: OpenRouter (one key, models referenced as openrouter/<provider>/<model>)
+  OPENROUTER_API_KEY: ${OPENCLAW_OPENROUTER_API_KEY}
   SLACK_BOT_TOKEN: ${OPENCLAW_SLACK_BOT_TOKEN}
   SLACK_APP_TOKEN: ${OPENCLAW_SLACK_APP_TOKEN}
 ---
@@ -25,12 +26,22 @@ spec:
     - secretRef:
         name: openclaw-api-keys
   config:
-    # overwrite = strict GitOps: the CR is the source of truth on every restart.
-    mergeMode: overwrite
+    # merge = operator config deep-merges with the PVC config on restart, so the
+    # instance's self-edits survive pod restarts. forcePaths re-imposes the
+    # owner-only access policy from the CR on every restart, so self-edits can
+    # never open DMs, group channels, or owner commands up.
+    mergeMode: merge
+    forcePaths:
+      - channels
+      - commands
     raw:
       agents:
         defaults:
-          model: anthropic/claude-sonnet-4-6
+          # OpenRouter provider (OPENROUTER_API_KEY from the Secret above).
+          model:
+            primary: openrouter/anthropic/claude-sonnet-4.6
+          models:
+            openrouter/anthropic/claude-sonnet-4.6: {}
       # Slack via Socket Mode (outbound WSS only). Tokens are referenced from
       # the env vars supplied by the openclaw-api-keys Secret above.
       channels:
@@ -57,6 +68,19 @@ spec:
       commands:
         ownerAllowFrom:
           - slack:${OPENCLAW_OWNER_SLACK_ID}
+  # The instance edits itself: install skills, patch config, add env vars, and
+  # seed workspace files via OpenClawSelfConfig. The operator validates every
+  # request against this allowlist (empty allowlist = nothing allowed; protected
+  # keys like gateway config and operator-managed env are always rejected) and
+  # grants the pod a scoped service-account token for the K8s API. Combined with
+  # mergeMode: merge above, self-edits persist across pod restarts.
+  selfConfigure:
+    enabled: true
+    allowedActions:
+      - skills
+      - config
+      - envVars
+      - workspaceFiles
   # Gateway proxy (nginx) — digest-pinned.
   gateway:
     image:
