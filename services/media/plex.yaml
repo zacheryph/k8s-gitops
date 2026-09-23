@@ -9,7 +9,7 @@ spec:
   accessModes: ["ReadWriteOnce"]
   resources:
     requests:
-      storage: 100Gi
+      storage: 48Gi
   storageClassName: longhorn
 ---
 # yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
@@ -93,7 +93,7 @@ spec:
       transcode:
         enabled: true
         type: emptyDir
-        sizeLimit: 100Gi
+        sizeLimit: 32Gi
     service:
       app:
         controller: plex
