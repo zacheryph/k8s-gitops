@@ -113,3 +113,8 @@ spec:
         parentRefs:
           - name: external
             namespace: gateway
+        rules:
+          - backendRefs:
+              - identifier: app
+            timeouts:
+              request: "0s"
