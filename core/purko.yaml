@@ -33,11 +33,111 @@ spec:
   values:
     namespace: purko-system
     dashboard:
-      enabled: false
+      enabled: true
     operator:
       history:
         enabled: false
     starterAgents:
-      enabled: false
+      enabled: true
+      provider: openai
+      model: gpt-5.6-terra
     presets: []
     triggerRules: []
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+  name: purko-oidc-credentials
+  namespace: purko-system
+type: Opaque
+stringData:
+  client-id: ${OIDC_PURKO_CLIENT_ID}
+  client-secret: ${OIDC_PURKO_CLIENT_SECRET}
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openrouter-api-key
+  namespace: purko-system
+type: Opaque
+stringData:
+  api-key: ${OPENROUTER_API_KEY}
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+metadata:
+  name: openai-api-key
+  namespace: purko-system
+type: Opaque
+stringData:
+  api-key: ${OPENAI_API_KEY}
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/gateway.networking.k8s.io/httproute_v1.json
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: purko-dashboard
+  namespace: purko-system
+  annotations:
+    dns.routine.sh/external: "true"
+  labels:
+    cluster.routine.sh/oidc-credentials: purko-oidc-credentials
+spec:
+  hostnames: [ "purko.${CLUSTER_DOMAIN}" ]
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: external
+      namespace: gateway
+  rules:
+    - backendRefs:
+        - group: ""
+          kind: Service
+          name: purko-operator
+          port: 8082
+      matches:
+        - path:
+            type: PathPrefix
+            value: /
+---
+apiVersion: purko.io/v1alpha1
+kind: LLMProvider
+metadata:
+  name: openrouter
+  namespace: purko-system
+spec:
+  type: custom
+  endpoint: https://openrouter.ai/api/v1
+  apiFormat: openai
+  model: deepseek/deepseek-v4-flash-0731
+  models:
+    - name: deepseek/deepseek-v4.1-flash
+    - name: google/gemini-3.8-flash
+    - name: z-ai/glm-5.3-flash
+    - name: x-ai/grok-4.6
+    - name: moonshotai/kimi-k3
+    - name: xiaomi/mimo-v2.5
+  credentials:
+    secretRef: openrouter-api-key
+    secretKey: api-key
+---
+apiVersion: purko.io/v1alpha1
+kind: LLMProvider
+metadata:
+  name: openai
+  namespace: purko-system
+spec:
+  type: openai
+  apiFormat: openai
+  model: gpt-5.6-terra
+  models:
+    - name: gpt-6-astra
+    - name: gpt-5.6-sol
+    - name: gpt-5.6-terra
+    - name: gpt-5.6-luna
+  credentials:
+    secretRef: openai-api-key
+    secretKey: api-key
