@@ -1,0 +1,75 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/monitoring.coreos.com/prometheusrule_v1.json
+---
+# Early-warning alert for kube-apiserver 5xx rate, per-instance.
+#
+# Background: on 2026-06-13, the k8s-health-check cron surfaced a stale
+# KSM liveness-probe 503 (finding #4) that had been firing since 2026-05-30.
+# Investigation found that the 503 was *itself* the canary for a real
+# underlying problem — the kube-apiserver on k0s-inwin-01 was returning
+# 5xx at 0.088% of requests (10x the rate of the other two apiservers),
+# with lease PUT p50 of 3.5s vs 25-56ms elsewhere. The cluster had
+# ~989k cumulative 5xx from that single instance over 14 days, but
+# no alert fired because nothing in the default kube-prometheus-stack
+# ruleset watches apiserver_request_total by-instance.
+#
+# This rule fires when any single apiserver's 5xx rate exceeds
+# ~0.6 errors/min sustained for 5 minutes. WATCH errors are excluded
+# because they're a different signal (long-lived stream reconnect blips
+# usually self-recover and are not actionable on their own).
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: kube-apiserver-errors
+  namespace: monitoring
+  labels:
+    app.kubernetes.io/name: kube-apiserver-errors
+    app.kubernetes.io/part-of: monitoring
+    app.kubernetes.io/component: alerts
+spec:
+  groups:
+    - name: kube-apiserver.errors
+      interval: 1m
+      rules:
+        - alert: KubeAPIServerHigh5xxRate
+          # Threshold: 0.01 5xx/s per apiserver instance for 5m.
+          # At 30 rps steady-state that's a 0.03% error rate, well
+          # above the 0.005-0.014% baseline of the healthy nodes
+          # in this cluster. Tune if too noisy in practice.
+          expr: |
+            sum by (instance) (
+              rate(apiserver_request_total{code=~"5..",verb!="WATCH"}[5m])
+            ) > 0.01
+          for: 5m
+          labels:
+            severity: warning
+          annotations:
+            summary: "kube-apiserver {{ $labels.instance }}: 5xx rate {{ $value | humanize }}/s"
+            description: |
+              kube-apiserver instance {{ $labels.instance }} is returning 5xx
+              responses at {{ $value | humanize }} requests/sec sustained for
+              5+ minutes. WATCH errors are excluded.
+
+              Diagnostic queries (run from a host with `kubectl` access):
+
+                # Per-verb 5xx breakdown for this instance:
+                sum by (verb, resource) (
+                  rate(apiserver_request_total{code=~"5..",instance="{{ $labels.instance }}",verb!="WATCH"}[5m])
+                )
+
+                # Apiserver self-reported request duration p99 for this instance:
+                histogram_quantile(0.99,
+                  sum by (le) (rate(apiserver_request_duration_seconds_bucket{instance="{{ $labels.instance }}"}[5m]))
+                )
+
+                # If the slowness is lease/coordination bound, check etcd-side
+                # latency as seen by the apiserver's own client:
+                histogram_quantile(0.99,
+                  sum by (le, operation) (
+                    rate(apiserver_etcd_request_duration_seconds_bucket{instance="{{ $labels.instance }}"}[5m])
+                  )
+                )
+
+              If the failing instance is a known-bad node (e.g. a slow disk
+              or a flapping apiserver process), drain it with
+              `kubectl drain <node> --ignore-daemonsets` and let the
+              remaining apiservers take over while you investigate.
