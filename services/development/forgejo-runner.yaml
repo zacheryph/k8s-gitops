@@ -90,7 +90,7 @@ spec:
       podspec-buildah.yaml: |-
         containers:
           - name: main
-            image: quay.io/buildah/stable:v1.43.4@sha256:2d4ddc6de2f3b563716d74d0c8b1b24f29f63cf591a3aa7e1d00b4d33787452f
+            image: quay.io/buildah/stable:v1.43.4@sha256:3e9b156ee8bdc6b4ffde303e66ab022c6c1e803450870cc31f0c649f38614ca5
             imagePullPolicy: IfNotPresent
             securityContext:
               privileged: true
