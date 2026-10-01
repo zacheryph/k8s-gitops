@@ -74,7 +74,7 @@ spec:
       podspec-default.yaml: |-
         containers:
           - name: main
-            image: ghcr.io/bjw-s-labs/forgejo-runner:ubuntu-24.04@sha256:d3f142f768c72e6f54443a07275889ee5b6c1e6560613be12a903744d6835c53
+            image: ghcr.io/bjw-s-labs/forgejo-runner:ubuntu-24.04@sha256:b16190bb905d533ccc21b6762198ebc52366c3df23b3ab538270f8953c5973bc
             imagePullPolicy: IfNotPresent
             env:
               - name: DEBIAN_FRONTEND
