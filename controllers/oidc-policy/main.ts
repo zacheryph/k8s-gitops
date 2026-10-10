@@ -1,11 +1,14 @@
-// OIDC SecurityPolicy controller — Metacontroller CompositeController webhook.
-// Watches HTTPRoutes labeled `cluster.routine.sh/oidc-credentials` and
-// generates an Envoy Gateway SecurityPolicy attaching OIDC authn to the route.
+// OIDC SecurityPolicy controller — Metacontroller DecoratorController webhook.
+// Watches every HTTPRoute and, for those labeled
+// `cluster.routine.sh/oidc-credentials`, attaches an Envoy Gateway
+// SecurityPolicy enabling OIDC authn on the route. Routes without the label get
+// no attachment, so removing the label makes Metacontroller delete the policy.
 
 export const OIDC_LABEL = "cluster.routine.sh/oidc-credentials";
 
+// DecoratorController v1 hook request: the watched HTTPRoute arrives as `object`.
 export interface HookRequest {
-  parent: {
+  object: {
     apiVersion: string;
     kind: string;
     metadata: { name: string; namespace: string; labels?: Record<string, string> };
@@ -29,11 +32,11 @@ export interface ChildObject {
  * Throws when the route is selected but misconfigured (bad label value).
  */
 export function buildSecurityPolicy(
-  parent: HookRequest["parent"],
+  parent: HookRequest["object"],
   env: { issuer: string; cookieDomain: string },
 ): ChildObject | null {
   const secretName = parent.metadata.labels?.[OIDC_LABEL];
-  if (secretName === undefined) return null; // not selected (selector drift safety)
+  if (secretName === undefined) return null; // unlabeled: no policy (deletes any existing one)
   if (!secretName) {
     throw new Error(
       `label ${OIDC_LABEL} is empty; expected the name of the Secret holding the OIDC client credentials`,
@@ -68,6 +71,15 @@ export function buildSecurityPolicy(
   };
 }
 
+/** DecoratorController sync hook: desired attachments for one HTTPRoute. */
+export function sync(
+  hook: HookRequest,
+  env: { issuer: string; cookieDomain: string },
+): { attachments: ChildObject[] } {
+  const child = buildSecurityPolicy(hook.object, env);
+  return { attachments: child ? [child] : [] };
+}
+
 function jsonResponse(body: unknown, status = 200): Response {
   return new Response(JSON.stringify(body), {
     status,
@@ -75,41 +87,40 @@ function jsonResponse(body: unknown, status = 200): Response {
   });
 }
 
-const env = {
-  issuer: process.env.OIDC_ISSUER_URL ?? "",
-  cookieDomain: process.env.OIDC_COOKIE_DOMAIN ?? "",
-};
-
-if (!env.issuer || !env.cookieDomain) {
-  console.error("OIDC_ISSUER_URL and OIDC_COOKIE_DOMAIN must be set");
-  process.exit(1);
+function serve(env: { issuer: string; cookieDomain: string }): void {
+  Bun.serve({
+    port: 8080,
+    async fetch(req): Promise<Response> {
+      const url = new URL(req.url);
+      switch (url.pathname) {
+        case "/healthz":
+        case "/readyz":
+          return new Response("ok");
+        case "/sync":
+          if (req.method !== "POST") {
+            return jsonResponse({ error: "method not allowed" }, 405);
+          }
+          try {
+            return jsonResponse(sync((await req.json()) as HookRequest, env));
+          } catch (err) {
+            console.error("sync failed:", err);
+            return jsonResponse({ error: String(err) }, 500);
+          }
+        default:
+          return jsonResponse({ error: "not found" }, 404);
+      }
+    },
+  });
 }
 
-Bun.serve({
-  port: 8080,
-  async fetch(req): Promise<Response> {
-    const url = new URL(req.url);
-    switch (url.pathname) {
-      case "/healthz":
-      case "/readyz":
-        return new Response("ok");
-      case "/sync":
-        if (req.method !== "POST") {
-          return jsonResponse({ error: "method not allowed" }, 405);
-        }
-        try {
-          const hook = (await req.json()) as HookRequest;
-          const child = buildSecurityPolicy(hook.parent, env);
-          const children = child
-            ? { "gateway.envoyproxy.io/v1alpha1/SecurityPolicy": [child] }
-            : {};
-          return jsonResponse({ children });
-        } catch (err) {
-          console.error("sync failed:", err);
-          return jsonResponse({ error: String(err) }, 500);
-        }
-      default:
-        return jsonResponse({ error: "not found" }, 404);
-    }
-  },
-});
+if (import.meta.main) {
+  const env = {
+    issuer: process.env.OIDC_ISSUER_URL ?? "",
+    cookieDomain: process.env.OIDC_COOKIE_DOMAIN ?? "",
+  };
+  if (!env.issuer || !env.cookieDomain) {
+    console.error("OIDC_ISSUER_URL and OIDC_COOKIE_DOMAIN must be set");
+    process.exit(1);
+  }
+  serve(env);
+}

@@ -12,15 +12,22 @@ generation policies in use).
 ## Design
 
 - **New controller** (`controllers/oidc-policy/`): a Metacontroller
-  CompositeController webhook written in TypeScript for Bun
-  (`Bun.serve`). One `/sync` endpoint maps a parent HTTPRoute to a
-  `gateway.envoyproxy.io/v1alpha1/SecurityPolicy` child, replicating the
-  Kyverno template 1:1 (secret name from the label value, issuer +
-  cookie domain from env, same scopes, same `source-httproute` label).
-- **CompositeController** custom resource (in `platform/security/`) selects
-  HTTPRoutes by label and adopts existing `-oidc` SecurityPolicies
-  (same naming as Kyverno's generate, `InPlace` update strategy,
-  `resyncPeriodSeconds: 600` ≈ Kyverno's background reconciliation).
+  DecoratorController webhook written in TypeScript for Bun
+  (`Bun.serve`). One `/sync` endpoint maps an HTTPRoute to a
+  `gateway.envoyproxy.io/v1alpha1/SecurityPolicy` attachment, replicating the
+  Kyverno template (secret name from the label value, issuer +
+  cookie domain from env, same `source-httproute` label). Scopes are now four
+  separate entries; Kyverno's `[ openid profile email groups ]` was a single
+  YAML string.
+- **DecoratorController** custom resource (in `platform/security/`) watches
+  **all** HTTPRoutes (no labelSelector, `ignoreStatusChanges: true`).
+  Unlabeled routes get no attachment, so removing the label deletes the
+  SecurityPolicy, matching Kyverno's `synchronize: true`. A labelSelector would
+  stop syncing the route on label removal and orphan the policy.
+  `InPlace` updates, `resyncPeriodSeconds: 600`.
+- **Why not CompositeController**: it requires the parent to have
+  `spec.selector` (HTTPRoutes don't) and overwrites the parent's entire
+  `.status` each sync, which would fight Envoy Gateway over `status.parents`.
 - **CI** (`.github/workflows/oidc-policy.yml`): triggered only on changes
   under `controllers/oidc-policy/` (plus the workflow file itself).
   Runs `bun test`, builds/pushes `ghcr.io/zacheryph/oidc-policy-controller`
@@ -34,21 +41,40 @@ generation policies in use).
 
 1. This PR: controller deployment points at a placeholder tag
    (`sha-bootstrap@sha256:0000…`); Flux will retry until the real image lands.
-2. After merge, trigger the workflow (it also runs automatically on the merge
-   push since the controller dir changed).
+2. After merge the workflow runs on the merge push (the controller dir changed),
+   pushes the image and opens an image-bump PR. GHCR packages start **private**:
+   make `oidc-policy-controller` public in the package settings (or add an
+   imagePullSecret) before the next step.
 3. Merge the automated image-bump PR → controller deploys.
-4. CompositeController adopts the existing `<route>-oidc` SecurityPolicies
-   (identical names) — no downtime or churn on the gateway.
-5. Manual cleanup (repo has `prune: false`, so removals are not automated):
-   - `flux suspend helmrelease kyverno -n kyverno` (optional, avoids re-install races)
-   - `helm uninstall kyverno -n kyverno` then `kubectl delete ns kyverno`
-   - delete the kyverno CRDs (`kubectl delete crd -l app.kubernetes.io/part-of=kyverno`)
+4. Uninstall Kyverno **before** touching its CRDs/ClusterPolicy (repo has
+   `prune: false`). With `synchronize: true`, a running Kyverno can delete the
+   generated SecurityPolicies when the ClusterPolicy goes away, which would drop
+   OIDC from every route:
+   - `flux suspend helmrelease kyverno -n kyverno`
+   - `helm uninstall kyverno -n kyverno`
+   - then `kubectl delete crd -l app.kubernetes.io/part-of=kyverno` and
+     `kubectl delete ns kyverno`
+5. Hand the existing policies to the controller. Metacontroller only manages
+   attachments it created; the Kyverno-made `<route>-oidc` policies keep
+   working but stay unmanaged (its create gets AlreadyExists, which it ignores).
+   Recreate each one, nudging the route so the resync happens immediately
+   (only a few seconds without OIDC per route):
+   ```sh
+   kubectl get httproute -A -l cluster.routine.sh/oidc-credentials \
+     -o jsonpath='{range .items[*]}{.metadata.namespace} {.metadata.name}{"\n"}{end}' |
+   while read -r ns name; do
+     kubectl -n "$ns" delete securitypolicy "${name}-oidc" --ignore-not-found
+     kubectl -n "$ns" annotate httproute "$name" --overwrite \
+       oidc-policy.routine.sh/resync="$(date +%s)"
+   done
+   ```
+   Verify each policy now has an `ownerReferences` entry pointing at its route.
 
 ## Tasks
 
 - [x] Write Bun controller + tests (`controllers/oidc-policy/`)
 - [x] Write GH Actions workflow with path filter + automated image-bump PR
-- [x] Add `platform/security/oidc-policy-controller.yaml` (HelmRelease + CompositeController)
+- [x] Add `platform/security/oidc-policy-controller.yaml` (HelmRelease + DecoratorController)
 - [x] Remove `core/kyverno.yaml`, `platform/security/policy.yaml`
 - [x] Remove kyverno from Velero `daily-infra` namespace list
 - [x] Remove kyverno Grafana dashboard

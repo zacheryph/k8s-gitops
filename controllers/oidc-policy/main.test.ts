@@ -1,5 +1,5 @@
 import { test, expect } from "bun:test";
-import { buildSecurityPolicy, OIDC_LABEL } from "./main";
+import { buildSecurityPolicy, sync, OIDC_LABEL } from "./main";
 
 const env = { issuer: "https://id.example.com", cookieDomain: "example.com" };
 
@@ -30,7 +30,7 @@ test("generates a SecurityPolicy wired to the labeled secret", () => {
   ]);
 });
 
-test("returns null for unselected routes", () => {
+test("returns null for unlabeled routes", () => {
   const unselected = {
     ...parent,
     metadata: { name: parent.metadata.name, namespace: parent.metadata.namespace },
@@ -44,4 +44,20 @@ test("throws on an empty label value", () => {
     metadata: { ...parent.metadata, labels: { [OIDC_LABEL]: "" } },
   };
   expect(() => buildSecurityPolicy(bad, env)).toThrow(/empty/);
+});
+
+test("sync attaches the SecurityPolicy for a labeled route", () => {
+  const { attachments } = sync({ object: parent }, env);
+  expect(attachments).toHaveLength(1);
+  expect(attachments[0]!.kind).toBe("SecurityPolicy");
+  expect(attachments[0]!.metadata.name).toBe("vaultwarden-oidc");
+});
+
+test("sync returns no attachments once the label is removed", () => {
+  const unlabeled = {
+    ...parent,
+    metadata: { name: parent.metadata.name, namespace: parent.metadata.namespace },
+  };
+  // Metacontroller deletes any previously attached child not in this list.
+  expect(sync({ object: unlabeled }, env)).toEqual({ attachments: [] });
 });
