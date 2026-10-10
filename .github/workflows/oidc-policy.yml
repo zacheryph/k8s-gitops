@@ -1,0 +1,71 @@
+name: oidc-policy-controller
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "controllers/oidc-policy/**"
+      - ".github/workflows/oidc-policy.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  packages: write
+  pull-requests: write
+
+concurrency:
+  group: oidc-policy-controller
+  cancel-in-progress: false
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+
+      - name: Test
+        working-directory: controllers/oidc-policy
+        run: |
+          bun install --ignore-scripts
+          bun test
+
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push
+        id: build
+        uses: docker/build-push-action@v6
+        with:
+          context: controllers/oidc-policy
+          push: true
+          tags: ghcr.io/${{ github.repository_owner }}/oidc-policy-controller:sha-${{ github.sha }}
+
+      - name: Open PR to update controller image
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DIGEST: ${{ steps.build.outputs.digest }}
+          SHA: ${{ github.sha }}
+          BRANCH: chore/oidc-policy-controller-${{ github.sha }}
+        run: |
+          SHORT_SHA="${SHA:0:7}"
+          git config user.name "hermes-release-bot"
+          git config user.email "zacheryph+hermes@gmail.com"
+          git checkout -b "${BRANCH}"
+          sed -i \
+            "s|tag: sha-.*@sha256:.*|tag: sha-${SHA}@${DIGEST}|" \
+            platform/security/oidc-policy-controller.yaml
+          git add platform/security/oidc-policy-controller.yaml
+          git commit -m "chore(deps): update oidc-policy-controller to sha-${SHORT_SHA}"
+          git push origin "${BRANCH}"
+          gh pr create \
+            --base main --head "${BRANCH}" \
+            --title "chore(deps): update oidc-policy-controller to sha-${SHORT_SHA}" \
+            --body "Automated image bump from the \`oidc-policy-controller\` workflow (commit ${SHORT_SHA}, digest \`${DIGEST}\`)."

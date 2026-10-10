@@ -16,7 +16,6 @@ resources:
 - hardware.yaml
 - hermes-viewer
 - k8tz.yaml
-- kyverno.yaml
 - longhorn.yaml
 - metallb.yaml
 - openclaw.yaml
