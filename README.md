@@ -14,7 +14,7 @@ bootstrap/          Flux bootstrapping + one Kustomization per layer
 
 **Layers apply in order with explicit `dependsOn` chains:**
 
-1. **`core/`** — Cluster infrastructure: cert-manager, Longhorn (storage), MetalLB (load balancing), Kyverno (policy), k8tz, reloader, Crossplane, external-snapshotter, plus operators (CloudNativePG, Dragonfly, Grafana operator, Strimzi Kafka) and a read-only ServiceAccount for cluster introspection.
+1. **`core/`** — Cluster infrastructure: cert-manager, Longhorn (storage), MetalLB (load balancing), k8tz, reloader, Crossplane, external-snapshotter, plus operators (CloudNativePG, Dragonfly, Grafana operator, Strimzi Kafka) and a read-only ServiceAccount for cluster introspection.
 
 2. **`platform/`** — Shared services: PostgreSQL 18 (CNPG), Kafka (Strimzi), Garage (S3-compatible object storage), Envoy Gateway + Gateway API, Prometheus/Grafana/Loki/Promtail monitoring stack, Pocket ID (OIDC), Velero (backup), ExternalDNS (AdGuard Home + Cloudflare), Crossplane providers.
 

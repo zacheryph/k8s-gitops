@@ -72,21 +72,23 @@ spec:
             primary: true
             port: *port
 ---
-# metacontroller CompositeController: generates Envoy SecurityPolicies for
-# HTTPRoutes labeled cluster.routine.sh/oidc-credentials
+# metacontroller DecoratorController: attaches an Envoy OIDC SecurityPolicy to
+# every HTTPRoute labeled cluster.routine.sh/oidc-credentials. Deliberately no
+# labelSelector: all HTTPRoutes are synced so that removing the label returns no
+# attachment and Metacontroller deletes the policy (a selector would just stop
+# syncing the route and orphan it). DecoratorController (not Composite) because
+# HTTPRoutes have no spec.selector and their status is owned by Envoy Gateway.
 apiVersion: metacontroller.k8s.io/v1alpha1
-kind: CompositeController
+kind: DecoratorController
 metadata:
   name: oidc-security-policy
 spec:
-  parentResource:
-    apiVersion: gateway.networking.k8s.io/v1
-    resource: httproutes
-    labelSelector:
-      matchExpressions:
-        - key: cluster.routine.sh/oidc-credentials
-          operator: Exists
-  childResources:
+  resources:
+    - apiVersion: gateway.networking.k8s.io/v1
+      resource: httproutes
+      # only resync on spec/label/annotation changes, not Envoy Gateway's status writes
+      ignoreStatusChanges: true
+  attachments:
     - apiVersion: gateway.envoyproxy.io/v1alpha1
       resource: securitypolicies
       updateStrategy:

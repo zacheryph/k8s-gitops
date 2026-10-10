@@ -169,7 +169,7 @@ spec:
 # browser Control UI.
 #
 # Deliberately NOT labeled cluster.routine.sh/oidc-credentials: the
-# Kyverno-generated Envoy OIDC SecurityPolicy is browser-redirect auth and would
+# controller-generated Envoy OIDC SecurityPolicy is browser-redirect auth and would
 # 302 both WebSocket upgrades from the native apps and webhook POSTs from
 # external senders. Access is enforced by OpenClaw itself instead — gateway
 # token + per-device pairing (apps, Control UI) and the dedicated hooks token
