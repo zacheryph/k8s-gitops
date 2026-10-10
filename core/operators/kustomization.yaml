@@ -8,5 +8,6 @@ resources:
 - cloudnative-pg.yaml
 - dragonfly.yaml
 - grafana.yaml
+- metacontroller.yaml
 - namespace.yaml
 - strimzi.yaml
