@@ -215,7 +215,6 @@ spec:
             - gateway
             - hardware-system
             - k0s-autopilot
-            - kyverno
             - metallb-system
             - operators-system
             - security
