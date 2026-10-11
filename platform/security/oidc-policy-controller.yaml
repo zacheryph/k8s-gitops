@@ -34,7 +34,7 @@ spec:
           app:
             image:
               repository: ghcr.io/zacheryph/oidc-policy-controller
-              tag: sha-bootstrap@sha256:0000000000000000000000000000000000000000000000000000000000000000
+              tag: sha-67caff9b1d7b29f0a589e89b45d81c583c7f372c@sha256:baac3df87836959ca26e1727c643d90c865a8ec1471d0f7d761ca98c9bcc9b8f
             env:
               - name: OIDC_ISSUER_URL
                 value: ${OIDC_ISSUER_URL}
