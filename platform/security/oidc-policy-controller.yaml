@@ -70,7 +70,8 @@ spec:
         ports:
           http:
             primary: true
-            port: *port
+            port: 80
+            targetPort: *port
 ---
 # metacontroller DecoratorController: attaches an Envoy OIDC SecurityPolicy to
 # every HTTPRoute labeled cluster.routine.sh/oidc-credentials. Deliberately no
