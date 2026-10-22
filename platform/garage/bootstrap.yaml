@@ -141,7 +141,7 @@ spec:
         seccompProfile: { type: RuntimeDefault }
       containers:
         - name: bootstrap
-          image: python:3.14-alpine@sha256:2e740b2c28a426e74f11396c05e38afb3191acced75045b8d62df573c1dc8ce8
+          image: python:3.14-alpine@sha256:601e99e090cb08c2784a42395487709500bc39930307fe72f3f11a8f3c430762
           securityContext:
             allowPrivilegeEscalation: false
             readOnlyRootFilesystem: true
