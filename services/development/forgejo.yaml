@@ -42,7 +42,7 @@ spec:
     image:
       registry: code.forgejo.org
       repository: forgejo/forgejo
-      tag: 16.0.5-rootless
+      tag: 16.0.7-rootless
 
     valkey-cluster:
       enabled: false
