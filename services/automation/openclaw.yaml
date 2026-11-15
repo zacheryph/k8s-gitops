@@ -42,7 +42,7 @@ spec:
   # Pinned app image (operator defaults to :latest). Bump tag+digest together.
   image:
     repository: ghcr.io/openclaw/openclaw
-    tag: "2026.10.10@sha256:1e5ee6c7d02d5b5f64f9cf26a30c7ef7d4ec292f0d25fa590f4b7e103e8bf799"
+    tag: "2026.11.3@sha256:e73f689d663567f0fe3c5a85c54beb3e102dc21f0814bf375e9039ee2d2df51b"
     digest: sha256:ea298b62be8955d3ef750e2004a610dd90c3a30e5f9886e5d654d78a0c573218
   envFrom:
     - secretRef:
