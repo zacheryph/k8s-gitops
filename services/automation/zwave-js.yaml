@@ -31,7 +31,7 @@ spec:
           app:
             image:
               repository: ghcr.io/zwave-js/zwave-js-ui
-              tag: 11.24.3@sha256:3fef66d575ea0ea9d50aad3e05c36619228557cfa888557eac2035215a29a321
+              tag: 11.26.2@sha256:00360afd0b0e833d6166d4127f4ef41d2b24c75f2b2172d32dd4e9d26d613778
             probes:
               liveness: &probes
                 enabled: true
