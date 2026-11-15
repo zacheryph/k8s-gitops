@@ -86,7 +86,7 @@ spec:
           app:
             image:
               repository: ghcr.io/zeroclaw-labs/zeroclaw
-              tag: v0.8.7@sha256:3ffa4a1eae189b3e6b2374685d08f3c086086ca26442366e8cbf9c743cbb6236
+              tag: v0.9.0@sha256:d3f567f253eb1de4dd89bc41730ff954f45958862c29465c21ec46d5c2387fd1
             args: ["daemon"]
             env:
               HOME: /zeroclaw-data
