@@ -6603,7 +6603,7 @@ spec:
             resourceFieldRef:
               containerName: manager
               resource: limits.memory
-        image: ghcr.io/fluxcd/notification-controller:v1.10.0
+        image: ghcr.io/fluxcd/notification-controller:v1.10.1
         imagePullPolicy: IfNotPresent
         livenessProbe:
           httpGet:
