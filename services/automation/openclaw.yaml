@@ -39,11 +39,12 @@ kind: OpenClawInstance
 metadata:
   name: openclaw
 spec:
-  # Pinned app image (operator defaults to :latest). Bump tag+digest together.
+  # Pinned app image (operator defaults to :latest). Keep the digest inside
+  # `tag` so Renovate bumps both together: the operator's separate `digest`
+  # field overrides `tag` entirely, so it must stay unset.
   image:
     repository: ghcr.io/openclaw/openclaw
     tag: "2026.11.7@sha256:461cc655301409901f2df11d6ec9f029f9709e4607826e9780fd74f8e1d12a16"
-    digest: sha256:ea298b62be8955d3ef750e2004a610dd90c3a30e5f9886e5d654d78a0c573218
   envFrom:
     - secretRef:
         name: openclaw-api-keys
@@ -142,10 +143,11 @@ spec:
       - envVars
       - workspaceFiles
   # Gateway proxy (nginx) — digest-pinned. Raw TCP proxy, no auth of its own.
+  # repository is the operator default, spelled out so Renovate can track it.
   gateway:
     image:
-      tag: "1.27-alpine"
-      digest: sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10
+      repository: docker.io/library/nginx
+      tag: "1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10"
   security:
     networkPolicy:
       # No same-namespace ingress to the gateway/canvas ports; the Slack path
