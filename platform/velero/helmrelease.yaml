@@ -113,18 +113,13 @@ spec:
     # Plugin: AWS S3 backend (B2). CSI snapshot support is built into Velero
     # core since v1.14 — no separate velero-plugin-for-csi plugin required.
     initContainers:
-      # NOTE: pinned to the unreleased `main` build, NOT a tagged release.
-      # Releases up to and including v1.14.2 unconditionally set PutObject's
-      # Tagging field (`Tagging: aws.String(o.tagging)`), so even with no
-      # tagging configured the AWS SDK emits an empty `x-amz-tagging:` header.
-      # Backblaze B2 rejects ANY x-amz-tagging header with HTTP 400
-      # "InvalidArgument: Unsupported header 'x-amz-tagging'", which fails every
-      # backup at the final velero-backup.json upload. The fix (only set Tagging
-      # when non-empty) is merged to main but not yet released. Revert to a
-      # pinned vX.Y.Z release once a release > v1.14.2 ships the fix.
-      # Renovate ignores this floating tag — bump the digest by hand.
+      # >= v1.14.3 only sets PutObject's Tagging field when tagging is
+      # configured. Earlier releases always sent an empty `x-amz-tagging:`
+      # header, which Backblaze B2 rejects (HTTP 400 "Unsupported header
+      # 'x-amz-tagging'"), failing every backup at the final upload.
+      # Plugin v1.14.x pairs with Velero v1.18.x (chart 12.x).
       - name: velero-plugin-for-aws
-        image: velero/velero-plugin-for-aws:main@sha256:c80a64273d4856f6b11494626392ffd7258e280d0e15d76d51fd1082a424b4fa
+        image: velero/velero-plugin-for-aws:v1.14.4@sha256:c85a7fa803569e3128c33e4f5766f84ab156c8d171c9f1dd2715581d45ce98fa
         imagePullPolicy: IfNotPresent
         volumeMounts:
           - name: plugins
