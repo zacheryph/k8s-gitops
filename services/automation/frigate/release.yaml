@@ -37,6 +37,14 @@ spec:
     defaultPodOptions:
       nodeSelector:
         intel.feature.node.kubernetes.io/gpu: "true"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: kubernetes.io/hostname
+              namespaces: [media]
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: plex
     controllers:
       app:
         type: statefulset

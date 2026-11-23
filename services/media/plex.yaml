@@ -32,6 +32,14 @@ spec:
         fsGroup: 568
       nodeSelector:
         intel.feature.node.kubernetes.io/gpu: "true"
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - topologyKey: kubernetes.io/hostname
+              namespaces: [automation]
+              labelSelector:
+                matchLabels:
+                  app.kubernetes.io/instance: frigate
     controllers:
       plex:
         containers:
