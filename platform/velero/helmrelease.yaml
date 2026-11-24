@@ -119,7 +119,7 @@ spec:
       # 'x-amz-tagging'"), failing every backup at the final upload.
       # Plugin v1.14.x pairs with Velero v1.18.x (chart 12.x).
       - name: velero-plugin-for-aws
-        image: velero/velero-plugin-for-aws:v1.14.4@sha256:c85a7fa803569e3128c33e4f5766f84ab156c8d171c9f1dd2715581d45ce98fa
+        image: velero/velero-plugin-for-aws:v1.15.0@sha256:cb8fdbefc54e2d99b124f6611bc8cad31a1e546689dfb2a32c9307339c492750
         imagePullPolicy: IfNotPresent
         volumeMounts:
           - name: plugins
