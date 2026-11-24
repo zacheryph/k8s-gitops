@@ -147,7 +147,7 @@ spec:
   gateway:
     image:
       repository: docker.io/library/nginx
-      tag: "1.27-alpine@sha256:65645c7bb6a0661892a8b03b89d0743208a18dd2f3f17a54ef4b76fb8e2f2a10"
+      tag: "1.31-alpine@sha256:b50897d5c7b1aa08067c3d90c5e8b3e47ec4e3c91c91446f67820228f7b41e34"
   security:
     networkPolicy:
       # No same-namespace ingress to the gateway/canvas ports; the Slack path
