@@ -21,4 +21,4 @@ kind: Provider
 metadata:
   name: crossplane-contrib-provider-upjet-github
 spec:
-  package: xpkg.upbound.io/crossplane-contrib/provider-upjet-github:v0.18.6
+  package: xpkg.upbound.io/crossplane-contrib/provider-upjet-github:v0.23.0
