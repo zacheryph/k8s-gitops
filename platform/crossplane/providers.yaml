@@ -5,7 +5,7 @@ kind: Provider
 metadata:
   name: markopolo123-provider-backblaze
 spec:
-  package: xpkg.upbound.io/markopolo123/provider-backblaze:v0.1.0
+  package: xpkg.upbound.io/markopolo123/provider-backblaze:v0.2.0
 ---
 # yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/pkg.crossplane.io/provider_v1.json
 apiVersion: pkg.crossplane.io/v1
