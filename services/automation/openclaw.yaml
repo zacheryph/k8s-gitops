@@ -44,7 +44,7 @@ spec:
   # field overrides `tag` entirely, so it must stay unset.
   image:
     repository: ghcr.io/openclaw/openclaw
-    tag: "2026.11.7@sha256:461cc655301409901f2df11d6ec9f029f9709e4607826e9780fd74f8e1d12a16"
+    tag: "2026.11.10@sha256:230afbdd8344310cac1e2d8e5dfad67315e82f3757692014310e77653639acb0"
   envFrom:
     - secretRef:
         name: openclaw-api-keys
