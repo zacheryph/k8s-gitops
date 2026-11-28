@@ -13,7 +13,9 @@ spec:
   dependsOn:
     - name: platform
   interval: 10m0s
-  prune: false
+  prune: true
+  deletionPolicy: WaitForTermination
+  timeout: 10m
   decryption:
     provider: sops
     secretRef:

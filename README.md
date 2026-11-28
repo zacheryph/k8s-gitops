@@ -23,9 +23,9 @@ bootstrap/          Flux bootstrapping + one Kustomization per layer
    - `development/` — Forgejo (self-hosted Git)
    - `general/` — Vaultwarden, Actual Budget
    - `immich/` — Immich photo management
-   - `media/` — Plex, Sonarr, Radarr, SABnzbd, ErsatzTV
+   - `media/` — Plex, Sonarr, Radarr, SABnzbd
 
-All layers use `prune: false` — deleting a file from git does **not** delete the resource from the cluster. Clean up removed resources manually.
+Shared layers use `prune: false` — deleting a file from git does **not** delete the resource from the cluster. The dedicated `core-crossplane`, `platform-crossplane`, `core-purko`, `services-zeroclaw`, and `services-mattermost` scopes use `prune: true` for staged removal. See the [service retirement plan](docs/service-retirement.md) for reconciliation gates, uninstall order, and storage cleanup.
 
 ## Secrets
 
