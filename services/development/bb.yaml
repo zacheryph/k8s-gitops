@@ -87,7 +87,7 @@ spec:
             image:
               repository: ghcr.io/zacheryph/devbox
               # Bumped by the devbox workflow's PR after each image build.
-              tag: sha-0000000000000000000000000000000000000000@sha256:0000000000000000000000000000000000000000000000000000000000000000
+              tag: sha-97597d9fc75eb512100c3c30c0c4d23b8b4715ea@sha256:b97cfc681546225b334b14ef9d9a6afc359e46a37760bc5740f9ef1f0acbb650
             # The entrypoint starts as root to reinstall the apt packages listed
             # in ~/.config/devbox/apt-packages, then drops to uid 1000 (dev).
             env:
