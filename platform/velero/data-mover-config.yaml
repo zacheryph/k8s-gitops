@@ -7,13 +7,21 @@
 #
 #   AttachVolume.Attach failed: volume … is not ready for workloads
 #
-# The loadAffinity ConfigMap constrains data mover pod scheduling.
-# Specifying the Longhorn storageClass ties the scheduling decision
-# to the StorageClass's topology (WaitForFirstConsumer), so the data
-# mover pod lands on the same node Longhorn expects.
+# The ConfigMap constrains data mover pod scheduling.  The loadAffinity
+# entry filtered to the Longhorn storageClass ties the scheduling
+# decision to the StorageClass's topology (WaitForFirstConsumer), so the
+# data mover pod lands on the same node Longhorn expects.
+#
+# Velero v1.18 changed the ConfigMap format (pkg/nodeagent.GetConfigs):
+# exactly one data key whose value is a full NodeAgentConfigs JSON
+# object, and each loadAffinity entry carries `storageClass` as a plain
+# string (previously it was an array of `{name: ...}` objects).  The old
+# format makes every node-agent pod crash-loop on startup with:
+#
+#   error getting node agent configs from configMap velero-data-mover-config:
+#   json: cannot unmarshal array into Go value of type types.NodeAgentConfigs
 #
 # Ref: https://velero.io/docs/main/data-movement-node-selection/
-# Ref: https://github.com/velero-io/velero/issues/9343
 ---
 apiVersion: v1
 kind: ConfigMap
@@ -21,13 +29,12 @@ metadata:
   name: velero-data-mover-config
   namespace: velero
 data:
-  loadAffinity: |
-    [
-      {
-        "storageClass": [
-          {
-            "name": "longhorn"
-          }
-        ]
-      }
-    ]
+  # Single key; only the value is parsed (as NodeAgentConfigs).
+  configs: |
+    {
+      "loadAffinity": [
+        {
+          "storageClass": "longhorn"
+        }
+      ]
+    }

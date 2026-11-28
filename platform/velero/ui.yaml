@@ -93,10 +93,17 @@ spec:
       general:
         veleroNamespace: velero
         grafanaUrl: https://grafana.${CLUSTER_DOMAIN}
-        # We supply the passphrase via envFrom (velero-ui-secret); don't let the
-        # chart mint its own placeholder passphrase Secret.
+        # The chart 1.2.0 deployment template unconditionally renders the
+        # AUTH_SECRET_PASSPHRASE env itself: with useSecret=false it
+        # hard-requires an inline `.value` (which would put the passphrase in
+        # plaintext inside the HelmRelease), and its env entry would shadow the
+        # envFrom-provided one anyway. Point the template at the pre-existing
+        # secret instead — no chart-minted passphrase Secret is created when
+        # existingSecret is set.
         secretPassPhrase:
-          useSecret: false
+          useSecret: true
+          existingSecret: velero-ui-secret
+          key: AUTH_SECRET_PASSPHRASE
 
     # Non-secret OIDC wiring for pocket-id (id.${CLUSTER_DOMAIN}). The client
     # id/secret come from velero-ui-secret via envFrom below.
