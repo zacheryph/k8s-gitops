@@ -5,7 +5,7 @@ metadata:
   name: k0s-inwin
 spec:
   k0s:
-    version: v1.36.2+k0s.0
+    version: v1.37.2+k0s.1
     config:
       apiVersion: k0s.k0sproject.io/v1beta1
       kind: ClusterConfig
