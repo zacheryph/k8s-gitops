@@ -1,0 +1,170 @@
+# bb (getbb.app): a web UI for coding agents (Pi, Claude Code, Codex),
+# reachable from phone, browser and desktop at https://bb.${CLUSTER_DOMAIN}.
+# Runs the devbox image (images/devbox/): bb's server and host daemon in one
+# container, agents and their tools beside them, /home/dev on a Longhorn
+# volume so logins, repos and anything installed at runtime persist.
+#
+# bb's HTTP API is unauthenticated and can run commands and read files: the
+# OIDC SecurityPolicy on the route and the NetworkPolicy below (only the
+# Envoy proxy may reach the pod) are the only access control. Keep both.
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/secret.json
+apiVersion: v1
+kind: Secret
+type: Opaque
+metadata:
+  name: bb-oidc-credentials
+  namespace: development
+stringData:
+  client-id: ${OIDC_BB_CLIENT_ID}
+  client-secret: ${OIDC_BB_CLIENT_SECRET}
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/persistentvolumeclaim.json
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: bb-home
+  namespace: development
+spec:
+  accessModes: ["ReadWriteOnce"]
+  resources:
+    requests:
+      storage: 100Gi
+  storageClassName: longhorn
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/networking.k8s.io/v1/networkpolicy.json
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata:
+  name: bb
+  namespace: development
+spec:
+  podSelector:
+    matchLabels:
+      app.kubernetes.io/name: bb
+  policyTypes: [Ingress]
+  ingress:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: gateway
+          podSelector:
+            matchLabels:
+              app.kubernetes.io/component: proxy
+              app.kubernetes.io/managed-by: envoy-gateway
+              app.kubernetes.io/name: envoy
+      ports:
+        - protocol: TCP
+          port: 38886
+---
+# yaml-language-server: $schema=https://raw.githubusercontent.com/bjw-s-labs/helm-charts/main/charts/other/app-template/schemas/helmrelease-helm-v2.schema.json
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: &name bb
+  namespace: development
+spec:
+  interval: 1h
+  chartRef:
+    kind: OCIRepository
+    name: app-template
+    namespace: flux-system
+
+  values:
+    defaultPodOptions:
+      # No cluster API access by default; give it a kubeconfig in $HOME if wanted.
+      automountServiceAccountToken: false
+      securityContext:
+        fsGroup: 1000
+        fsGroupChangePolicy: OnRootMismatch
+
+    controllers:
+      bb:
+        # One RWO volume: the old pod must let go before the new one mounts it.
+        strategy: Recreate
+        containers:
+          app:
+            image:
+              repository: ghcr.io/zacheryph/devbox
+              # Bumped by the devbox workflow's PR after each image build.
+              tag: sha-0000000000000000000000000000000000000000@sha256:0000000000000000000000000000000000000000000000000000000000000000
+            # The entrypoint starts as root to reinstall the apt packages listed
+            # in ~/.config/devbox/apt-packages, then drops to uid 1000 (dev).
+            env:
+              BB_APP_URL: https://bb.${CLUSTER_DOMAIN}
+            probes:
+              startup:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: &port 38886
+                  periodSeconds: 5
+                  # The first boot and every apt/mise change install before bb starts.
+                  failureThreshold: 120
+              liveness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  periodSeconds: 30
+                  timeoutSeconds: 10
+                  failureThreshold: 5
+              readiness:
+                enabled: true
+                custom: true
+                spec:
+                  httpGet:
+                    path: /health
+                    port: *port
+                  periodSeconds: 10
+                  timeoutSeconds: 5
+            resources:
+              requests:
+                cpu: 500m
+                memory: 1Gi
+              # Agents run builds and test suites in here.
+              limits:
+                memory: 8Gi
+
+    service:
+      app:
+        controller: bb
+        ports:
+          http:
+            port: *port
+
+    route:
+      app:
+        enabled: true
+        kind: HTTPRoute
+        annotations:
+          dns.routine.sh/external: "true"
+        labels:
+          cluster.routine.sh/oidc-credentials: bb-oidc-credentials
+        hostnames: ["bb.${CLUSTER_DOMAIN}"]
+        parentRefs:
+          - name: external
+            namespace: gateway
+        rules:
+          - backendRefs:
+              - identifier: app
+            # bb's UI lives on long-lived WebSockets.
+            timeouts:
+              request: "0s"
+
+    persistence:
+      home:
+        existingClaim: bb-home
+        globalMounts:
+          - path: /home/dev
+      # Headless browsers (Playwright) need more than the default 64Mi.
+      shm:
+        type: emptyDir
+        medium: Memory
+        sizeLimit: 1Gi
+        globalMounts:
+          - path: /dev/shm

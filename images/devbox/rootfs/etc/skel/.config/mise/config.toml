@@ -1,0 +1,17 @@
+# Global tools for the devbox. Installed into ~/.local/share/mise (on the
+# persistent volume); the entrypoint runs `mise install` at boot, which only
+# fetches what is missing. Add tools with `mise use -g <tool>@<version>`.
+#
+# The image already ships node, bun, go, python3/uv, gh, kubectl, helm, flux,
+# sops and yq; a version pinned here takes precedence on PATH.
+#
+# Examples:
+#   rust = "latest"
+#   java = "temurin-21"
+#   ruby = "3.4"
+#   zig = "latest"
+#   terraform = "latest"
+#   "aqua:casey/just" = "latest"
+#   "ubi:charmbracelet/glow" = "latest"
+
+[tools]
