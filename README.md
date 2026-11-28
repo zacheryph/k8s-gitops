@@ -25,9 +25,7 @@ bootstrap/          Flux bootstrapping + one Kustomization per layer
    - `immich/` — Immich photo management
    - `media/` — Plex, Sonarr, Radarr, SABnzbd
 
-Shared layers use `prune: false` — deleting a file from git does **not** delete the resource from the cluster. The dedicated `core-crossplane`, `platform-crossplane`, `core-purko`, `services-zeroclaw`, and `services-mattermost` scopes use `prune: true` for staged removal. See the [service retirement plan](docs/service-retirement.md) for reconciliation gates, uninstall order, and storage cleanup.
-
-Retirement step 4A removes Crossplane's HelmRelease and Mattermost's remaining namespace/chart source. Crossplane's namespace/source and the retirement Flux scopes remain until uninstall and pruning finish. Final cleanup of those objects, retained CRDs, storage, and credentials follows in step 4B.
+Shared layers use `prune: false` — deleting a file from git does **not** delete the resource from the cluster. The root `flux-system` scope uses pruning. The final [service retirement cleanup](docs/service-retirement.md) removes the temporary scopes using their live deletion policies and deletes the untracked Purko namespace with a one-time Job in `bootstrap/service-retirement.yaml`. Retained CRDs, storage, and credentials need the documented inventory checks.
 
 ## Secrets
 

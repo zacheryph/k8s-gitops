@@ -205,7 +205,6 @@ spec:
           ttl: 720h0m0s           # 30 days
           includedNamespaces:
             - cert-manager
-            - crossplane
             - dns
             - gateway
             - hardware-system
