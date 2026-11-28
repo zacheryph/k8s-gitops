@@ -18,17 +18,3 @@ spec:
   ref:
     tag: 2.4.3
   url: oci://ghcr.io/home-operations/charts-mirror/crossplane
----
-apiVersion: helm.toolkit.fluxcd.io/v2
-kind: HelmRelease
-metadata:
-  name: crossplane
-  namespace: crossplane
-spec:
-  chartRef:
-    kind: OCIRepository
-    name: crossplane
-  interval: 1h
-  values:
-    metrics:
-      enabled: true

@@ -2,8 +2,9 @@
 
 ## Sequence
 
-Use four separately reconciled stages. Stage 1 prepares deletion; the later
-stages remove resources. Do not merge the stages together or advance before
+Use four stages with separately reconciled changes. Stage 1 prepares deletion;
+the later stages remove resources. Stage 4 needs two reconciled revisions so
+Crossplane uninstalls before its namespace is deleted. Do not advance before
 checking the live cluster. Git describes desired state, not everything left
 behind by earlier `prune: false` reconciliations.
 
@@ -11,8 +12,9 @@ behind by earlier `prune: false` reconciliations.
 | --- | --- | --- |
 | 1 (merged) | Give the active targets their own pruning scopes. Keep their resource specs unchanged. Delete the unused ErsatzTV manifest and references. | Owner reports all Kustomizations healthy after merging. Keep the live inventory for cleanup. |
 | 2 (merged) | Empty the Purko/ZeroClaw scopes and remove Mattermost's HelmRelease/HTTPRoute, keeping its namespace/repository. Drain any live Crossplane composites and managed resources operationally, with controllers still running. | Owner reports step 2 merged and healthy. Verify live Crossplane managed-resource cleanup before removing providers. |
-| 3 (this PR) | Empty the Crossplane provider scope to prune the three declared Providers. Remove any discovered configuration/function packages and provider configs operationally. | Providers, revisions, their controller workloads, and dependent resources are gone. Crossplane itself remains running until this completes. |
-| 4 | Uninstall Crossplane, then remove namespaces, retained CRDs, dedicated storage, credentials, and repository references. | No target workloads, controllers, custom resources, dedicated PVs/Longhorn volumes, or unexplained finalizers remain. |
+| 3 (merged) | Empty the Crossplane provider scope to prune the three declared Providers. Remove any discovered configuration/function packages and provider configs operationally. | Owner reports the PR merged. Verify Providers, revisions, their controller workloads, and dependent resources are gone before 4A. |
+| 4A (this PR) | Remove Crossplane's HelmRelease; empty Mattermost's scope; remove obsolete provider Renovate rules. | Crossplane Helm uninstall has finished, Mattermost's namespace/source are gone, and retained storage is accounted for. |
+| 4B (next reconciliation) | Remove Crossplane's namespace/source and empty scopes; finish retained CRD, storage, database, credential, and repository cleanup. | No target workloads, controllers, custom resources, dedicated PVs/Longhorn volumes, or unexplained finalizers remain. |
 
 These are operational stages; a stage may need another PR if the live inventory
 reveals resources or dependencies not represented in Git.
@@ -104,7 +106,7 @@ external identifiers, ownership, `deletionPolicy`, and `managementPolicies` for
 all Crossplane resources, including resources installed manually. Inventory
 provider configs, compositions/revisions, package revisions, runtime configs,
 usages, connection secrets, and any other installed Crossplane APIs too. Git
-currently defines three Providers but no managed resources or provider configs;
+defined three Providers at stage 1 but no managed resources or provider configs;
 this does not establish that the live cluster has none.
 
 Inspect installed Purko CRDs and their instances, Helm hooks, and cluster-scoped
@@ -206,7 +208,7 @@ finalizers to make a blocked uninstall appear successful.
 
 ## Stage 3: remove Crossplane packages
 
-This PR removes the three Provider manifests (Backblaze, DigitalOcean, GitHub)
+Stage 3 removes the three Provider manifests (Backblaze, DigitalOcean, GitHub)
 and leaves `platform/crossplane` with `resources: []`. The existing
 `platform-crossplane` Flux Kustomization remains with pruning enabled, so it
 deletes the Providers from its previous inventory. The Crossplane HelmRelease,
@@ -268,11 +270,73 @@ throughout this stage. Emptying Git alone cannot remove manually created items.
 
 ## Stage 4: uninstall Crossplane and finish cleanup
 
-1. Remove just the Crossplane HelmRelease from `core/crossplane/release.yaml`.
-   Reconcile `core-crossplane` and wait for its uninstall to finish. Then remove
-   its OCIRepository and namespace, reconcile again, and verify deletion.
-2. Remove the empty retirement scopes/directories and the Mattermost bootstrap
-   definition only after their inventories and actual resources are empty.
+### 4A: uninstall Crossplane (this PR)
+
+Remove only the Crossplane HelmRelease from `core/crossplane/release.yaml`.
+Keep its namespace, OCIRepository, and `core-crossplane` scope in place until
+Helm has finished uninstalling. The existing pruning scope deletes the
+HelmRelease and helm-controller runs the uninstall. This revision also empties
+`services/mattermost` to prune its remaining Namespace and HelmRepository after
+the stage-2 application uninstall. All five retirement Flux scopes stay present.
+Obsolete Crossplane provider Renovate matching and digest exceptions are removed.
+
+Before merging, confirm Provider and ProviderRevision cleanup from stage 3 is
+complete, including manually installed packages/functions/configurations. Do
+not uninstall Crossplane with unresolved package or managed-resource finalizers.
+Confirm Mattermost's HelmRelease and application workloads are gone, then
+record any remaining Mattermost PVC/PV bindings and CSI volume handles: deleting
+the namespace also deletes its retained PVCs. The Longhorn data still requires
+explicit cleanup when its PV reclaim policy is Retain.
+
+```sh
+# Before merging: these must have no remaining packages needing Crossplane.
+kubectl get providers.pkg.crossplane.io
+kubectl get providerrevisions.pkg.crossplane.io
+kubectl get configurations.pkg.crossplane.io
+kubectl get functions.pkg.crossplane.io
+kubectl get configurationrevisions.pkg.crossplane.io
+kubectl get functionrevisions.pkg.crossplane.io
+kubectl get deployment,pod -n crossplane --show-labels
+
+# Mattermost's application must be gone; record any remaining storage first.
+kubectl get helmrelease mattermost -n mattermost --ignore-not-found
+kubectl get deployment,statefulset,pod -n mattermost
+kubectl get pvc -n mattermost -o yaml
+kubectl get pv -o yaml
+
+# After merging: uninstall Crossplane and prune Mattermost's final inventory.
+flux reconcile kustomization flux-system --with-source
+flux reconcile kustomization core-crossplane
+flux reconcile kustomization services-mattermost
+kubectl get helmrelease crossplane -n crossplane --ignore-not-found
+helm list -A --all
+kubectl get deployment,pod -n crossplane
+kubectl get namespace mattermost --ignore-not-found
+
+# Expected: Crossplane retains just Namespace + OCIRepository; Mattermost empty.
+flux tree kustomization core-crossplane
+flux tree kustomization services-mattermost
+```
+
+Check the step-4A revision (or a descendant) was applied. The Crossplane
+HelmRelease must be absent rather than Terminating, the Helm release must no
+longer be installed/pending/failed-uninstall, and its controller workloads must
+be gone. Mattermost's namespace must be absent, with no unexplained terminating
+resources. A healthy Kustomization alone does not establish those results.
+Keep CRDs available until any remaining custom resources/finalizers have been
+resolved. No cluster or database commands run as part of preparing this PR.
+
+### 4B: cleanup after uninstall is verified (next reconciliation)
+
+1. After 4A has finished uninstalling Crossplane, confirm `core-crossplane`'s
+   inventory contains only its Namespace and OCIRepository. Remove its bootstrap
+   definition and directory in 4B: the live scope's `WaitForTermination` deletion
+   policy collects those two remaining objects. Verify actual deletion, including
+   any timeout/finalizer leftovers. No HelmRelease may remain at this point.
+2. In the same 4B revision, remove the other empty retirement scopes/directories
+   and the Mattermost bootstrap definition only after their inventories and
+   actual resources are empty. The root `flux-system` scope has pruning enabled,
+   so removing bootstrap definitions deletes the Flux scopes too.
 3. Inspect retained Purko and Crossplane/provider CRDs, including provider API
    groups that do not end in `crossplane.io`. Verify each type has no remaining
    instances and delete only the exact CRDs belonging to the retired services.
@@ -289,8 +353,10 @@ throughout this stage. Emptying Git alone cannot remove manually created items.
    manually, not by Flux. Remove dedicated OIDC clients/credentials and unused
    SOPS keys (including `MATTERMOST_DB_PASSWORD` and ZeroClaw OIDC variables),
    verifying they have no other consumers.
-6. Remove Crossplane's Renovate package matcher/digest exception, its Velero
-   namespace exclusion, and update README/CLAUDE architecture descriptions.
+6. Crossplane's Renovate provider matcher/digest exception and active
+   architecture listings are removed in 4A. Remove the `crossplane` namespace
+   entry from Velero's `daily-infra.template.includedNamespaces`, remove the
+   remaining retirement-scope references from README/CLAUDE, and reconcile.
    Keep Velero and its Backblaze integration: they are separate services.
 7. Compare the live cluster against the captured inventory, including external
    resources, rather than relying on `kubectl get all` (which omits CRs, PVCs,

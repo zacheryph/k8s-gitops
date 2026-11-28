@@ -14,9 +14,9 @@ bootstrap/          Flux bootstrapping + one Kustomization per layer
 
 **Layers apply in order with explicit `dependsOn` chains:**
 
-1. **`core/`** — Cluster infrastructure: cert-manager, Longhorn (storage), MetalLB (load balancing), k8tz, reloader, Crossplane, external-snapshotter, plus operators (CloudNativePG, Dragonfly, Grafana operator, Strimzi Kafka) and a read-only ServiceAccount for cluster introspection.
+1. **`core/`** — Cluster infrastructure: cert-manager, Longhorn (storage), MetalLB (load balancing), k8tz, reloader, external-snapshotter, plus operators (CloudNativePG, Dragonfly, Grafana operator, Strimzi Kafka) and a read-only ServiceAccount for cluster introspection.
 
-2. **`platform/`** — Shared services: PostgreSQL 18 (CNPG), Kafka (Strimzi), Garage (S3-compatible object storage), Envoy Gateway + Gateway API, Prometheus/Grafana/Loki/Promtail monitoring stack, Pocket ID (OIDC), Velero (backup), ExternalDNS (AdGuard Home + Cloudflare), Crossplane providers.
+2. **`platform/`** — Shared services: PostgreSQL 18 (CNPG), Kafka (Strimzi), Garage (S3-compatible object storage), Envoy Gateway + Gateway API, Prometheus/Grafana/Loki/Promtail monitoring stack, Pocket ID (OIDC), Velero (backup), ExternalDNS (AdGuard Home + Cloudflare).
 
 3. **`services/<group>/`** — Application workloads, one Flux Kustomization per group:
    - `automation/` — Home Assistant, Frigate NVR, Z-Wave JS, Hermes Agent, Signal CLI
@@ -27,7 +27,7 @@ bootstrap/          Flux bootstrapping + one Kustomization per layer
 
 Shared layers use `prune: false` — deleting a file from git does **not** delete the resource from the cluster. The dedicated `core-crossplane`, `platform-crossplane`, `core-purko`, `services-zeroclaw`, and `services-mattermost` scopes use `prune: true` for staged removal. See the [service retirement plan](docs/service-retirement.md) for reconciliation gates, uninstall order, and storage cleanup.
 
-Retirement step 3 empties the Crossplane provider scope after step 2 removed the Purko, ZeroClaw, and Mattermost workloads. Their Flux scopes remain for pruning; Mattermost's namespace and chart source remain until cleanup. Crossplane itself remains installed until provider deletion is verified.
+Retirement step 4A removes Crossplane's HelmRelease and Mattermost's remaining namespace/chart source. Crossplane's namespace/source and the retirement Flux scopes remain until uninstall and pruning finish. Final cleanup of those objects, retained CRDs, storage, and credentials follows in step 4B.
 
 ## Secrets
 

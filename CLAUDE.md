@@ -38,13 +38,15 @@ k0sctl apply --config config/cluster.yaml
 
 `bootstrap/flux-system/gotk-sync.yaml` points Flux at `./bootstrap`, which holds one Flux `Kustomization` per layer with explicit ordering via `dependsOn`:
 
-1. **`core/`** — cluster infrastructure: cert-manager, Longhorn (storage), MetalLB, k8tz, reloader, external-snapshotter, Crossplane, plus `core/operators/` (CloudNativePG, Dragonfly, Grafana operator, Strimzi) and `core/repositories/` (the shared `app-template` OCIRepository in `flux-system`). Also `core/hermes-viewer/` (read-only ServiceAccount/RBAC for cluster introspection).
+1. **`core/`** — cluster infrastructure: cert-manager, Longhorn (storage), MetalLB, k8tz, reloader, external-snapshotter, plus `core/operators/` (CloudNativePG, Dragonfly, Grafana operator, Strimzi) and `core/repositories/` (the shared `app-template` OCIRepository in `flux-system`). Also `core/hermes-viewer/` (read-only ServiceAccount/RBAC for cluster introspection).
 2. **`platform/`** (dependsOn core) — shared services: `database/` (CNPG PostgreSQL 18, Strimzi Kafka + topics), `garage/`, `minio.yaml`, `gateway/` (Envoy Gateway + Gateway API), `monitoring/` (Grafana, Prometheus stack, Loki, Promtail), `security/` (pocket-id, OIDC SecurityPolicy controller — a Metacontroller DecoratorController whose webhook source lives in `controllers/oidc-policy/`).
 3. **`services/<group>/`** (each dependsOn platform; one Flux Kustomization per group in `bootstrap/`) — workloads: `automation/` (frigate, home-assistant, zwave-js, hermes-agent), `development/` (forgejo, bb — a coding-agent web UI on the `images/devbox` image), `general/` (vaultwarden, unifi, actual), `immich/`, `media/` (plex, sonarr, radarr, sabnzbd).
 
 All layers decrypt with SOPS (`sops-gpg` secret) and run `postBuild.substituteFrom` the `cluster-secrets` Secret — manifests reference `${CLUSTER_DOMAIN}`, `${LOAD_BALANCER_*}`, `${POSTGRES_ADDRESS}`, credentials, etc. as literal `${VAR}` strings that Flux substitutes at apply time. New variables go in `config/secrets.yaml` (SOPS-encrypted, included by `core/kustomization.yaml`).
 
 **`prune: false` on shared layers**: deleting a file from git does NOT delete the resource from the cluster. The dedicated `core-crossplane`, `platform-crossplane`, `core-purko`, `services-zeroclaw`, and `services-mattermost` scopes use `prune: true` with `deletionPolicy: WaitForTermination` for staged retirement. Their manifests are excluded from the shared layer builds. Follow `docs/service-retirement.md`; verify ownership transfer before deleting resources, drain Crossplane-managed resources before providers, and finish provider cleanup before uninstalling Crossplane itself.
+
+Retirement step 4A removes Crossplane's HelmRelease and empties Mattermost's scope. Keep Crossplane's Namespace/OCIRepository and the retirement scopes until deletion is verified; remove them in a separate step-4B reconciliation. Retained CRDs, Longhorn data, and manually managed database/credentials require explicit cleanup.
 
 ## Conventions
 
