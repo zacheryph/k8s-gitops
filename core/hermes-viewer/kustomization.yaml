@@ -11,3 +11,4 @@ resources:
   - binding.yaml
   - operators-rbac.yaml
   - nodes-rbac.yaml
+  - gateway-rbac.yaml
