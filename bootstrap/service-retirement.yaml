@@ -1,0 +1,149 @@
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/v1/serviceaccount.json
+---
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: retire-purko-namespace
+  namespace: flux-system
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/clusterrole_v1.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: retire-purko-namespace
+rules:
+  - apiGroups: [""]
+    resources: [namespaces]
+    resourceNames: [purko-system]
+    verbs: [get, delete]
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/clusterrolebinding_v1.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: retire-purko-namespace
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: retire-purko-namespace
+subjects:
+  - kind: ServiceAccount
+    name: retire-purko-namespace
+    namespace: flux-system
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/role_v1.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: retire-purko-namespace
+  namespace: operators-system
+rules:
+  - apiGroups: [helm.toolkit.fluxcd.io]
+    resources: [helmreleases]
+    resourceNames: [purko]
+    verbs: [get]
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/rolebinding_v1.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: retire-purko-namespace
+  namespace: operators-system
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: retire-purko-namespace
+subjects:
+  - kind: ServiceAccount
+    name: retire-purko-namespace
+    namespace: flux-system
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/batch/job_v1.json
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: retire-purko-namespace
+  namespace: flux-system
+spec:
+  # No TTL: retain completion as a receipt instead of recreating every sync.
+  backoffLimit: 1
+  activeDeadlineSeconds: 720
+  template:
+    spec:
+      serviceAccountName: retire-purko-namespace
+      automountServiceAccountToken: true
+      restartPolicy: Never
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 65534
+        runAsGroup: 65534
+        seccompProfile: { type: RuntimeDefault }
+      containers:
+        - name: cleanup
+          image: python:3.15-alpine@sha256:0f9552bb28711333da16915ec146f5e6bb44a7fdac9ced15dc17c2e0206346dd
+          securityContext:
+            allowPrivilegeEscalation: false
+            readOnlyRootFilesystem: true
+            capabilities: { drop: [ALL] }
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 128Mi
+          command: [python3, -B, -u, -c]
+          args:
+            - |
+              import os
+              from pathlib import Path
+              import ssl
+              import time
+              from urllib.error import HTTPError
+              from urllib.request import Request, urlopen
+
+              NAMESPACE = "/api/v1/namespaces/purko-system"
+              RELEASE = "/apis/helm.toolkit.fluxcd.io/v2/namespaces/operators-system/helmreleases/purko"
+
+              def main():
+                  account = Path("/var/run/secrets/kubernetes.io/serviceaccount")
+                  token = (account / "token").read_text().strip()
+                  context = ssl.create_default_context(cafile=str(account / "ca.crt"))
+                  host = os.environ["KUBERNETES_SERVICE_HOST"]
+                  if ":" in host:
+                      host = "[" + host + "]"
+                  port = os.environ.get("KUBERNETES_SERVICE_PORT_HTTPS", "443")
+                  endpoint = "https://" + host + ":" + port
+
+                  def api(method, path):
+                      request = Request(
+                          endpoint + path,
+                          method=method,
+                          headers={"Authorization": "Bearer " + token},
+                      )
+                      try:
+                          with urlopen(request, context=context, timeout=10) as response:
+                              return response.status
+                      except HTTPError as error:
+                          if error.code == 404:
+                              return 404
+                          raise RuntimeError(
+                              method + " " + path + " failed: HTTP " + str(error.code)
+                          ) from error
+
+                  if api("GET", RELEASE) != 404:
+                      raise RuntimeError("Purko HelmRelease still exists; finish uninstall first")
+                  if api("GET", NAMESPACE) == 404:
+                      print("purko-system is already absent")
+                      return
+                  api("DELETE", NAMESPACE)
+                  deadline = time.monotonic() + 600
+                  while time.monotonic() < deadline:
+                      if api("GET", NAMESPACE) == 404:
+                          print("purko-system deletion completed")
+                          return
+                      time.sleep(5)
+                  raise TimeoutError("purko-system is still terminating; inspect remaining resources/finalizers")
+
+              if __name__ == "__main__":
+                  main()

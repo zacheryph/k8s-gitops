@@ -44,9 +44,9 @@ k0sctl apply --config config/cluster.yaml
 
 All layers decrypt with SOPS (`sops-gpg` secret) and run `postBuild.substituteFrom` the `cluster-secrets` Secret — manifests reference `${CLUSTER_DOMAIN}`, `${LOAD_BALANCER_*}`, `${POSTGRES_ADDRESS}`, credentials, etc. as literal `${VAR}` strings that Flux substitutes at apply time. New variables go in `config/secrets.yaml` (SOPS-encrypted, included by `core/kustomization.yaml`).
 
-**`prune: false` on shared layers**: deleting a file from git does NOT delete the resource from the cluster. The dedicated `core-crossplane`, `platform-crossplane`, `core-purko`, `services-zeroclaw`, and `services-mattermost` scopes use `prune: true` with `deletionPolicy: WaitForTermination` for staged retirement. Their manifests are excluded from the shared layer builds. Follow `docs/service-retirement.md`; verify ownership transfer before deleting resources, drain Crossplane-managed resources before providers, and finish provider cleanup before uninstalling Crossplane itself.
+**`prune: false` on shared layers**: deleting a file from git does NOT delete the resource from the cluster. The root `flux-system` scope uses pruning. Final retirement removes the five temporary scopes through their existing live `WaitForTermination` deletion policies; Crossplane's final namespace/source are collected from its saved inventory.
 
-Retirement step 4A removes Crossplane's HelmRelease and empties Mattermost's scope. Keep Crossplane's Namespace/OCIRepository and the retirement scopes until deletion is verified; remove them in a separate step-4B reconciliation. Retained CRDs, Longhorn data, and manually managed database/credentials require explicit cleanup.
+`bootstrap/service-retirement.yaml` is a one-time Purko namespace deletion Job with permissions limited to that namespace and reading Purko's old HelmRelease. Keep its completed Job as a receipt until cleanup is verified; do not add a TTL that would cause Flux to recreate it every sync. It is excluded from Renovate because Job pod templates are immutable. Follow `docs/service-retirement.md` for verification and removal of the Job/RBAC afterward. Retained CRDs, Longhorn data, and manually managed database/credentials need explicit cleanup. Preserve the shared `operators-system`, `automation`, and `media` namespaces and shared storage.
 
 ## Conventions
 

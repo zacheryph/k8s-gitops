@@ -19,6 +19,8 @@
   // config/ holds SOPS-encrypted secrets and host-level OS config; only
   // config/cluster.yaml (k0sctl) is scanned, by the k0s custom manager below.
   ignorePaths: [
+    // Completed one-time cleanup Job: keep its immutable pod template pinned.
+    "bootstrap/service-retirement.yaml",
     "config/secrets.yaml",
     "config/*.secret.yaml",
     "config/ubuntu/**",
