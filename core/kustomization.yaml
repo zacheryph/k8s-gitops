@@ -15,6 +15,7 @@ resources:
 - external-snapshotter.yaml
 - hardware.yaml
 - hermes-viewer
+- istio
 - k8tz.yaml
 - longhorn.yaml
 - metallb.yaml
