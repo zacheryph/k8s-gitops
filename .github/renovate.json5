@@ -97,15 +97,6 @@
     },
     {
       customType: "regex",
-      description: "Process Crossplane provider packages",
-      managerFilePatterns: ["/(core|platform|services)/.+\\.yaml$/"],
-      matchStrings: [
-        "package:\\s*(?<depName>xpkg\\.(upbound|crossplane)\\.io\\/[^\\s:@]+):(?<currentValue>[^\\s@]+)",
-      ],
-      datasourceTemplate: "docker",
-    },
-    {
-      customType: "regex",
       description: "Process Grafana dashboards pulled from grafana.com",
       managerFilePatterns: ["/(core|platform|services)/.+\\.yaml$/"],
       matchStrings: [
@@ -211,14 +202,12 @@
       // - flux-system: i don't quite know, but it just breaks renovate?
       // - resource/hardware#intel-gpu-plugin: operator does not support digesting
       // - development/forgejo: pinning the oci helm repository does not work
-      // - crossplane providers: package refs are kept as plain tags
       description: ["Do not attempt to pinDigest files that cause issues"],
       pinDigests: false,
       matchFileNames: [
         "bootstrap/flux-system/**",
         "core/resources/hardware.yaml",
         "services/development/forgejo.yaml",
-        "platform/crossplane/providers.yaml",
       ],
     },
   ],
