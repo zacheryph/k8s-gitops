@@ -23,7 +23,7 @@ RUN apt-get update \
 
 # Node.js (bb and Pi need 24+)
 # renovate: datasource=node-version depName=node versioning=node
-ARG NODE_VERSION=24.22.3
+ARG NODE_VERSION=26.13.1
 RUN case "${TARGETARCH:-amd64}" in amd64) a=x64;; arm64) a=arm64;; esac \
  && curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${a}.tar.xz" \
     | tar -xJ -C /usr/local --strip-components=1 --exclude=CHANGELOG.md --exclude=LICENSE --exclude=README.md \
