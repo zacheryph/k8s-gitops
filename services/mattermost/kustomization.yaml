@@ -5,4 +5,4 @@ kind: Kustomization
 namespace: mattermost
 resources:
   - namespace.yaml
-  - release.yaml
+  - repository.yaml

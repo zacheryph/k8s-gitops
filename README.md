@@ -27,6 +27,8 @@ bootstrap/          Flux bootstrapping + one Kustomization per layer
 
 Shared layers use `prune: false` — deleting a file from git does **not** delete the resource from the cluster. The dedicated `core-crossplane`, `platform-crossplane`, `core-purko`, `services-zeroclaw`, and `services-mattermost` scopes use `prune: true` for staged removal. See the [service retirement plan](docs/service-retirement.md) for reconciliation gates, uninstall order, and storage cleanup.
 
+Retirement step 2 empties the Purko and ZeroClaw scopes and removes Mattermost's workload and route. Their Flux scopes remain for pruning; Mattermost's namespace and chart source remain until uninstall is verified. Crossplane and its providers remain installed for the next teardown stages.
+
 ## Secrets
 
 Managed with [SOPS](https://github.com/getsops/sops) (PGP encryption) and Flux variable substitution:

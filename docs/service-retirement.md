@@ -9,8 +9,8 @@ behind by earlier `prune: false` reconciliations.
 
 | Stage | Change | Required evidence before advancing |
 | --- | --- | --- |
-| 1 (this PR) | Give the active targets their own pruning scopes. Keep their resource specs unchanged. Delete the unused ErsatzTV manifest and references. | New scopes own the expected objects; previous layers no longer inventory them. Capture live resources and storage. |
-| 2 | Remove Purko, ZeroClaw, Mattermost workloads and their dedicated resources. Drain Crossplane composites and managed resources with controllers still running. | App HelmReleases have finished uninstalling; Crossplane managed resources have finished their intended external deletion or explicit handoff. |
+| 1 (merged) | Give the active targets their own pruning scopes. Keep their resource specs unchanged. Delete the unused ErsatzTV manifest and references. | Owner reports all Kustomizations healthy after merging. Keep the live inventory for cleanup. |
+| 2 (this PR) | Empty the Purko/ZeroClaw scopes and remove Mattermost's HelmRelease/HTTPRoute, keeping its namespace/repository. Drain any live Crossplane composites and managed resources operationally, with controllers still running. | App HelmReleases have finished uninstalling; Crossplane managed resources have finished their intended external deletion or explicit handoff. |
 | 3 | Remove Crossplane providers and any discovered configuration/function packages and provider configs. | Providers, revisions, their controller workloads, and dependent resources are gone. Crossplane itself remains running until this completes. |
 | 4 | Uninstall Crossplane, then remove namespaces, retained CRDs, dedicated storage, credentials, and repository references. | No target workloads, controllers, custom resources, dedicated PVs/Longhorn volumes, or unexplained finalizers remain. |
 
@@ -117,6 +117,65 @@ database/role and external OIDC clients. Keep inventory exports containing
 credentials out of Git.
 
 ## Stage 2: remove apps and drain Crossplane-managed resources
+
+### Changes applied by this PR
+
+`core/purko` and `services/automation/zeroclaw` now render zero resources. Their
+existing Flux Kustomizations remain present with pruning enabled, so the next
+reconciliation collects their previous inventories. Mattermost now renders only
+its namespace and HelmRepository; its HelmRelease and HTTPRoute are collected.
+The Crossplane controller and all three Providers are unchanged. No Crossplane
+managed resources are declared in Git, so any live managed-resource teardown
+must be done against the identified cluster objects before stage 3.
+
+Before merging, capture `automation/zeroclaw-data`'s bound PV and CSI volume
+handle using the inventory commands above: this PR deletes that PVC. Check for
+Purko custom resources requiring its operator for finalization and remove those
+first. Healthy Flux Kustomizations alone do not establish that such resources
+are absent. Keep the operator installed until those deletions finish.
+
+After merging, reconcile the scopes and check the actual uninstall results:
+
+```sh
+flux reconcile kustomization flux-system --with-source
+flux reconcile kustomization core-purko
+flux reconcile kustomization services-zeroclaw
+flux reconcile kustomization services-mattermost
+
+# These HelmReleases must disappear, not remain Terminating.
+kubectl get helmrelease purko -n operators-system --ignore-not-found
+kubectl get helmrelease zeroclaw -n automation --ignore-not-found
+kubectl get helmrelease mattermost -n mattermost --ignore-not-found
+helm list -A --all
+
+# These dedicated resources must also disappear.
+kubectl get pvc zeroclaw-data -n automation --ignore-not-found
+kubectl get secret zeroclaw-oidc-credentials -n automation --ignore-not-found
+kubectl get networkpolicy zeroclaw -n automation --ignore-not-found
+kubectl get httproute mattermost -n mattermost --ignore-not-found
+
+# Purko and ZeroClaw inventories should be empty. Mattermost should retain
+# only its Namespace and HelmRepository until a later cleanup reconciliation.
+flux tree kustomization core-purko
+flux tree kustomization services-zeroclaw
+flux tree kustomization services-mattermost
+
+# Keep these installed. Inspect actual managed resources before stage 3.
+kubectl get providers.pkg.crossplane.io
+kubectl get managed -A -o yaml
+kubectl get composite -A -o yaml
+kubectl get claim -A -o yaml
+```
+
+Confirm the scopes applied the step-2 commit (or a descendant), then check for
+remaining app pods, services, routes, and finalizers. A healthy Kustomization or
+empty inventory is not sufficient proof that Helm finished uninstalling.
+Mattermost's chart-retained PVCs, database/role, namespace, and source remain
+for cleanup after the initial uninstall. ZeroClaw's retained PV/Longhorn data
+also still needs the stage-4 storage cleanup. No live cluster operations are
+performed by opening this PR.
+
+### Operational order and remaining cleanup
 
 - Remove Purko custom resources while its operator can still process their
   finalizers; then empty `core/purko` and reconcile `core-purko`.
