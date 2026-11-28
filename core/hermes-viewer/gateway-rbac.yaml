@@ -1,0 +1,44 @@
+# Extends the hermes-viewer (read-only) cluster access to include the
+# Gateway API custom resources so the Hermes health-check cron can
+# inspect HTTPRoutes (and the Gateways/GatewayClasses that carry them)
+# when diagnosing workload reachability.
+#
+# The built-in `view` ClusterRole bound in `binding.yaml` only covers
+# core API resources; CRDs such as gateway.networking.k8s.io are not
+# included unless an aggregating ClusterRole adds them.
+#
+# Scope: get / list / watch only. No write verbs. No pod exec. No
+# secrets. The hermes-viewer SA remains read-only cluster-wide.
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/v1/clusterrole.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: hermes-viewer-gateway-read
+  labels:
+    app.kubernetes.io/name: hermes-viewer
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/part-of: homelab-tooling
+rules:
+  # Gateway API — HTTPRoutes, GRPCRoutes, Gateways, GatewayClasses
+  - apiGroups: ["gateway.networking.k8s.io"]
+    resources: ["httproutes", "grpcroutes", "gateways", "gatewayclasses"]
+    verbs: ["get", "list", "watch"]
+---
+# yaml-language-server: $schema=https://kubernetes-schemas.pages.dev/rbac.authorization.k8s.io/v1/clusterrolebinding.json
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: hermes-viewer-gateway-read
+  labels:
+    app.kubernetes.io/name: hermes-viewer
+    app.kubernetes.io/component: rbac
+    app.kubernetes.io/part-of: homelab-tooling
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: hermes-viewer-gateway-read
+subjects:
+  - kind: ServiceAccount
+    name: hermes-viewer
+    namespace: automation
