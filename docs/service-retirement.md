@@ -10,8 +10,8 @@ behind by earlier `prune: false` reconciliations.
 | Stage | Change | Required evidence before advancing |
 | --- | --- | --- |
 | 1 (merged) | Give the active targets their own pruning scopes. Keep their resource specs unchanged. Delete the unused ErsatzTV manifest and references. | Owner reports all Kustomizations healthy after merging. Keep the live inventory for cleanup. |
-| 2 (this PR) | Empty the Purko/ZeroClaw scopes and remove Mattermost's HelmRelease/HTTPRoute, keeping its namespace/repository. Drain any live Crossplane composites and managed resources operationally, with controllers still running. | App HelmReleases have finished uninstalling; Crossplane managed resources have finished their intended external deletion or explicit handoff. |
-| 3 | Remove Crossplane providers and any discovered configuration/function packages and provider configs. | Providers, revisions, their controller workloads, and dependent resources are gone. Crossplane itself remains running until this completes. |
+| 2 (merged) | Empty the Purko/ZeroClaw scopes and remove Mattermost's HelmRelease/HTTPRoute, keeping its namespace/repository. Drain any live Crossplane composites and managed resources operationally, with controllers still running. | Owner reports step 2 merged and healthy. Verify live Crossplane managed-resource cleanup before removing providers. |
+| 3 (this PR) | Empty the Crossplane provider scope to prune the three declared Providers. Remove any discovered configuration/function packages and provider configs operationally. | Providers, revisions, their controller workloads, and dependent resources are gone. Crossplane itself remains running until this completes. |
 | 4 | Uninstall Crossplane, then remove namespaces, retained CRDs, dedicated storage, credentials, and repository references. | No target workloads, controllers, custom resources, dedicated PVs/Longhorn volumes, or unexplained finalizers remain. |
 
 These are operational stages; a stage may need another PR if the live inventory
@@ -118,7 +118,7 @@ credentials out of Git.
 
 ## Stage 2: remove apps and drain Crossplane-managed resources
 
-### Changes applied by this PR
+### Changes applied in stage 2
 
 `core/purko` and `services/automation/zeroclaw` now render zero resources. Their
 existing Flux Kustomizations remain present with pruning enabled, so the next
@@ -129,7 +129,7 @@ managed resources are declared in Git, so any live managed-resource teardown
 must be done against the identified cluster objects before stage 3.
 
 Before merging, capture `automation/zeroclaw-data`'s bound PV and CSI volume
-handle using the inventory commands above: this PR deletes that PVC. Check for
+handle using the inventory commands above: stage 2 deletes that PVC. Check for
 Purko custom resources requiring its operator for finalization and remove those
 first. Healthy Flux Kustomizations alone do not establish that such resources
 are absent. Keep the operator installed until those deletions finish.
@@ -205,6 +205,57 @@ state, pods, routes, services, and finalizers after reconciliation. Do not remov
 finalizers to make a blocked uninstall appear successful.
 
 ## Stage 3: remove Crossplane packages
+
+This PR removes the three Provider manifests (Backblaze, DigitalOcean, GitHub)
+and leaves `platform/crossplane` with `resources: []`. The existing
+`platform-crossplane` Flux Kustomization remains with pruning enabled, so it
+deletes the Providers from its previous inventory. The Crossplane HelmRelease,
+OCIRepository, namespace, and `core-crossplane` scope are unchanged.
+
+Before merging, verify live composite/managed/claim resources have finished
+deleting or have an explicit handoff. Stage-2 Kustomization health does not
+prove this. Git contains no provider configs or managed resources to delete;
+do not infer that manually created resources are absent. Capture the installed
+Providers, ProviderRevisions, controller workloads, and their CRDs so stage 4
+can account for retained objects even after the package inventory is gone.
+
+```sh
+# Before merging: inspect these while providers still run.
+kubectl get managed -A -o yaml
+kubectl get composite -A -o yaml
+kubectl get claim -A -o yaml
+kubectl get configurations.pkg.crossplane.io
+kubectl get functions.pkg.crossplane.io
+kubectl get providers.pkg.crossplane.io -o yaml
+kubectl get providerrevisions.pkg.crossplane.io -o yaml
+kubectl get deployment,pod -n crossplane --show-labels
+kubectl get crd -o yaml
+
+# After merging: collect the old provider inventory.
+flux reconcile kustomization flux-system --with-source
+flux reconcile kustomization platform-crossplane
+flux tree kustomization platform-crossplane
+
+# These exact Providers must disappear, not remain Terminating.
+kubectl get providers.pkg.crossplane.io markopolo123-provider-backblaze --ignore-not-found
+kubectl get providers.pkg.crossplane.io crossplane-contrib-provider-upjet-digitalocean --ignore-not-found
+kubectl get providers.pkg.crossplane.io crossplane-contrib-provider-upjet-github --ignore-not-found
+kubectl get providers.pkg.crossplane.io
+kubectl get providerrevisions.pkg.crossplane.io
+kubectl get deployment,pod -n crossplane --show-labels
+
+# Crossplane itself must still be present for package finalization.
+kubectl get helmrelease crossplane -n crossplane
+flux tree kustomization core-crossplane
+```
+
+Check `platform-crossplane` applied the step-3 commit (or a descendant) and its
+inventory is empty. Compare actual ProviderRevisions and provider controller
+workloads against the captured inventory; an empty Flux inventory or healthy
+Kustomization alone does not prove package cleanup finished. Do not advance to
+stage 4 while provider finalizers, revisions, or controller workloads remain.
+Resolve blocked cleanup with Crossplane running rather than removing finalizers.
+Leave retained CRDs for the explicit stage-4 inventory check and cleanup.
 
 After all composite/managed resources are drained, remove any discovered
 Configuration packages that could recreate providers/functions. Empty
