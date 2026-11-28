@@ -1,0 +1,4 @@
+# apt packages reinstalled at every boot, one or more per line.
+# Manage with `devbox-apt add|remove|list`, or edit by hand.
+# Prefer mise (~/.config/mise/config.toml) for languages and CLIs: those are
+# installed once onto the volume instead of on every start.

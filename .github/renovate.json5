@@ -63,6 +63,18 @@
       // extractVersionTemplate: "{{#if extractVersion}}{{{extractVersion}}}{{else}}^v?(?<version>.*)${{/if}}",
     },
     {
+      // # renovate: datasource=<ds> depName=<name> [versioning=<v>] [extractVersion=<re>]
+      // ARG SOME_VERSION=<version>
+      customType: "regex",
+      description: "Process tool versions pinned in image Dockerfiles",
+      managerFilePatterns: ["/(^|/)images/.+/Dockerfile$/"],
+      matchStrings: [
+        "# renovate: datasource=(?<datasource>\\S+) depName=(?<depName>\\S+)( versioning=(?<versioning>\\S+))?( extractVersion=(?<extractVersion>\\S+))?\\s+ARG \\S+?=(?<currentValue>\\S+)",
+      ],
+      versioningTemplate: "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}",
+      extractVersionTemplate: "{{#if extractVersion}}{{{extractVersion}}}{{else}}^v?(?<version>.*)${{/if}}",
+    },
+    {
       customType: "regex",
       description: "Process k0s version in the k0sctl cluster config",
       managerFilePatterns: ["/^config/cluster\\.yaml$/"],

@@ -1,0 +1,40 @@
+#!/usr/bin/env bash
+# Install apt packages now and remember them, so the entrypoint reinstalls
+# them after every restart (the root filesystem is not persistent; $HOME is).
+#
+#   devbox-apt add <pkg>...     install and add to the list
+#   devbox-apt remove <pkg>...  remove from the list (and uninstall)
+#   devbox-apt list             show the list
+set -euo pipefail
+
+LIST="$HOME/.config/devbox/apt-packages"
+mkdir -p "$(dirname "$LIST")"
+touch "$LIST"
+
+listed() { sed -e 's/#.*//' "$LIST" | tr -s '[:space:]' '\n' | grep -qxF -- "$1"; }
+
+cmd="${1:-}"
+shift || true
+case "$cmd" in
+  add)
+    [ "$#" -gt 0 ] || { echo "usage: devbox-apt add <pkg>..." >&2; exit 2; }
+    sudo apt-get update -qq
+    sudo apt-get install -y --no-install-recommends "$@"
+    for p in "$@"; do listed "$p" || echo "$p" >>"$LIST"; done
+    ;;
+  remove)
+    [ "$#" -gt 0 ] || { echo "usage: devbox-apt remove <pkg>..." >&2; exit 2; }
+    for p in "$@"; do
+      grep -vxF -- "$p" "$LIST" >"$LIST.tmp" || true
+      mv "$LIST.tmp" "$LIST"
+    done
+    sudo apt-get remove -y "$@" || true
+    ;;
+  list)
+    sed -e 's/#.*//' "$LIST" | sed '/^[[:space:]]*$/d'
+    ;;
+  *)
+    sed -n '2,8p' "$0" | sed 's/^# \{0,1\}//'
+    exit 2
+    ;;
+esac

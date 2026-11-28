@@ -8,3 +8,4 @@ resources:
 - forgejo-runner.yaml
 - forgejo-runner-secret.yaml
 - forgejo-runner-repo.yaml
+- bb.yaml

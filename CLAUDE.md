@@ -40,7 +40,7 @@ k0sctl apply --config config/cluster.yaml
 
 1. **`core/`** — cluster infrastructure: cert-manager, Longhorn (storage), MetalLB, k8tz, reloader, external-snapshotter, Crossplane, plus `core/operators/` (CloudNativePG, Dragonfly, Grafana operator, Strimzi) and `core/repositories/` (the shared `app-template` OCIRepository in `flux-system`). Also `core/hermes-viewer/` (read-only ServiceAccount/RBAC for cluster introspection).
 2. **`platform/`** (dependsOn core) — shared services: `database/` (CNPG PostgreSQL 18, Strimzi Kafka + topics), `garage/`, `minio.yaml`, `gateway/` (Envoy Gateway + Gateway API), `monitoring/` (Grafana, Prometheus stack, Loki, Promtail), `security/` (pocket-id, OIDC SecurityPolicy controller — a Metacontroller DecoratorController whose webhook source lives in `controllers/oidc-policy/`).
-3. **`services/<group>/`** (each dependsOn platform; one Flux Kustomization per group in `bootstrap/`) — workloads: `automation/` (frigate, home-assistant, zwave-js, hermes-agent), `development/` (forgejo), `general/` (vaultwarden, unifi, actual), `immich/`, `media/` (plex, sonarr, radarr, sabnzbd).
+3. **`services/<group>/`** (each dependsOn platform; one Flux Kustomization per group in `bootstrap/`) — workloads: `automation/` (frigate, home-assistant, zwave-js, hermes-agent), `development/` (forgejo, bb — a coding-agent web UI on the `images/devbox` image), `general/` (vaultwarden, unifi, actual), `immich/`, `media/` (plex, sonarr, radarr, sabnzbd).
 
 All layers decrypt with SOPS (`sops-gpg` secret) and run `postBuild.substituteFrom` the `cluster-secrets` Secret — manifests reference `${CLUSTER_DOMAIN}`, `${LOAD_BALANCER_*}`, `${POSTGRES_ADDRESS}`, credentials, etc. as literal `${VAR}` strings that Flux substitutes at apply time. New variables go in `config/secrets.yaml` (SOPS-encrypted, included by `core/kustomization.yaml`).
 
@@ -55,4 +55,5 @@ All layers decrypt with SOPS (`sops-gpg` secret) and run `postBuild.substituteFr
 - Image tags are pinned to digests; **Renovate** (`.github/renovate.json5`) manages bumps. Don't hand-edit versions unless asked.
 - Commit messages are conventional commits scoped to the area: `feat(core): ...`, `fix(frigate): ...`, `chore(deps): ...`.
 - Postgres roles/databases are created manually (not GitOps) — see `platform/database/README.md` for the SQL.
+- `images/<name>/` holds Dockerfiles for images built in this repo (like `controllers/`, each has a workflow in `.github/workflows/` that pushes to GHCR and opens a digest-bump PR). Tool versions are `ARG`s with `# renovate:` comments.
 - `config/ubuntu/` is host-level OS config (sysctl, kernel modules) applied to nodes via `config/ubuntu/apply.sh`, outside Kubernetes.

@@ -1,0 +1,68 @@
+#!/usr/bin/env bash
+# Devbox entrypoint.
+#
+# As root (the default): make sure /home/dev belongs to dev, reinstall the
+# apt packages listed in ~/.config/devbox/apt-packages (the root filesystem is
+# rebuilt on every restart, the list lives on the volume), then re-run this
+# script as dev.
+#
+# As dev: copy any missing default files into $HOME, install the tools in
+# mise's global config (only the missing ones), run ~/.config/devbox/startup.sh
+# when present, then exec the command (bb by default).
+#
+# Setup failures are logged and skipped: a bad package name must not keep the
+# box from starting.
+set -uo pipefail
+
+DEV_UID=1000
+DEV_GID=1000
+DEV_HOME=/home/dev
+CONF="$DEV_HOME/.config/devbox"
+
+log() { echo "[devbox] $*" >&2; }
+
+# Package names from a list file: comments and blank lines dropped.
+list_packages() {
+  [ -f "$1" ] || return 0
+  sed -e 's/#.*//' "$1" | tr -s '[:space:]' '\n' | sed '/^$/d'
+}
+
+if [ "$(id -u)" = 0 ]; then
+  # A fresh volume's root, or files dropped in as root (kubectl cp), would
+  # stop dev from writing its own config. Only the top two levels: a
+  # recursive walk of a large home would slow every start.
+  find "$DEV_HOME" -xdev -maxdepth 2 \! -user "$DEV_UID" -exec chown -h "$DEV_UID:$DEV_GID" {} + 2>/dev/null || true
+  [ -d "$CONF" ] && chown -R "$DEV_UID:$DEV_GID" "$CONF"
+
+  mapfile -t pkgs < <(list_packages "$CONF/apt-packages")
+  if [ "${#pkgs[@]}" -gt 0 ]; then
+    log "installing apt packages: ${pkgs[*]}"
+    if ! { apt-get update -qq && apt-get install -y -qq --no-install-recommends "${pkgs[@]}"; } >&2; then
+      log "warning: apt install failed; continuing without some packages"
+    fi
+  fi
+
+  export HOME="$DEV_HOME" USER=dev LOGNAME=dev
+  exec setpriv --reuid="$DEV_UID" --regid="$DEV_GID" --init-groups "$0" "$@"
+fi
+
+# --- as dev ---
+cp -r --update=none /etc/skel/. "$HOME"/ 2>/dev/null || log "warning: could not seed defaults into $HOME"
+mkdir -p "$HOME/.local/bin" "$HOME/src"
+
+if [ -f "$HOME/.config/mise/config.toml" ]; then
+  mise trust --quiet "$HOME/.config/mise/config.toml" >/dev/null 2>&1 || true
+  if ! mise install >&2; then
+    log "warning: mise install failed; run it in a terminal to see why"
+  fi
+fi
+
+if [ -f "$CONF/startup.sh" ]; then
+  log "running $CONF/startup.sh"
+  bash "$CONF/startup.sh" >&2 || log "warning: startup.sh exited with $?"
+fi
+
+if [ "$#" -eq 0 ]; then
+  set -- bash -l
+fi
+exec "$@"
