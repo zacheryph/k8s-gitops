@@ -21,14 +21,18 @@ RUN apt-get update \
  && ln -s /usr/bin/fdfind /usr/local/bin/fd \
  && rm -rf /var/lib/apt/lists/*
 
-# Node.js (bb and Pi need 24+)
+# Node.js (bb supports 22.19, 24 and 26; Pi needs 24+). Node 25+ no longer
+# bundles corepack (pnpm/yarn shims), so it comes from npm.
 # renovate: datasource=node-version depName=node versioning=node
 ARG NODE_VERSION=26.13.1
+# renovate: datasource=npm depName=corepack
+ARG COREPACK_VERSION=0.36.0
 RUN case "${TARGETARCH:-amd64}" in amd64) a=x64;; arm64) a=arm64;; esac \
  && curl -fsSL "https://nodejs.org/dist/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-${a}.tar.xz" \
     | tar -xJ -C /usr/local --strip-components=1 --exclude=CHANGELOG.md --exclude=LICENSE --exclude=README.md \
+ && npm install -g --no-fund --no-audit "corepack@${COREPACK_VERSION}" \
  && corepack enable \
- && node --version
+ && node --version && corepack --version
 
 # Bun
 # renovate: datasource=github-releases depName=oven-sh/bun extractVersion=^bun-v(?<version>.+)$

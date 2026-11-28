@@ -18,7 +18,7 @@ Ubuntu 26.04, user `dev` (uid 1000) with passwordless sudo.
 
 | Kind      | Baked in                                                                                         |
 | --------- | ------------------------------------------------------------------------------------------------ |
-| Languages | Node.js 24 (+ corepack: pnpm, yarn), Bun, Go, Python 3 + uv                                      |
+| Languages | Node.js 26 (+ corepack: pnpm, yarn), Bun, Go, Python 3 + uv                                      |
 | Agents    | bb, Pi, Claude Code, Codex                                                                       |
 | CLIs      | gh, git, git-lfs, kubectl, helm, flux, sops, yq, jq, ripgrep, fd, fzf, tmux, vim, sqlite3, psql |
 | Build     | build-essential, pkg-config, libssl-dev, python3-dev, shellcheck                                 |
